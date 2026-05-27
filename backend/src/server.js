@@ -1,4 +1,5 @@
 import express from "express"
+import cors from "cors"
 import dotenv from "dotenv"
 
 import { connectDB } from "./config/db.js"
@@ -23,8 +24,6 @@ app.use(cors({
 
 // set up routes
 app.use("/api/test", testRoutes)
-
-
 
 // connect to the database
 connectDB().then(() => {
