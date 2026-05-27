@@ -6,7 +6,7 @@ import TestPage from "./pages/TestPage.jsx"
 
 const App = () => {
   return (
-    <div>
+    <div data-theme="valentine">
         <Routes>
             <Route path="/" element={<HomePage />} />
             <Route path="/test" element={<TestPage />} />
