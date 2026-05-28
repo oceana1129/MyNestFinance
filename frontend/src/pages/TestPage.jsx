@@ -1,15 +1,12 @@
 import React from 'react'
 import toast from "react-hot-toast"
+import NavBar from "../components/navigation/HomeNavBar.jsx"
 
 const TestPage = () => {
   return (
-    <div>
+    <div className='max-h-screen'>
         Testing!
-        <button onClick={() => toast.success("Yay!")} className='btn btn-primary '>Click me</button>
-        <button onClick={() => toast.error("Bad!")} className='btn btn-error'>Don't click me</button>
-        <h1 class="text-3xl font-bold underline">
-            Hello world!
-        </h1>
+        <NavBar />
     </div>
   )
 }
