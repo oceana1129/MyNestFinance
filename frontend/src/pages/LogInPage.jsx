@@ -1,17 +1,17 @@
 import React from 'react'
-import SignUpForm from '../components/forms/SignUpForm'
+import LogInForm from '../components/forms/LogInForm'
 import HomeNavBar from "../components/navigation/HomeNavBar"
 
-const SignUpPage = () => {
+const LogInPage = () => {
   return (
     <div>
         <HomeNavBar />
         <main className='p-4'>
-          <SignUpForm />
+          <LogInForm />
         </main>
         
     </div>
   )
 }
 
-export default SignUpPage
+export default LogInPage

@@ -12,7 +12,7 @@ const NavBar = () => {
                 </Link>
                 
                 <div className="flex items-center gap-4">
-                    <Link to={"/signup"} className="btn btn-secondary btn-outline">
+                    <Link to={"/login"} className="btn btn-secondary btn-outline">
                         <span>login</span>
                     </Link>
                     <Link to={"/signup"} className="btn btn-primary">

@@ -1,9 +1,15 @@
 import React from 'react'
 
-const InputText = ({placeholder, type}) => {
+const InputText = ({onChange, value, placeholder, type}) => {
   return (
     <div>
-      <input type={type} placeholder={placeholder} className="input input-primary min-w-full" />
+      <input 
+        className="input input-primary min-w-full"
+        placeholder={placeholder} 
+        value={value}
+        onChange={onChange}
+        type={type} 
+         />
     </div>
   )
 }
