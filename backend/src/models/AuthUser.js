@@ -45,7 +45,14 @@ const authUserSchema = new mongoose.Schema(
      */
     provider: {
       type: String,
-      enum: ["email", "google", "facebook", "apple", "yahoo", "microsoft"],
+      enum: [
+        "password",
+        "google.com",
+        "facebook.com",
+        "apple.com",
+        "yahoo.com",
+        "microsoft.com",
+      ],
       required: true,
     },
 
@@ -64,7 +71,7 @@ const authUserSchema = new mongoose.Schema(
   { timestamps: true },
 );
 
-authUserSchema.index({ _firebaseUid: 1 }, { unique: true });
+// authUserSchema.index({ _firebaseUid: 1 }, { unique: true });
 
 /**
  * AuthUser model.
