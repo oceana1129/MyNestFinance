@@ -8,6 +8,7 @@ import rateLimiter from "./middleware/rateLimiter.js";
 import testRoutes from "./routes/testRoutes.js";
 import authRoutes from "./routes/authRoutes.js";
 import userRoutes from "./routes/userRoutes.js";
+import budgetRoutes from "./routes/monthlyBudgetRoutes.js"
 
 // set up .env config
 dotenv.config();
@@ -30,6 +31,7 @@ app.use(
 app.use("/api/test", testRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/user", userRoutes);
+app.use("/api/budget", budgetRoutes);
 
 // connect to the database
 connectDB().then(() => {
