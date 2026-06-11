@@ -16,10 +16,10 @@ const router = express.Router();
 router.post("/", createBudgetItem);
 router.get("/", getAllBudgetItems);
 router.get("/:id", getBudgetItemById);
-router.get("/budget/:budgetCategoryId", getBudgetItemByCategory);
+router.get("/category/:budgetCategoryId", getBudgetItemByCategory);
 router.put("/:id", updateBudgetItem);
 router.patch("/reorder", reorderBudgetItems);
 router.delete("/:id", deleteBudgetItem);
-router.delete("/budget/:budgetCategoryId", deleteBudgetItemByCategory);
+router.delete("/category/:budgetCategoryId", deleteBudgetItemByCategory);
 
 export default router;
