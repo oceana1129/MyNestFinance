@@ -7,7 +7,6 @@ import User from "../src/models/UserProfile.js";
 
 /**
  * create authuser and user profile for testing
- * for testing.
  */
 async function createTestUser() {
   const authUser = await AuthUser.create({

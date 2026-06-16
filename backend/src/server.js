@@ -13,6 +13,7 @@ import categoryRoutes from "./routes/categoryRoutes.js";
 import budgetItemRoutes from "./routes/budgetItemRoutes.js";
 import activityLogRoutes from "./routes/activityLogRoutes.js";
 import debtItemRoutes from "./routes/budgetDebtItemRoutes.js";
+import budgetPlanRoutes from "./routes/budgetPlanRoutes.js"
 
 // set up .env config
 dotenv.config();
@@ -39,7 +40,8 @@ app.use("/api/budget", budgetRoutes);
 app.use("/api/category", categoryRoutes);
 app.use("/api/item", budgetItemRoutes);
 app.use("/api/activity", activityLogRoutes);
-app.use("api/debt", debtItemRoutes);
+app.use("/api/debt", debtItemRoutes);
+app.use("/api/plan", budgetPlanRoutes);
 
 // connect to the database
 connectDB().then(() => {

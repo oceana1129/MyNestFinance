@@ -98,7 +98,7 @@ const budgetPlanSchema = new mongoose.Schema(
      */
     startDate: {
       type: Date,
-      required: true,
+      required: false,
     },
   },
   { timestamps: true },
