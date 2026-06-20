@@ -2,7 +2,6 @@ import express from "express";
 import { 
     createCategory, 
     deleteCategory, 
-    deleteCategoryByBudget, 
     getAllCategories, 
     getCategoriesByBudget, 
     getCategoryById, 
@@ -20,6 +19,6 @@ router.get("/budget/:monthlyBudgetId", getCategoriesByBudget);
 router.put("/:id", updateCategory);
 router.patch("/reorder", reorderCategories);
 router.delete("/:id", deleteCategory);
-router.delete("/budget/:monthlyBudgetId", deleteCategoryByBudget);
+// router.delete("/budget/:monthlyBudgetId", deleteCategoryByBudget);
 
 export default router;

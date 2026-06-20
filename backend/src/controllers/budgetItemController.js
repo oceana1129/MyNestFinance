@@ -1,5 +1,6 @@
 import BudgetItem from "../models/BudgetItem.js";
 import Category from "../models/BudgetCategory.js";
+import { deleteItemData } from "../services/deleteItemData.js";
 
 // CREATE
 // create a budget item
@@ -131,6 +132,7 @@ export async function updateBudgetItem(req, res) {
     res.status(500).json({ message: "internal server error" });
   }
 }
+
 // update budget item display order
 export async function reorderBudgetItems(req, res) {
   try {
@@ -173,7 +175,7 @@ export async function reorderBudgetItems(req, res) {
 // delete budget item
 export async function deleteBudgetItem(req, res) {
   try {
-    const deletedItem = await BudgetItem.findByIdAndDelete(req.params.id);
+    const deletedItem = await deleteItemData(req.params.id);
     if (!deletedItem)
       return res.status(404).json({ message: "Item not found" });
     res
@@ -181,22 +183,6 @@ export async function deleteBudgetItem(req, res) {
       .json({ message: "Item deleted successfully!", deletedItem });
   } catch (err) {
     console.error("deleteBudgetItem(): ", err);
-    res.status(500).json({ message: "internal server error" });
-  }
-}
-
-// delete budget item by category
-export async function deleteBudgetItemByCategory(req, res) {
-  try {
-    const deletedItems = await BudgetItem.deleteMany({
-      budgetCategory: req.params.budgetCategoryId,
-    });
-    res.status(200).json({
-      message: "Items deleted successfully!",
-      deletedCount: deletedItems.deletedCount,
-    });
-  } catch (err) {
-    console.error("deleteBudgetItemByCategory(): ", err);
     res.status(500).json({ message: "internal server error" });
   }
 }

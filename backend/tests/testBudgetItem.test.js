@@ -185,14 +185,5 @@ describe("Budget Item API", () => {
         expect(deletedItem).toBeNull();
     })
 
-    test("delete all items by category", async () => {
-        const {category1} = await createTestItem();
-        const response = await request(app)
-            .delete(`/api/item/category/${category1._id}`);
-        expect(response.status).toBe(200);
-        const deletedItems = await BudgetItem.find({
-            budgetCategory: category1._id,
-        })
-        expect(deletedItems).toHaveLength(0);
-    })
+    // TODO: delete items works with the cascade
 })

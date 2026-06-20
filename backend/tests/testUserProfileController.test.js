@@ -107,4 +107,6 @@ describe("User API", () => {
 
     expect(deletedUser).toBeNull();
   });
+
+  // TODO: confirm cascade user deletes cascade
 });

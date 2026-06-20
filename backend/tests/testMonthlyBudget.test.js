@@ -105,17 +105,5 @@ describe("Monthly Budget API", () => {
         expect(deletedBudget).toBeNull()
     });
 
-    test("delete all budgets from user", async () => {
-        const {user1} = await createTestBudget();
-
-        const response = await request(app).delete(`/api/budget/user/${user1._id}`)
-
-        expect(response.status).toBe(200);
-
-        const deletedBudgets = await MonthlyBudget.find({
-            userProfile: user1._id,
-        });
-
-        expect(deletedBudgets).toHaveLength(0)
-    });
+    // TODO: delete budget cascades
 })

@@ -1,5 +1,6 @@
 import Budget from "../models/MonthlyBudget.js";
 import UserProfile from "../models/UserProfile.js";
+import { deleteBudgetData } from "../services/deleteBudgetData.js";
 
 // TODO: auth used dynamically for user
 // const authUser = await AuthUser.findOne({
@@ -117,31 +118,12 @@ export async function getBudgetById(req, res) {
  */
 export async function deleteBudget(req, res) {
   try {
-    const deletedBudget = await Budget.findByIdAndDelete(req.params.id);
+    const deletedBudget = await deleteBudgetData(req.params.id);
     if (!deletedBudget)
       return res.status(404).json({ message: "Budget not found" });
     res.status(200).json({
       message: "Budget deleted successfully!",
       deletedBudget,
-    });
-  } catch (err) {
-    console.error("deleteBudget(): ", err);
-    res.status(500).json({ message: "internal server error" });
-  }
-}
-
-/**
- * Will delete all monthly budgets for a specific
- * user. Used in cases where a user is deleted.
- */
-export async function deleteBudgetByUser(req, res) {
-  try {
-    const deletedBudgets = await Budget.deleteMany({
-      userProfile: req.params.userProfileId,
-    });
-    res.status(200).json({
-      message: "Budgets deleted successfully",
-      deletedCount: deletedBudgets.deletedCount,
     });
   } catch (err) {
     console.error("deleteBudget(): ", err);

@@ -5,7 +5,6 @@ import {
     getBudgetById,
     getBudgetsForUser,
     deleteBudget,
-    deleteBudgetByUser
 } from "../controllers/monthlyBudgetController.js";
 
 const router = express.Router();
@@ -17,7 +16,7 @@ router.get("/", getAllBudgets);
 router.get("/:id", getBudgetById);
 router.get("/user/:userProfileId", getBudgetsForUser);
 router.delete("/:id", deleteBudget);
-router.delete("/user/:userProfileId", deleteBudgetByUser);
+// router.delete("/user/:userProfileId", deleteBudgetByUser);
 
 
 export default router;

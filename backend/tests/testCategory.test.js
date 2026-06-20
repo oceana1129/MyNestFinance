@@ -173,15 +173,6 @@ describe("Category API", () => {
         const deletedCategory = await BudgetCategory.findById(categories[0]._id);
         expect(deletedCategory).toBeNull();
     })
-
-    test("delete all categories by budget", async () => {
-        const {budget1} = await createTestCategory();
-        const response = await request(app)
-            .delete(`/api/category/budget/${budget1._id}`);
-        expect(response.status).toBe(200);
-        const deletedCategories = await BudgetCategory.find({
-            monthlyBudget: budget1._id,
-        })
-        expect(deletedCategories).toHaveLength(0);
-    })
+    
+    // TODO: delete category and verify cascade
 });

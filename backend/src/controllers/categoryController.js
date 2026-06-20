@@ -1,5 +1,6 @@
 import Category from "../models/BudgetCategory.js";
 import Budget from "../models/MonthlyBudget.js";
+import { deleteCategoryData } from "../services/deleteCategoryData.js";
 
 // CREATE
 // create a category
@@ -176,7 +177,7 @@ export async function reorderCategories(req, res) {
 // delete category by id
 export async function deleteCategory(req, res) {
   try {
-    const deletedCategory = await Category.findByIdAndDelete(req.params.id);
+    const deletedCategory = await deleteCategoryData(req.params.id);
     if (!deletedCategory)
       return res.status(404).json({ message: "Category not found" });
     res.status(200).json({
@@ -185,22 +186,6 @@ export async function deleteCategory(req, res) {
     });
   } catch (err) {
     console.error("deleteCategory(): ", err);
-    res.status(500).json({ message: "internal server error" });
-  }
-}
-
-// delete category by budget
-export async function deleteCategoryByBudget(req, res) {
-  try {
-    const deletedCategories = await Category.deleteMany({
-      monthlyBudget: req.params.monthlyBudgetId,
-    });
-    res.status(200).json({
-      message: "Categories deleted successfully",
-      deletedCount: deletedCategories.deletedCount,
-    });
-  } catch (err) {
-    console.error("deleteCategoryByBudget(): ", err);
     res.status(500).json({ message: "internal server error" });
   }
 }

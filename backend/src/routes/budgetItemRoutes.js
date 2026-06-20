@@ -2,7 +2,6 @@ import express from "express";
 import { 
     createBudgetItem, 
     deleteBudgetItem, 
-    deleteBudgetItemByCategory, 
     getAllBudgetItems, 
     getBudgetItemByCategory, 
     getBudgetItemById, 
@@ -20,6 +19,6 @@ router.get("/category/:budgetCategoryId", getBudgetItemByCategory);
 router.put("/:id", updateBudgetItem);
 router.patch("/reorder", reorderBudgetItems);
 router.delete("/:id", deleteBudgetItem);
-router.delete("/category/:budgetCategoryId", deleteBudgetItemByCategory);
+// router.delete("/category/:budgetCategoryId", deleteBudgetItemByCategory);
 
 export default router;

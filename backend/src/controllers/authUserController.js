@@ -1,6 +1,7 @@
 import admin from "../config/firebase.js";
 import AuthUser from "../models/AuthUser.js";
 import UserProfile from "../models/UserProfile.js";
+import { deleteAuthUserData } from "../services/deleteAuthUser.js";
 
 export async function getAllAuthUsers(_, res) {
   try {
@@ -117,13 +118,7 @@ export async function deleteAuthUser(req, res) {
       });
     }
 
-    await UserProfile.deleteOne({
-      authUser: authUser._id,
-    });
-
-    await AuthUser.deleteOne({
-      _id: authUser._id,
-    });
+    await deleteAuthUserData(authUser._id)
 
     res.status(200).json({
       message: "Account deleted",
@@ -155,13 +150,7 @@ export async function cleanupAuthUsers(_, res) {
         if (err.code === "auth/user-not-found") {
           console.log(`Deleting orphaned user: ${authUser._firebaseUid}`);
 
-          await UserProfile.deleteOne({
-            authUser: authUser._id,
-          });
-
-          await AuthUser.deleteOne({
-            _id: authUser._id,
-          });
+          await deleteAuthUserData(authUser._id)
 
           deletedCount++;
         } else {
