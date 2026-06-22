@@ -74,16 +74,6 @@ const budgetItemSchema = new mongoose.Schema(
     },
 
     /**
-     * Actual amount recorded for this item.
-     */
-    actualAmount: {
-      type: Number,
-      min: 0,
-      max: 999999999,
-      default: 0,
-    },
-
-    /**
      * Optional recurring schedule associated
      * with the budget item.
      */

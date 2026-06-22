@@ -97,16 +97,6 @@ const budgetCategorySchema = new mongoose.Schema(
       max: 999999999,
       default: 0,
     },
-
-    /**
-     * Total actual amount recorded for this category.
-     */
-    actualAmount: {
-      type: Number,
-      min: 0,
-      max: 999999999,
-      default: 0,
-    },
   },
   { timestamps: true },
 );
