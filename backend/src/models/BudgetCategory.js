@@ -84,18 +84,8 @@ const budgetCategorySchema = new mongoose.Schema(
      */
     categoryType: {
       type: String,
-      enum: ["income", "expense"],
+      enum: ["income", "expense", "debt"],
       required: true,
-    },
-
-    /**
-     * Total planned amount assigned to this category.
-     */
-    plannedAmount: {
-      type: Number,
-      min: 0,
-      max: 999999999,
-      default: 0,
     },
   },
   { timestamps: true },

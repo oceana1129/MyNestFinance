@@ -44,7 +44,6 @@ async function createTestActivityLog(count = 3) {
         displayOrder: 0,
         name: "Item 1",
         emoji: "emoji",
-        itemType: category.categoryType,
     })
 
     const item2 = await BudgetItem.create({
@@ -52,7 +51,6 @@ async function createTestActivityLog(count = 3) {
         displayOrder: 1,
         name: "Item 2",
         emoji: "heart",
-        itemType: category.categoryType,
     })
 
     let activities = [];
@@ -62,7 +60,6 @@ async function createTestActivityLog(count = 3) {
             budgetItem: item1._id,
             name: `Log ${i}`,
             amount: 50,
-            activityType: item1.itemType,
         });
         activities.push(activity)
     }
@@ -72,7 +69,6 @@ async function createTestActivityLog(count = 3) {
             budgetItem: item2._id,
             name: `Log ${i}`,
             amount: 50,
-            activityType: item2.itemType,
         });
         activities.push(activity)
     }

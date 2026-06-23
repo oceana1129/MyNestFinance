@@ -101,17 +101,7 @@ const budgetItemSchema = new mongoose.Schema(
       min: 1,
       max: 60,
       default: null,
-    },
-
-    /**
-     * Indicates whether the item represents
-     * income or an expense.
-     */
-    itemType: {
-      type: String,
-      enum: ["income", "expense"],
-      required: true,
-    },
+    }
   },
   { timestamps: true },
 );
@@ -131,10 +121,6 @@ budgetItemSchema.index({ budgetCategory: 1, name: 1 }, { unique: true });
 budgetItemSchema.index({
   budgetCategory: 1,
   displayOrder: 1,
-});
-
-budgetItemSchema.index({
-  itemType: 1,
 });
 
 /**

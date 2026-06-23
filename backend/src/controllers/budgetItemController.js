@@ -6,7 +6,7 @@ import { deleteItemData } from "../services/deleteItemData.js";
 // create a budget item
 export async function createBudgetItem(req, res) {
   try {
-    const { budgetCategory, name, emoji, itemType } = req.body;
+    const { budgetCategory, name, emoji } = req.body;
 
     // does category exist
     const category = await Category.findById(budgetCategory);
@@ -30,7 +30,6 @@ export async function createBudgetItem(req, res) {
       displayOrder,
       name,
       emoji,
-      itemType,
     });
 
     res

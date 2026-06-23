@@ -5,7 +5,7 @@ import BudgetItem from "../models/BudgetItem.js";
 // create an activity log
 export async function createActivityLog(req, res) {
   try {
-    const { budgetItem, name, amount, activityDate, notes, activityType } =
+    const { budgetItem, name, amount, activityDate, notes } =
       req.body;
 
     // does budgetItem exist?
@@ -18,8 +18,7 @@ export async function createActivityLog(req, res) {
       name,
       amount,
       activityDate,
-      notes,
-      activityType,
+      notes
     });
 
     res.status(200).json({

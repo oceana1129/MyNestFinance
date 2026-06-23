@@ -101,7 +101,7 @@ export async function getCategoriesByBudget(req, res) {
 // update category
 export async function updateCategory(req, res) {
   try {
-    const { name, emoji, color, categoryType, plannedAmount } =
+    const { name, emoji, color, categoryType } =
       req.body;
     const updatedCategory = await Category.findByIdAndUpdate(
       req.params.id,
@@ -110,7 +110,6 @@ export async function updateCategory(req, res) {
         emoji,
         color,
         categoryType,
-        plannedAmount,
       },
       { new: true, runValidators: true },
     );

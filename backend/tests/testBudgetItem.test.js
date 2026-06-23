@@ -7,6 +7,9 @@ import User from "../src/models/UserProfile.js"
 import MonthlyBudget from "../src/models/MonthlyBudget.js"
 import BudgetCategory from "../src/models/BudgetCategory.js"
 import BudgetItem from "../src/models/BudgetItem.js"
+import BudgetActivityLog from "../src/models/BudgetActivityLog.js"
+
+import { calculateActualAmount } from "../src/services/budgetItemService.js"
 
 /**
  * Create users, budgets, and items for categories
@@ -55,7 +58,6 @@ async function createTestItem(count = 3) {
             displayOrder: i,
             name: `Item ${i}`,
             emoji: "emoji",
-            itemType: category1.categoryType,
         })
         items.push(item)
     }
@@ -66,9 +68,28 @@ async function createTestItem(count = 3) {
             displayOrder: i,
             name: `Item ${i}`,
             emoji: "emoji",
-            itemType: category2.categoryType,
         })
         items.push(item)
+    }
+
+    let activities = [];
+
+    for (let i = 0; i < count; i++) {
+        let activity = await BudgetActivityLog.create({
+            budgetItem: items[0]._id,
+            name: `Log ${i}`,
+            amount: 50,
+        });
+        activities.push(activity)
+    }
+
+    for (let i = 0; i < count; i++) {
+        let activity = await BudgetActivityLog.create({
+            budgetItem: items[0]._id,
+            name: `Log ${i}`,
+            amount: 50,
+        });
+        activities.push(activity)
     }
 
     return {category1, category2, items}
@@ -176,6 +197,18 @@ describe("Budget Item API", () => {
             "Items array required"
         );
     });
+
+    test("calculate actual amount spent", async () => {
+        const {items} = await createTestItem();
+        const total = await calculateActualAmount(items[0]._id)
+        expect(total).toBe(300);
+    })
+
+    test("calculate actual amount spent 2", async () => {
+        const {items} = await createTestItem(6);
+        const total = await calculateActualAmount(items[0]._id)
+        expect(total).toBe(600);
+    })
 
     test("delete an item", async () => {
         const {items} = await createTestItem();

@@ -62,20 +62,6 @@ const budgetActivityLogSchema = new mongoose.Schema(
       maxlength: 1000,
       default: null,
     },
-
-    /**
-     * The type of financial activity recorded.
-     *
-     * income: money received
-     * expense: money spent
-     * interest: accrued interest
-     * payment: payment toward debt
-     */
-    activityType: {
-      type: String,
-      enum: ["income", "expense", "interest", "payment"],
-      required: true,
-    },
   },
   { timestamps: true },
 );

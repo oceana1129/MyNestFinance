@@ -46,7 +46,6 @@ async function createTestDebtItem(count = 2) {
         displayOrder: 0,
         name: "Item 1",
         emoji: "emoji",
-        itemType: category.categoryType,
     })
 
     const item2 = await BudgetItem.create({
@@ -54,10 +53,7 @@ async function createTestDebtItem(count = 2) {
         displayOrder: 1,
         name: "Item 2",
         emoji: "heart",
-        itemType: category.categoryType,
     })
-
-    let items = [item1, item2]
 
     let debt = await BudgetDebtItem.create({
         budgetItem: item1._id,
