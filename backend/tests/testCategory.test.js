@@ -10,6 +10,7 @@ import BudgetItem from "../src/models/BudgetItem.js";
 import BudgetActivityLog from "../src/models/BudgetActivityLog.js";
 import {
   calculateActualAmount,
+  calculateDifference,
   calculatePlannedAmount,
 } from "../src/services/budgetCategoryService.js";
 
