@@ -89,6 +89,21 @@ export async function getBudgetItemByCategory(req, res) {
   }
 }
 
+// get budget item from by category
+export async function getBudgetItemByBudget(req, res) {
+  try {
+    const items = await BudgetItem.find({
+      monthlyBudget: req.params.monthlyBudgetId,
+    }).sort({
+      displayOrder: 1,
+    });
+    res.status(200).json({ message: "Items found", items });
+  } catch (err) {
+    console.error("getBudgetItemByBudget(): ", err);
+    res.status(500).json({ message: "internal server error" });
+  }
+}
+
 // UPDATE
 // update budget item
 export async function updateBudgetItem(req, res) {

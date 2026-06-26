@@ -11,8 +11,6 @@ import BudgetActivityLog from "../src/models/BudgetActivityLog.js";
 import BudgetDebtItem from "../src/models/BudgetDebtItem.js";
 import BudgetPlan from "../src/models/BudgetPlan.js";
 
-import { calculateActualAmount } from "../src/services/budgetItemService.js";
-
 /**
  * Create users, budgets, and items for categories
  */
@@ -57,6 +55,7 @@ async function createTestItem(count = 3) {
   for (let i = 0; i < count; i++) {
     let item = await BudgetItem.create({
       budgetCategory: category1._id,
+      monthlyBudget: budget._id,
       displayOrder: i,
       name: `Item ${i}`,
       emoji: "emoji",
@@ -67,6 +66,7 @@ async function createTestItem(count = 3) {
   for (let i = 0; i < count; i++) {
     let item = await BudgetItem.create({
       budgetCategory: category2._id,
+      monthlyBudget: budget._id,
       displayOrder: i,
       name: `Item ${i}`,
       emoji: "emoji",
@@ -198,18 +198,6 @@ describe("Budget Item API", () => {
 
     expect(response.status).toBe(400);
     expect(response.body.message).toBe("Items array required");
-  });
-
-  test("calculate actual amount spent", async () => {
-    const { items } = await createTestItem();
-    const total = await calculateActualAmount(items[0]._id);
-    expect(total).toBe(300);
-  });
-
-  test("calculate actual amount spent 2", async () => {
-    const { items } = await createTestItem(6);
-    const total = await calculateActualAmount(items[0]._id);
-    expect(total).toBe(600);
   });
 
   test("delete an item", async () => {

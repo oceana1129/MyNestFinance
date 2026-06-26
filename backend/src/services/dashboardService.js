@@ -19,7 +19,6 @@ export async function getDashboard(monthlyBudgetId) {
 
 export async function getDashboardSummary(monthlyBudgetId) {
     // get all categories for the month
-    // should be sorted based on display order
   const categories = await BudgetCategory.find({
     monthlyBudget: monthlyBudgetId,
   });
@@ -39,8 +38,6 @@ export async function getDashboardSummary(monthlyBudgetId) {
         .filter((category) => category.categoryType === "debt")
         .reduce((total, category) => total + category.actualAmount, 0);
 
-    // get all category ids
-  const categoryIds = categories.map((category) => category._id);
 
   return {
     income,

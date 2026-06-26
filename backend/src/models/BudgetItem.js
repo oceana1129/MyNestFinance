@@ -24,6 +24,15 @@ const budgetItemSchema = new mongoose.Schema(
     },
 
     /**
+     * The monthly budget this budget item belongs to.
+     */
+    monthlyBudget: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "MonthlyBudget",
+      required: true,
+    },
+
+    /**
      * Controls the display order of budget items
      * within a category.
      */
@@ -122,6 +131,7 @@ budgetItemSchema.index({
   budgetCategory: 1,
   displayOrder: 1,
 });
+budgetItemSchema.index({ monthlyBudget: 1 });
 
 /**
  * BudgetItem model.

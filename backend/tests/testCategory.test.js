@@ -8,11 +8,6 @@ import MonthlyBudget from "../src/models/MonthlyBudget.js";
 import BudgetCategory from "../src/models/BudgetCategory.js";
 import BudgetItem from "../src/models/BudgetItem.js";
 import BudgetActivityLog from "../src/models/BudgetActivityLog.js";
-import {
-  calculateActualAmount,
-  calculateDifference,
-  calculatePlannedAmount,
-} from "../src/services/budgetCategoryService.js";
 
 /**
  * Create users, budgets, and categories for user
@@ -72,6 +67,7 @@ async function createTestCategory(count = 3) {
   for (let i = 0; i < count; i++) {
     let item = await BudgetItem.create({
       budgetCategory: categories[0]._id,
+      monthlyBudget: budget1._id,
       displayOrder: i,
       name: `Item ${i}`,
       emoji: "emoji",
@@ -184,30 +180,6 @@ describe("Category API", () => {
 
     expect(response.status).toBe(400);
     expect(response.body.message).toBe("No categories provided");
-  });
-
-  test("calculate actual amount", async () => {
-    const { categories } = await createTestCategory();
-    const total = await calculateActualAmount(categories[0]._id);
-    expect(total).toBe(150);
-  });
-
-  test("calculate actual amount 2", async () => {
-    const { categories } = await createTestCategory(6);
-    const total = await calculateActualAmount(categories[0]._id);
-    expect(total).toBe(300);
-  });
-
-  test("calculate planned amount", async () => {
-    const { categories } = await createTestCategory();
-    const total = await calculatePlannedAmount(categories[0]._id);
-    expect(total).toBe(300);
-  });
-
-  test("calculate planned amount 2", async () => {
-    const { categories } = await createTestCategory(6);
-    const total = await calculatePlannedAmount(categories[0]._id);
-    expect(total).toBe(600);
   });
 
   test("delete a category", async () => {

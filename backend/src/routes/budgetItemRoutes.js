@@ -3,6 +3,7 @@ import {
     createBudgetItem, 
     deleteBudgetItem, 
     getAllBudgetItems, 
+    getBudgetItemByBudget, 
     getBudgetItemByCategory, 
     getBudgetItemById, 
     reorderBudgetItems, 
@@ -16,6 +17,7 @@ router.post("/", createBudgetItem);
 router.get("/", getAllBudgetItems);
 router.get("/:id", getBudgetItemById);
 router.get("/category/:budgetCategoryId", getBudgetItemByCategory);
+router.get("/budget/:monthlyBudgetId", getBudgetItemByBudget);
 router.put("/:id", updateBudgetItem);
 router.patch("/reorder", reorderBudgetItems);
 router.delete("/:id", deleteBudgetItem);

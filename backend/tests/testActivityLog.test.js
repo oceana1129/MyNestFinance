@@ -41,6 +41,7 @@ async function createTestActivityLog(count = 3) {
     
     const item1 = await BudgetItem.create({
         budgetCategory: category._id,
+        monthlyBudget: budget._id,
         displayOrder: 0,
         name: "Item 1",
         emoji: "emoji",
@@ -48,6 +49,7 @@ async function createTestActivityLog(count = 3) {
 
     const item2 = await BudgetItem.create({
         budgetCategory: category._id,
+        monthlyBudget: budget._id,
         displayOrder: 1,
         name: "Item 2",
         emoji: "heart",
