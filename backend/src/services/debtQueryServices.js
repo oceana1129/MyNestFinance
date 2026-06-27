@@ -1,8 +1,8 @@
-import BudgetDebtItem from "./BudgetDebtItem.js";
-import BudgetItem from "./BudgetItem.js";
-import BudgetCategory from "./BudgetCategory.js";
-import BudgetActivityLog from "./BudgetActivityLog.js";
-import { getBudgetReaction } from "./budgetQueryService.js" 
+import BudgetDebtItem from "../models/BudgetDebtItem.js";
+import BudgetItem from "../models/BudgetItem.js";
+import BudgetCategory from "../models/BudgetCategory.js";
+import BudgetActivityLog from "../models/BudgetActivityLog.js";
+import { calculatePercentage, getBudgetReaction } from "../services/budgetQueryService.js" 
 
 
 /**
@@ -24,7 +24,10 @@ import { getBudgetReaction } from "./budgetQueryService.js"
  * @param {number} years - Desired payoff timeline in years
  * @returns {number} - Suggested monthly payment, rounded to 2 decimal places
  */
-function calcSuggestedPayment(balance, annualRate, years = 5) {
+export function calcSuggestedPayment(balance, annualRate, years = 5) {
+  // balance not added
+  if (balance === 0) return null;
+
     // num of payments per year
   const n = years * 12;
 
@@ -53,7 +56,8 @@ function calcSuggestedPayment(balance, annualRate, years = 5) {
  * @param {number} annualRate - Annual interest rate as a percentage
  * @returns {number} - Estimated interest for the month
  */
-function calcMonthlyInterest(balance, annualRate) {
+export function calcMonthlyInterest(balance, annualRate = 1) {
+  if (annualRate <= 0) return 0;
   return Number(((balance * annualRate) / 12 / 100).toFixed(2));
 }
 

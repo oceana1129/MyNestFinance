@@ -1,13 +1,13 @@
 import mongoose from "mongoose";
-import BudgetActivityLog from "./BudgetActivityLog.js";
-import BudgetItem from "./BudgetItem.js";
-import BudgetCategory from "./BudgetCategory.js";
+import BudgetActivityLog from "../models/BudgetActivityLog.js";
+import BudgetItem from "../models/BudgetItem.js";
+import BudgetCategory from "../models/BudgetCategory.js";
 
 ///////////////////////////////////////
 // HELPERS
 ///////////////////////////////////////
 
-function calculatePercentage(dividend, divisor) {
+export function calculatePercentage(dividend, divisor) {
     return divisor === 0 ? 0 : Number(((dividend / divisor) * 100).toFixed(2));
 }
 
@@ -105,7 +105,7 @@ async function sumItemPlannedAmounts(itemsIds) {
  * @param {"income" | "expense" | "debt"} categoryType
  * @returns {{ reaction: string, isActive: boolean, percentage: number }}
  */
-function getBudgetReaction({ planned, actual, difference }, categoryType) {
+export function getBudgetReaction({ planned, actual, difference }, categoryType) {
   let reaction = "on-target";
  
   if (difference !== 0) {
@@ -555,18 +555,17 @@ export async function getMonthlyActivitiesByRange(monthlyBudgetId, startDate, en
     // get all item ids in the budget
   const itemIds = await getItemIds(monthlyBudgetId);
 
+  // if no items return []
   if (!itemIds.length) return [];
 
   return BudgetActivityLog.find({
     budgetItem: { $in: itemIds },
-    // filter by date
     activityDate: {
-      $gte: startDate,
-      $lte: endDate,
-    },
-  })
+        $gte: startDate,
+        $lte: endDate,
+        },
+    })
     .sort({ activityDate: -1 })
-    // attach parent info name, emoji, and budgetcategory
     .populate("budgetItem", "name emoji budgetCategory")
     .lean();
 }

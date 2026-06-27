@@ -11,19 +11,12 @@ import BudgetActivityLog from "../src/models/BudgetActivityLog.js"
 import BudgetDebtItem from "../src/models/BudgetDebtItem.js"
 
 import {
-    getMonthlyTotalIncome,
-    getMonthlyTotalExpenses,
-    getMonthlyTotalPayments,
-    getMonthlyTotalRemaining,
-    getMonthlyDashboardSummary,
-    getTotalCategoryPlanned,
-    getTotalCategoryActual,
-    getTotalCategoryDifference,
-    getTotalItemActual,
-    getTotalItemDifference,
-    getMonthlyActivity,
-    getMonthlyActivitiesByRange,
-} from "../src/services/budgetQueryService.js";
+    calcSuggestedPayment,
+    calcMonthlyInterest,
+    getDebtItemSummary,
+    getAllDebtSummaries,
+    getTotalDebtOwed
+} from "../src/services/debtQueryServices.js"
 
 /**
  * Create users, budgets, and debt items
@@ -308,6 +301,25 @@ async function createTestDatabase() {
         preferredPayoffInYears: 10,
     });
 
+    const studentLoanItem2 = await BudgetItem.create({
+        budgetCategory: debtCategory._id,
+        monthlyBudget: budget._id,
+        displayOrder: 0,
+        name: "Student Loans 2",
+        emoji: "graduation-cap",
+        plannedAmount: 150,
+    });
+
+    const studentLoanDebt2 = await BudgetDebtItem.create({
+        budgetItem: studentLoanItem2._id,
+        debtType: "student-loan",
+        currentBalance: 8945.00,
+        interestRate: 8.05,
+        minimumPayment: 75,
+        originalBalance: 17000.00,
+        preferredPayoffInYears: 10,
+    });
+
     // activity logs
     const logs = await BudgetActivityLog.insertMany([
         // Income
@@ -360,6 +372,9 @@ async function createTestDatabase() {
         { budgetItem: netflixItem._id, monthlyBudget: budget._id, amount: 12.99, name: "Netflix", activityDate: new Date("2025-01-06") },
         // Debt
         { budgetItem: studentLoanItem._id, monthlyBudget: budget._id, amount: 200, name: "Student loan payment", activityDate: new Date("2025-01-15") },
+        { budgetItem: studentLoanItem._id, monthlyBudget: budget._id, amount: 200, name: "Student loan payment", activityDate: new Date("2025-01-27") },
+        { budgetItem: studentLoanItem._id, monthlyBudget: budget._id, amount: 200, name: "Student loan payment", activityDate: new Date("2025-01-15") },
+        { budgetItem: studentLoanItem2._id, monthlyBudget: budget._id, amount: 200, name: "Student loan payment", activityDate: new Date("2025-01-15") },
     ]);
 
     return {
@@ -372,340 +387,168 @@ async function createTestDatabase() {
             gasItem, maintenanceItem, groceriesItem, eatingOutItem, 
             coffeeItem, clothingItem, gymItem, birthControlItem, 
             nailsItem, adobeItem, netflixItem, studentLoanItem },
-        debt: { studentLoanDebt },
+        debt: { studentLoanDebt, studentLoanDebt2 },
         logs,
     };
 }
 
-describe("Dashboard Queries", () => {
-    // TEST MOCK SETUP
-    // // categories
-    test("gets all categories", async () => {
-        await createTestDatabase();
+describe("Budget Queries", () => {
+    test("calcSuggestedPayment returns valid payment suggestion", () => {
+        const result = calcSuggestedPayment(18000, 8.5, 5) 
+        expect(result).toBeCloseTo(369.3, 2);
+    })
 
-        const response = await request(app).get("/api/category");
-        expect(response.status).toBe(200);
-        expect(response.body.categories).toHaveLength(7);
-    });
+    test("calcSuggestedPayment works with larger numbers", () => {
+        const result = calcSuggestedPayment(125000, 8.5, 20) 
+        expect(result).toBeCloseTo(1084.78, 2);
+    })
 
-    test("gets all categories by budget", async () => {
+    test("calcSuggestedPayment works with no interest rate", () => {
+        const result = calcSuggestedPayment(140000, 0, 20) 
+        expect(result).toBeCloseTo(583.33, 2);
+    })
+
+    test("calcMonthlyInterest standard case", () => {
+        const result = calcMonthlyInterest(14000, 8.5);
+        expect(result).toBeCloseTo(99.17)
+    })
+
+    test("calcMonthlyInterest no interest added", () => {
+        const result = calcMonthlyInterest(14000, 0);
+        expect(result).toBeCloseTo(0)
+    })
+
+    test("getAllDebtSummaries returns summary for each debt item", async () => {
         const { budget } = await createTestDatabase();
 
-        const response = await request(app).get(`/api/category/budget/${budget._id}`);
-        expect(response.status).toBe(200);
-        expect(response.body.categories).toHaveLength(7);
+        const result = await getAllDebtSummaries(budget._id);
+        expect(result).toHaveLength(2); // one student loan
     });
 
-    test("gets a single category by id", async () => {
-        const { categories: { incomeCategory } } = await createTestDatabase();
-
-        const response = await request(app).get(`/api/category/${incomeCategory._id}`);
-        expect(response.status).toBe(200);
-        expect(response.body.category._id).toBe(incomeCategory._id.toString());
-        expect(response.body.category.name).toBe("Income");
-    });
-
-
-    test("gets all items by budget", async () => {
+    test("getAllDebtSummaries returns correct shape", async () => {
         const { budget } = await createTestDatabase();
 
-        const response = await request(app).get(`/api/item/budget/${budget._id}`);
-        expect(response.status).toBe(200);
-        expect(response.body.items).toHaveLength(20);
+        const [summary] = await getAllDebtSummaries(budget._id);
+
+        expect(summary).toHaveProperty("budgetItemId");
+        expect(summary).toHaveProperty("name");
+        expect(summary).toHaveProperty("emoji");
+        expect(summary).toHaveProperty("plannedPayment");
+        expect(summary).toHaveProperty("actualPayment");
+        expect(summary).toHaveProperty("difference");
+        expect(summary).toHaveProperty("percentage");
+        expect(summary).toHaveProperty("reaction");
+        expect(summary).toHaveProperty("isActive");
+        expect(summary).toHaveProperty("debtType");
+        expect(summary).toHaveProperty("originalBalance");
+        expect(summary).toHaveProperty("currentBalance");
+        expect(summary).toHaveProperty("minimumPayment");
+        expect(summary).toHaveProperty("interestRate");
+        expect(summary).toHaveProperty("preferredPayoffInYears");
+        expect(summary).toHaveProperty("estimatedMonthlyInterest");
+        expect(summary).toHaveProperty("suggestedPayment");
     });
 
-    test("gets all items by category", async () => {
-        const { categories: { foodCategory } } = await createTestDatabase();
-
-        const response = await request(app).get(`/api/item/category/${foodCategory._id}`);
-        expect(response.status).toBe(200);
-        expect(response.body.items).toHaveLength(3); // groceries, eating out, coffee
-    });
-
-    test("gets a single item by id", async () => {
-        const { items: { groceriesItem } } = await createTestDatabase();
-
-        const response = await request(app).get(`/api/item/${groceriesItem._id}`);
-        expect(response.status).toBe(200);
-        expect(response.body.item._id).toBe(groceriesItem._id.toString());
-        expect(response.body.item.name).toBe("Groceries");
-    });
-
-    // // activity logs
-    test("gets all activity logs by item", async () => {
-        const { items: { coffeeItem } } = await createTestDatabase();
-        const response = await request(app).get(`/api/activity/item/${coffeeItem._id}`);
-        expect(response.status).toBe(200);
-        expect(response.body.activityLogs).toHaveLength(12);
-    });
-
-    test("gets all activity logs by item - groceries", async () => {
-        const { items: { groceriesItem } } = await createTestDatabase();
-
-        const response = await request(app).get(`/api/activity/item/${groceriesItem._id}`);
-        expect(response.status).toBe(200);
-        expect(response.body.activityLogs).toHaveLength(5);
-    });
-
-    // // debt
-    test("gets debt item by budget item", async () => {
-        const { items: { studentLoanItem }, debt: { studentLoanDebt } } = await createTestDatabase();
-
-        const response = await request(app).get(`/api/debt/item/${studentLoanItem._id}`);
-        expect(response.status).toBe(200);
-        expect(response.body.debtItem._id).toBe(studentLoanDebt._id.toString());
-    });
-
-    // // Test Dashboard Queries
-    test("getMonthlyTotalIncome returns sum of all income logs", async () => {
+    test("getAllDebtSummaries returns correct values for student loan", async () => {
         const { budget } = await createTestDatabase();
 
-        const result = await getMonthlyTotalIncome(budget._id);
-        // paycheck1(1400.22) + paycheck2(1560.47) + commission(95+35+60)
-        expect(result).toBeCloseTo(3150.69, 2);
+        const [summary] = await getAllDebtSummaries(budget._id);
+
+        expect(summary.name).toBe("Student Loans");
+        expect(summary.debtType).toBe("student-loan");
+        expect(summary.currentBalance).toBeCloseTo(18450, 2);
+        expect(summary.interestRate).toBeCloseTo(5.05, 2);
+        expect(summary.minimumPayment).toBeCloseTo(150, 2);
+        expect(summary.plannedPayment).toBeCloseTo(150, 2);
+        expect(summary.actualPayment).toBeCloseTo(600, 2); // log from fixture
+        expect(summary.isActive).toBe(true);
     });
 
-    test("getMonthlyTotalExpenses returns sum of all expense logs", async () => {
+    test("getAllDebtSummaries reaction is behind when overpaid vs planned", async () => {
         const { budget } = await createTestDatabase();
 
-        const result = await getMonthlyTotalExpenses(budget._id);
-        // all logs except income and debt categories
-        expect(result).toBeGreaterThan(0);
+        // actual(200) > planned(150) → for debt, paying more is "behind" per getBudgetReaction
+        const [summary] = await getAllDebtSummaries(budget._id);
+        expect(summary.reaction).toBe("ahead");
     });
 
-    test("getMonthlyTotalPayments returns sum of debt logs", async () => {
+    test("getAllDebtSummaries returns empty array when no debt categories", async () => {
+        const authUser = await AuthUser.create({
+            _firebaseUid: crypto.randomUUID(),
+            emailAddress: `${crypto.randomUUID()}@test.com`,
+            provider: "password",
+        });
+        const user = await User.create({ authUser: authUser._id, displayName: "No Debt User" });
+        const budget = await MonthlyBudget.create({ userProfile: user._id, month: 3, year: 2025 });
+
+        const result = await getAllDebtSummaries(budget._id);
+        expect(result).toEqual([]);
+    });
+
+    test("getAllDebtSummaries returns empty array when debt category has no items", async () => {
+        const authUser = await AuthUser.create({
+            _firebaseUid: crypto.randomUUID(),
+            emailAddress: `${crypto.randomUUID()}@test.com`,
+            provider: "password",
+        });
+        const user = await User.create({ authUser: authUser._id, displayName: "Empty Debt User" });
+        const budget = await MonthlyBudget.create({ userProfile: user._id, month: 4, year: 2025 });
+        await BudgetCategory.create({
+            monthlyBudget: budget._id,
+            displayOrder: 0,
+            name: "Debt",
+            emoji: "credit-card",
+            color: "607D8B",
+            categoryType: "debt",
+        });
+
+        const result = await getAllDebtSummaries(budget._id);
+        expect(result).toEqual([]);
+    });
+
+    test("getTotalDebtOwed returns sum of all debt balances", async () => {
         const { budget } = await createTestDatabase();
 
-        const result = await getMonthlyTotalPayments(budget._id);
-        // student loan payment = 200
-        expect(result).toBeCloseTo(200, 2);
+        const result = await getTotalDebtOwed(budget._id);
+        // studentLoanDebt currentBalance = 18450 + 8945
+        expect(result).toBeCloseTo(27395, 2);
     });
 
-    test("getMonthlyTotalRemaining returns income minus expenses and payments", async () => {
-        const { budget } = await createTestDatabase();
+    test("getTotalDebtOwed returns 0 when no debt categories exist", async () => {
+        // budget with no debt category
+        const authUser = await AuthUser.create({
+            _firebaseUid: crypto.randomUUID(),
+            emailAddress: `${crypto.randomUUID()}@test.com`,
+            provider: "password",
+        });
+        const user = await User.create({ authUser: authUser._id, displayName: "No Debt User" });
+        const budget = await MonthlyBudget.create({ userProfile: user._id, month: 3, year: 2025 });
 
-        const [income, expenses, payments, remaining] = await Promise.all([
-            getMonthlyTotalIncome(budget._id),
-            getMonthlyTotalExpenses(budget._id),
-            getMonthlyTotalPayments(budget._id),
-            getMonthlyTotalRemaining(budget._id),
-        ]);
-
-        expect(remaining).toBeCloseTo(income - (expenses + payments), 2);
-    });
-
-    test("getMonthlyTotalRemaining is positive (under budget)", async () => {
-        const { budget } = await createTestDatabase();
-
-        const result = await getMonthlyTotalRemaining(budget._id);
-        expect(result).toBeGreaterThan(0);
-    });
-
-    test("getMonthlyDashboardSummary returns correct data", async () => {
-        const { budget } = await createTestDatabase();
-
-        const result = await getMonthlyDashboardSummary(budget._id);
-
-        expect(result).toHaveProperty("actualIncome");
-        expect(result).toHaveProperty("actualExpenses");
-        expect(result).toHaveProperty("actualPayments");
-        expect(result).toHaveProperty("actualRemaining");
-        expect(result).toHaveProperty("plannedIncome");
-        expect(result).toHaveProperty("plannedExpenses");
-        expect(result).toHaveProperty("plannedPayments");
-        expect(result).toHaveProperty("percentageUsedIncome");
-        expect(result).toHaveProperty("percentageUsedExpenses");
-        expect(result).toHaveProperty("percentageUsedPayments");
-        expect(result).toHaveProperty("percentageUsedAllExpenses");
-    });
-
-    test("getMonthlyDashboardSummary actualRemaining equals income minus expenses and payments", async () => {
-        const { budget } = await createTestDatabase();
-
-        const result = await getMonthlyDashboardSummary(budget._id);
-
-        expect(result.actualRemaining).toBeCloseTo(
-            result.actualIncome - (result.actualExpenses + result.actualPayments), 2
-        );
-    });
-
-    test("getMonthlyDashboardSummary income matches getMonthlyTotalIncome", async () => {
-        const { budget } = await createTestDatabase();
-
-        const [summary, income] = await Promise.all([
-            getMonthlyDashboardSummary(budget._id),
-            getMonthlyTotalIncome(budget._id),
-        ]);
-
-        expect(summary.actualIncome).toBeCloseTo(income, 2);
-    });
-
-    // test("getCategoryDashboardSummary returns all 7 categories", async () => {
-    //     const { budget } = await createTestDatabase();
-
-    //     const result = await getCategoryDashboardSummary(budget._id);
-    //     expect(result).toHaveLength(7);
-    // });
-
-    // test("getCategoryDashboardSummary returns correct shape per category", async () => {
-    //     const { budget } = await createTestDatabase();
-
-    //     const result = await getCategoryDashboardSummary(budget._id);
-    //     const food = result.find((c) => c.name === "Food");
-
-    //     expect(food).toBeDefined();
-    //     expect(food).toHaveProperty("planned");
-    //     expect(food).toHaveProperty("actual");
-    //     expect(food).toHaveProperty("difference");
-    //     expect(food).toHaveProperty("reaction");
-    //     expect(food).toHaveProperty("isActive");
-    //     expect(food).toHaveProperty("percentage");
-    //     expect(food).toHaveProperty("itemCount");
-    //     expect(food.itemCount).toBe(3); // groceries, eating out, coffee
-    // });
-
-    // test("getCategoryDashboardSummary food category actual matches logs", async () => {
-    //     const { budget } = await createTestDatabase();
-
-    //     const result = await getCategoryDashboardSummary(budget._id);
-    //     const food = result.find((c) => c.name === "Food");
-
-    //     // groceries(275.73) + eating out(40.89) + coffee(73.40)
-    //     expect(food.actual).toBeCloseTo(390.02, 2);
-    // });
-
-    // test("getCategoryDashboardSummary categories are sorted by displayOrder", async () => {
-    //     const { budget } = await createTestDatabase();
-
-    //     const result = await getCategoryDashboardSummary(budget._id);
-    //     const orders = result.map((c) => c.displayOrder);
-
-    //     expect(orders).toEqual([...orders].sort((a, b) => a - b));
-    // });
-
-    test("getTotalCategoryPlanned sums item plannedAmounts", async () => {
-        const { categories: { foodCategory } } = await createTestDatabase();
-
-        const result = await getTotalCategoryPlanned(foodCategory._id);
-        // groceries(280) + eating out(100) + coffee(100)
-        expect(result).toBeCloseTo(480, 2);
-    });
-
-    test("getTotalCategoryActual sums activity logs", async () => {
-        const { categories: { homeCategory } } = await createTestDatabase();
-
-        const result = await getTotalCategoryActual(homeCategory._id);
-        // rent = 1220
-        expect(result).toBeCloseTo(1220, 2);
-    });
-
-    test("getTotalCategoryDifference returns ahead for expense under budget", async () => {
-        const { categories: { foodCategory } } = await createTestDatabase();
-
-        const result = await getTotalCategoryDifference(foodCategory._id);
-
-        expect(result).toHaveProperty("planned");
-        expect(result).toHaveProperty("actual");
-        expect(result).toHaveProperty("difference");
-        expect(result).toHaveProperty("reaction");
-        expect(result.reaction).toBe("ahead"); // spent less than planned
-    });
-
-    test("getTotalCategoryDifference returns behind for expense over budget", async () => {
-        const { categories: { homeCategory } } = await createTestDatabase();
-
-        // rent planned 1200, actual 1220 — over budget
-        const result = await getTotalCategoryDifference(homeCategory._id);
-        expect(result.reaction).toBe("behind");
-    });
-
-    test("getTotalItemActual sums logs for a single item", async () => {
-        const { items: { gasItem } } = await createTestDatabase();
-
-        const result = await getTotalItemActual(gasItem._id);
-        // 80 + 60 + 70
-        expect(result).toBeCloseTo(210, 2);
-    });
-
-    test("getTotalItemActual returns 0 for item with no logs", async () => {
-        const { items: { maintenanceItem } } = await createTestDatabase();
-
-        const result = await getTotalItemActual(maintenanceItem._id);
+        const result = await getTotalDebtOwed(budget._id);
         expect(result).toBe(0);
     });
 
-    test("getTotalItemDifference returns correct shape", async () => {
-        const { items: { groceriesItem } } = await createTestDatabase();
+    test("getTotalDebtOwed returns 0 when debt category has no items", async () => {
+        const authUser = await AuthUser.create({
+            _firebaseUid: crypto.randomUUID(),
+            emailAddress: `${crypto.randomUUID()}@test.com`,
+            provider: "password",
+        });
+        const user = await User.create({ authUser: authUser._id, displayName: "Empty Debt User" });
+        const budget = await MonthlyBudget.create({ userProfile: user._id, month: 4, year: 2025 });
+        await BudgetCategory.create({
+            monthlyBudget: budget._id,
+            displayOrder: 0,
+            name: "Debt",
+            emoji: "credit-card",
+            color: "607D8B",
+            categoryType: "debt",
+        });
 
-        const result = await getTotalItemDifference(groceriesItem._id);
-
-        expect(result).toHaveProperty("planned");
-        expect(result).toHaveProperty("actual");
-        expect(result).toHaveProperty("difference");
-        expect(result).toHaveProperty("reaction");
-        expect(result).toHaveProperty("isActive");
-        expect(result).toHaveProperty("percentage");
+        const result = await getTotalDebtOwed(budget._id);
+        expect(result).toBe(0);
     });
+})
 
-    test("getTotalItemDifference item with no logs is not active", async () => {
-        const { items: { maintenanceItem } } = await createTestDatabase();
 
-        const result = await getTotalItemDifference(maintenanceItem._id);
-        expect(result.isActive).toBe(false);
-        expect(result.reaction).toBe("ahead");
-    });
 
-    test("getTotalItemDifference item that is behind budget", async () => {
-        const { items: { electricItem } } = await createTestDatabase();
-
-        const result = await getTotalItemDifference(electricItem._id);
-        expect(result.isActive).toBe(true);
-        expect(result.reaction).toBe("behind");
-    });
-
-    test("getTotalItemDifference throws for unknown item", async () => {
-        await expect(
-            getTotalItemDifference("507f191e810c19729de860ea")
-        ).rejects.toThrow("BudgetItem not found");
-    });
-
-    test("getMonthlyActivity returns all logs for the budget", async () => {
-        const { budget } = await createTestDatabase();
-
-        const result = await getMonthlyActivity(budget._id);
-        expect(result).toHaveLength(41);
-    });
-
-    test("getMonthlyActivity populates budgetItem name and emoji", async () => {
-        const { budget } = await createTestDatabase();
-
-        const result = await getMonthlyActivity(budget._id);
-        expect(result[0].budgetItem).toHaveProperty("name");
-        expect(result[0].budgetItem).toHaveProperty("emoji");
-    });
-
-    test("getMonthlyActivitiesByRange returns logs within range", async () => {
-        const { budget } = await createTestDatabase();
-
-        const result = await getMonthlyActivitiesByRange(
-            budget._id,
-            new Date("2025-01-01"),
-            new Date("2025-01-07")
-        );
-
-        // rent(1), gas(1), car insurance(1), cafe x2(2), winco(1) = 6
-        expect(result).toHaveLength(11);
-    });
-
-    test("getMonthlyActivitiesByRange returns empty array for range with no logs", async () => {
-        const { budget } = await createTestDatabase();
-
-        const result = await getMonthlyActivitiesByRange(
-            budget._id,
-            new Date("2025-02-01"),
-            new Date("2025-02-28")
-        );
-
-        expect(result).toHaveLength(0);
-    });
-});
