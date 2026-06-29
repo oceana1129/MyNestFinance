@@ -1,4 +1,6 @@
 import express from "express";
+import { verifyFirebaseToken } from "../middleware/verifyFirebaseTokens.js";
+import { loadUserProfile } from "../middleware/loadUserProfile.js";
 import {
   getAllUsers,
   getUserById,
@@ -9,6 +11,9 @@ import {
 } from "../controllers/userController.js";
 
 const router = express.Router();
+
+router.use(verifyFirebaseToken);
+router.use(loadUserProfile);
 
 // the controller routes
 // TODO: change from :id to dynamic auth from user

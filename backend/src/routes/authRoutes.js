@@ -4,7 +4,6 @@ import {
   getAllAuthUsers,
   syncAuthUser,
   getCurrentAuthUser,
-  deleteAuthUser,
   cleanupAuthUsers,
 } from "../controllers/authUserController.js";
 

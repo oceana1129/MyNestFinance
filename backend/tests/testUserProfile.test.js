@@ -27,7 +27,7 @@ async function createTestUser() {
     year: 2025,
   });
 
-  return { user, budget };
+  return { authUser, user, budget };
 }
 
 describe("User API", () => {
