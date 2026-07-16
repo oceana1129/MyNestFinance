@@ -28,17 +28,37 @@ const LogInForm = () => {
   }
 
   return (
-    <div className='flex flex-col gap-4 bg-seconday max-w-[700px] mx-auto'>
-      <h1 className='text-center text-3xl font-bold'>Log in and start budgeting</h1>
-      <p className='text-center'>Don't have an account? <Link to="/signup" className='underline'>Sign Up</Link></p> 
-      <form onSubmit={handleSubmit} className='flex flex-col gap-4'>
-        <InputText onChange={(e) => setEmail(e.target.value)} value={email} placeholder={"email"} type={"email"}/>
-        <InputText onChange={(e) => setPassword(e.target.value)} value={password} placeholder={"password"} type={"password"}/>
-        <button className='btn btn-primary'>
-            Log In
-        </button>
-      </form>
-    </div>
+    // <div className='flex flex-col gap-4 bg-seconday max-w-[700px] mx-auto'>
+    //   <h1 className='text-center text-3xl font-bold'>Log in and start budgeting</h1>
+    //   <p className='text-center'>Don't have an account? <Link to="/signup" className='underline'>Sign Up</Link></p> 
+    //   <form onSubmit={handleSubmit} className='flex flex-col gap-4'>
+    //     <InputText onChange={(e) => setEmail(e.target.value)} value={email} placeholder={"email"} type={"email"}/>
+    //     <InputText onChange={(e) => setPassword(e.target.value)} value={password} placeholder={"password"} type={"password"}/>
+    //     <button className='btn btn-primary'>
+    //         Log In
+    //     </button>
+    //   </form>
+    // </div>
+
+    <div className='flex flex-col gap-8 bg-seconday max-w-[700px] mx-auto'>
+          <div>
+            <h1 className='text-center text-3xl font-bold'>Welcome back!</h1>
+            <p className='text-center'>Good to see you! Your nest is waiting.</p>
+          </div>
+          
+          
+          <form onSubmit={handleSubmit} className='flex flex-col gap-8'>
+            <fieldset className='flex gap-4 flex-col'>
+              <InputText onChange={(e) => setEmail(e.target.value)} value={email} placeholder={"email"} type={"email"}/>
+              <InputText onChange={(e) => setPassword(e.target.value)} value={password} placeholder={"password"} type={"password"}/>
+            </fieldset>
+            
+            <button className='btn btn-primary'>
+                Log in
+            </button>
+          </form>
+          <p className='text-center'>Already have an account? <Link to="/login" className='underline'> Sign up for free.</Link></p> 
+        </div>
   )
 }
 

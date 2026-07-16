@@ -30,16 +30,24 @@ const SignUpForm = () => {
   }
 
   return (
-    <div className='flex flex-col gap-4 bg-seconday max-w-[700px] mx-auto'>
-      <h1 className='text-center text-3xl font-bold'>Sign up for a free account</h1>
-      <p className='text-center'>Already have an account? <Link to="/login" className='underline'>Log In</Link></p> 
-      <form onSubmit={handleSubmit} className='flex flex-col gap-4'>
-        <InputText onChange={(e) => setEmail(e.target.value)} value={email} placeholder={"email"} type={"email"}/>
-        <InputText onChange={(e) => setPassword(e.target.value)} value={password} placeholder={"password"} type={"password"}/>
+    <div className='flex flex-col gap-8 bg-seconday max-w-[700px] mx-auto'>
+      <div>
+        <h1 className='text-center text-3xl font-bold'>Create your nest</h1>
+        <p className='text-center'>Start budgeting for free! No card required.</p>
+      </div>
+      
+      
+      <form onSubmit={handleSubmit} className='flex flex-col gap-8'>
+        <fieldset className='flex gap-4 flex-col'>
+          <InputText onChange={(e) => setEmail(e.target.value)} value={email} placeholder={"email"} type={"email"}/>
+          <InputText onChange={(e) => setPassword(e.target.value)} value={password} placeholder={"password"} type={"password"}/>
+        </fieldset>
+        
         <button className='btn btn-primary'>
             Sign Up
         </button>
       </form>
+      <p className='text-center'>Already have an account?<Link to="/login" className='underline'>Log In.</Link></p> 
     </div>
   )
 }

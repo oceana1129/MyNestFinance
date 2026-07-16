@@ -1,7 +1,7 @@
 import { Link } from "react-router";
 import { PlusIcon } from "lucide-react";
 
-const NavBar = () => {
+const NavBar = ({defaultPage=true, signupPage=false, loginPage=false}) => {
     return (
         <header className="bg-base-200 border-b border-base-content border-blue-600">
             <div className="mx-auto max-w-6xl p-4 flex items-center justify-between">
@@ -10,15 +10,35 @@ const NavBar = () => {
                         MyNest
                     </h1> 
                 </Link>
-                
-                <div className="flex items-center gap-4">
-                    <Link to={"/login"} className="btn btn-secondary btn-outline">
-                        <span>login</span>
-                    </Link>
-                    <Link to={"/signup"} className="btn btn-primary">
-                        <span>sign up</span>
-                    </Link>
-                </div>
+                {defaultPage &&
+                    <div className="flex items-center gap-4">
+                        <Link to={"/login"} className="btn btn-secondary btn-outline">
+                            Log in
+                        </Link>
+                        <Link to={"/signup"} className="btn btn-primary">
+                            Sign up
+                        </Link>
+                    </div> }
+                    
+                {signupPage &&
+                    <div className="flex items-center gap-4">
+                        <Link to={"/signup"} className="btn btn-secondary btn-outline">
+                            Already have an account?
+                        </Link>
+                        <Link to={"/login"} className="btn btn-primary">
+                            Log in
+                        </Link>
+                    </div> }
+
+                {loginPage &&
+                    <div className="flex items-center gap-4">
+                        <Link to={"/signup"} className="btn btn-secondary btn-outline">
+                            Need to sign up?
+                        </Link>
+                        <Link to={"/login"} className="btn btn-primary">
+                            Sign up
+                        </Link>
+                    </div> }
             </div>
         </header>
     );
