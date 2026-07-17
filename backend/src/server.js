@@ -21,16 +21,16 @@ dotenv.config();
 const PORT = process.env.PORT || 5001;
 // set up express
 const app = express();
-// can read json sent from client
-app.use(express.json());
-// set up rate limiter
-app.use(rateLimiter);
 // use use middleware cors on front end url
 app.use(
   cors({
     origin: "http://localhost:5173",
   }),
 );
+// can read json sent from client
+app.use(express.json());
+// set up rate limiter
+// app.use(rateLimiter);
 
 // set up routes
 app.use("/api/test", testRoutes);
