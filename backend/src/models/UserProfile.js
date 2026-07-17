@@ -72,7 +72,7 @@ const userProfileSchema = new mongoose.Schema(
        */
       currencyPreference: {
         type: String,
-        default: "USD",
+        default: "$",
       },
 
       /**

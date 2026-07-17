@@ -6,6 +6,7 @@ import TestPage from "./pages/TestPage.jsx"
 import SignUpPage from './pages/SignUpPage.jsx'
 import LogInPage from './pages/LogInPage.jsx'
 import AccountPage from './pages/AccountPage.jsx'
+import SettingsPage from './pages/SettingsPage.jsx'
 import ProtectedRoute from './components/protected/ProtectedRoute.jsx'
 import { AuthContextProvider } from './context/AuthContext.jsx'
 
@@ -21,6 +22,12 @@ const App = () => {
             <Route path="/account" element={
               <ProtectedRoute>
                 <AccountPage />
+                {/* <SettingsPage /> */}
+              </ProtectedRoute>
+              } />
+            <Route path="/settings" element={
+              <ProtectedRoute>
+                <SettingsPage />
               </ProtectedRoute>
               } />
         </Routes>

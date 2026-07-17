@@ -22,9 +22,7 @@ const NavBar = ({defaultPage=true, signupPage=false, loginPage=false}) => {
                     
                 {signupPage &&
                     <div className="flex items-center gap-4">
-                        <Link to={"/signup"} className="btn btn-secondary btn-outline">
-                            Already have an account?
-                        </Link>
+                        <p>Already have an account?</p>
                         <Link to={"/login"} className="btn btn-primary">
                             Log in
                         </Link>
@@ -32,10 +30,8 @@ const NavBar = ({defaultPage=true, signupPage=false, loginPage=false}) => {
 
                 {loginPage &&
                     <div className="flex items-center gap-4">
-                        <Link to={"/signup"} className="btn btn-secondary btn-outline">
-                            Need to sign up?
-                        </Link>
-                        <Link to={"/login"} className="btn btn-primary">
+                        <p>Need to sign up?</p>
+                        <Link to={"/signup"} className="btn btn-primary">
                             Sign up
                         </Link>
                     </div> }

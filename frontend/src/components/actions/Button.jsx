@@ -16,7 +16,6 @@ const Button = ({
     className = "" // additional classes
 }) => {
     // variant styles
-    // TODO: added dotted button
     const variantStyles = {
         primary: "bg-blue-600 text-white hover:bg-blue-700 shadow-md",
         secondary: "bg-white border-2 border-slate-300 text-slate-700 hover:bg-slate-50",

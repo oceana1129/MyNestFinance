@@ -3,7 +3,6 @@ import { useState } from "react"
 import toast from "react-hot-toast"
 import { Check, Mail, Lock, User, Banknote } from "lucide-react";
 import NavBar from "../components/navigation/HomeNavBar.jsx"
-import Toggle from '../components/actions/toggle.jsx'
 import CheckmarkTOS from '../components/actions/CheckmarkTOS.jsx'
 import HeaderStandard from '../components/data-display/HeaderStandard.jsx'
 import InputText from '../components/data-input/InputText.jsx'
@@ -12,7 +11,6 @@ import Button from '../components/actions/Button.jsx';
 import MultiSelect from '../components/actions/MultiSelect.jsx';
 
 const TestPage = () => {
-  const [checked, setChecked] = useState(false);
   const [checkboxChecked, setCheckboxChecked] = useState(false);
   const [input, setInput] = useState("");
   const [multiSelect, setMultiSelect] = useState(false);
@@ -21,6 +19,8 @@ const TestPage = () => {
     <div className='max-h-screen'>
         Testing!
         <NavBar />
+
+        
         <CardStandard 
           content={
             <>
@@ -51,7 +51,9 @@ const TestPage = () => {
               
             </>
           }/>
-        <Toggle checked={checked} onChange={setChecked}/>
+
+
+        
         <CheckmarkTOS checked={checkboxChecked} onChange={setCheckboxChecked}/>
         
 

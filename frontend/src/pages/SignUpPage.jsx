@@ -5,7 +5,7 @@ import HomeNavBar from "../components/navigation/HomeNavBar"
 const SignUpPage = () => {
   return (
     <div>
-        <HomeNavBar />
+        <HomeNavBar defaultPage={false} signupPage={true} />
         <main className='p-4'>
           <SignUpForm />
         </main>

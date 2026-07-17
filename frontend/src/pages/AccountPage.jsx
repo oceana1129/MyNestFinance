@@ -2,6 +2,9 @@ import React from 'react'
 import { UserAuth } from '../context/AuthContext'
 import { useNavigate } from 'react-router'
 import HomeBarNav from "../components/navigation/HomeNavBar"
+import CardStandard from '../components/data-display/CardStandard'
+import HeaderStandard from '../components/data-display/HeaderStandard'
+import SettingsCurrency from '../components/forms/SettingsCurrency';
 
 const AccountPage = () => {
 const {user, logout} = UserAuth();
@@ -20,8 +23,14 @@ const handleLogout = async () => {
   return (
     <div>
       <HomeBarNav />
+      <HeaderStandard 
+        textAlign='left'
+        header="Account"
+        text="Your account information"
+      />
+      
+      
       <div className='p-4 flex flex-col gap-4'>
-        <h1 className='text-2xl font-bold'>Account Page</h1>
         <p>User Email: {user && user.email}</p>
         <button onClick={handleLogout} className='btn btn-primary'>Log Out</button>
       </div>
