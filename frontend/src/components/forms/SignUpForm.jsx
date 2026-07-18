@@ -28,7 +28,7 @@ const SignUpForm = () => {
       console.log("Email:", email)
       console.log("Password:", password)
       await createUser(email, password)
-      navigate("/account")
+      navigate("/onboarding")
     } catch (error) {
       setError(error.message)
       console.error({message: "Sign up handle submit error", error})

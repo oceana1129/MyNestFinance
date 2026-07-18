@@ -10,9 +10,11 @@ import SettingsPage from './pages/SettingsPage.jsx'
 import PlanPage from './pages/PlanPage.jsx'
 import InsightsPage from "./pages/InsightsPage.jsx"
 import ExportPage from './pages/ExportPage.jsx'
+import OnboardingPage from './pages/OnboardingPage.jsx'
 
 import ProtectedRoute from './components/protected/ProtectedRoute.jsx'
 import { AuthContextProvider } from './context/AuthContext.jsx'
+
 
 const App = () => {
   return (
@@ -46,6 +48,11 @@ const App = () => {
             <Route path="/export" element={
               <ProtectedRoute>
                 <ExportPage />
+              </ProtectedRoute>
+              } />
+            <Route path="/onboarding" element={
+              <ProtectedRoute>
+                <OnboardingPage />
               </ProtectedRoute>
               } />
         </Routes>

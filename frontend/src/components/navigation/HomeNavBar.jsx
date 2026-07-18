@@ -32,7 +32,7 @@ const HomeNavBar = ({defaultPage=true, signupPage=false, loginPage=false, onboar
                     <div className="flex items-center">
                         <Button variant="ghost" text="Skip setup" 
                             iconRight={ArrowRight}
-                            to={"/dashboard"}/>
+                            to={"/plan"}/>
                     </div> }
             </div>
         </header>

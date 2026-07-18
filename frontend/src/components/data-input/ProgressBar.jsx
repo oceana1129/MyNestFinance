@@ -11,7 +11,7 @@ const ProgressBar = ({
 
     // if colorTwo is given, build a two-color gradient; otherwise flat fill
     const mainColor = colorTwo
-        ? `bg-gradient-to-r from-purple-500 ${colorTwo}`
+        ? `bg-gradient-to-r ${color} ${colorTwo}`
         : color;
 
     return (
