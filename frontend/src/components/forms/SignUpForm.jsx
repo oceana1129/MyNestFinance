@@ -72,6 +72,7 @@ const SignUpForm = () => {
         
         <Button 
           text="Sign up" 
+          size='large'
           onClick={handleSubmit} 
         />
         

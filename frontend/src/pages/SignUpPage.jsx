@@ -1,16 +1,14 @@
 import React from 'react'
 import SignUpForm from '../components/forms/SignUpForm'
 import HomeNavBar from "../components/navigation/HomeNavBar"
+import DefaultPageDisplay from '../components/data-display/DefaultPageDisplay'
 
 const SignUpPage = () => {
   return (
-    <div>
-        <HomeNavBar defaultPage={false} signupPage={true} />
-        <main className='p-4'>
-          <SignUpForm />
-        </main>
-        
-    </div>
+    <DefaultPageDisplay
+      nav={<HomeNavBar defaultPage={false} signupPage={true} />}
+      content={<SignUpForm />}
+    />
   )
 }
 

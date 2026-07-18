@@ -7,13 +7,14 @@ import { UserAuth} from "../../context/AuthContext"
 import InputText from '../data-input/InputText.jsx'
 import CardStandard from '../data-display/CardStandard.jsx'
 import HeaderStandard from '../data-display/HeaderStandard.jsx'
-import CheckmarkTOS from '../actions/CheckmarkTOS.jsx'
+import Checkbox from '../actions/Checkbox.jsx'
 import Button from '../actions/Button.jsx'
-import { Check, Mail, Lock, User } from "lucide-react";
+import { Mail, Lock } from "lucide-react";
 
 const LogInForm = () => {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
+  const [loginPersist, setLoginPersist] = useState(false)
   const [error, setError] = useState("")
 
   const navigate = useNavigate()
@@ -24,7 +25,7 @@ const LogInForm = () => {
     setError("")
     try {
       await signIn(email, password)
-      navigate("/account")
+      navigate("/settings")
       
     } catch (error) {
       setError(error.message)
@@ -62,9 +63,13 @@ const LogInForm = () => {
             onChange={(e) => setPassword(e.target.value)} 
           />
         </fieldset>
-        
+        <div className='flex gap-4'>
+          <Checkbox checked={loginPersist} onChange={setLoginPersist}/>
+          <p onClick={() => setLoginPersist(!loginPersist)}>Keep me logged in.</p>
+        </div>
         <Button 
           text="Log in" 
+          size='large'
           onClick={handleSubmit} 
         />
         

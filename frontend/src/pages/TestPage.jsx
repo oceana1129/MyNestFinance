@@ -2,13 +2,16 @@ import React from 'react'
 import { useState } from "react"
 import toast from "react-hot-toast"
 import { Check, Mail, Lock, User, Banknote } from "lucide-react";
-import NavBar from "../components/navigation/HomeNavBar.jsx"
+import HomeNavBar from "../components/navigation/HomeNavBar.jsx"
+import NavBar from '../components/navigation/NavBar.jsx';
 import CheckmarkTOS from '../components/actions/CheckmarkTOS.jsx'
 import HeaderStandard from '../components/data-display/HeaderStandard.jsx'
 import InputText from '../components/data-input/InputText.jsx'
 import CardStandard from '../components/data-display/CardStandard.jsx';
 import Button from '../components/actions/Button.jsx';
 import MultiSelect from '../components/actions/MultiSelect.jsx';
+import ProgressBar from '../components/data-input/ProgressBar.jsx';
+
 
 const TestPage = () => {
   const [checkboxChecked, setCheckboxChecked] = useState(false);
@@ -18,12 +21,13 @@ const TestPage = () => {
   return (
     <div className='max-h-screen'>
         Testing!
+        <HomeNavBar onboarding={true} defaultPage={false}/>
         <NavBar />
-
         
         <CardStandard 
           content={
             <>
+            <ProgressBar value={86} rounded={false} />
               <HeaderStandard 
               header="Hi there! What's your name?"
               subheader="personalization"

@@ -8,14 +8,13 @@ import Button from '../actions/Button';
 import { Trash } from "lucide-react";
 
 const SettingsAccount = () => {
-  const [emailNotification, setEmailNotification] = useState(true)
-  const [inAppNotification, setInAppNotification] = useState(true)
     // TODO: change user settings in backend
 
     function handleDelete() {
         // will pop up an 'are you sure' component
         // the component will provide the delete account functionality
         console.log('clicked delete')
+        
     }
 
   return (

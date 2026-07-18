@@ -30,7 +30,9 @@ app.use(
 // can read json sent from client
 app.use(express.json());
 // set up rate limiter
+// rate limiter needs to be set up again
 // app.use(rateLimiter);
+
 
 // set up routes
 app.use("/api/test", testRoutes);
