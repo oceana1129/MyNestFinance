@@ -1,7 +1,7 @@
 import admin from "../config/firebase.js";
 
 export async function verifyFirebaseToken(req, res, next) {
-
+  console.log("verifyFirebaseToken.js: verifyFirebaseToken()")
   // Testing
   if (process.env.NODE_ENV === "test") {
     return next();

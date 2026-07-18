@@ -1,10 +1,7 @@
-import React from 'react'
 import { UserAuth } from '../context/AuthContext'
 import { useNavigate } from 'react-router'
-import HomeBarNav from "../components/navigation/HomeNavBar"
-import CardStandard from '../components/data-display/CardStandard'
-import HeaderStandard from '../components/data-display/HeaderStandard'
-import SettingsCurrency from '../components/forms/SettingsCurrency';
+import NavBar from '../components/navigation/NavBar'
+import AppPageDisplay from "../components/data-display/AppPageDisplay"
 
 const AccountPage = () => {
 const {user, logout} = UserAuth();
@@ -21,20 +18,15 @@ const handleLogout = async () => {
 }
 
   return (
-    <div>
-      <HomeBarNav />
-      <HeaderStandard 
-        textAlign='left'
-        header="Account"
-        text="Your account information"
+    <AppPageDisplay 
+      nav={<NavBar activePage='settings'/>}
+      contentPrimary={
+          <div className='p-4 flex flex-col gap-4'>
+            <p>User Email: {user && user.email}</p>
+            <button onClick={handleLogout} className='btn btn-primary'>Log Out</button>
+          </div>
+      }
       />
-      
-      
-      <div className='p-4 flex flex-col gap-4'>
-        <p>User Email: {user && user.email}</p>
-        <button onClick={handleLogout} className='btn btn-primary'>Log Out</button>
-      </div>
-    </div>
   )
 }
 

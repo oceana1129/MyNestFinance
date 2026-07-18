@@ -1,9 +1,8 @@
+import admin from "../config/firebase.js";
 import AuthUser from "../models/AuthUser.js";
 import UserProfile from "../models/UserProfile.js";
 
 import { deleteUserData } from "./deleteUserData.js";
-
-// TODO: delete firebase user before deleting database data
 
 /**
  * Delete an AuthUser and all related data.
@@ -12,6 +11,7 @@ import { deleteUserData } from "./deleteUserData.js";
  * @returns {Object|null} deleted AuthUser
  */
 export async function deleteAuthUserData(authId) {
+  console.log("deleteAuthUser.js: deleteAuthUserData()")
   // find auth user
   const authUser = await AuthUser.findById(authId);
 
@@ -33,6 +33,16 @@ export async function deleteAuthUserData(authId) {
   // delete auth user
   await AuthUser.findByIdAndDelete(authUser._id);
 
+  // delete the Firebase account last
+  try {
+    await admin.auth().deleteUser(authUser._firebaseUid);
+  } catch (err) {
+    // the firebase user is gone
+    // could be deleted manually or cleaned up
+    if (err.code !== "auth/user-not-found") {
+      throw err;
+    }
+  }
   // return deleted user
   return authUser;
 }

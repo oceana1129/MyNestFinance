@@ -71,8 +71,6 @@ const authUserSchema = new mongoose.Schema(
   { timestamps: true },
 );
 
-// authUserSchema.index({ _firebaseUid: 1 }, { unique: true });
-
 /**
  * AuthUser model.
  */

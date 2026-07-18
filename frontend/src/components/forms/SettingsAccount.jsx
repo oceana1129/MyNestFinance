@@ -7,14 +7,28 @@ import InfoDisplay from '../data-display/InfoDisplay';
 import Button from '../actions/Button';
 import { Trash } from "lucide-react";
 
-const SettingsAccount = () => {
-    // TODO: change user settings in backend
+import { UserAuth } from "../../context/AuthContext"
+import { useNavigate } from 'react-router';
 
-    function handleDelete() {
-        // will pop up an 'are you sure' component
-        // the component will provide the delete account functionality
-        console.log('clicked delete')
-        
+const SettingsAccount = () => {
+    const {deleteAccount} = UserAuth();
+    const navigate = useNavigate();
+
+    const handleDelete = async () => {
+        console.log('SettingsAccount.jsx: handleDelete()')
+        const confirmed = window.confirm(
+            "This will permanently delete your account and all data. This can't be undone."
+        );
+        if (!confirmed) return;
+
+        try {
+            // delete backend user
+            await deleteAccount();
+            navigate("/");
+        } catch (error) {
+            console.error(error.message);
+            alert("problem deleting your account")
+        }
     }
 
   return (
