@@ -27,7 +27,7 @@ const MultiSelect = ({
                     <Checkbox variant="circle" checked={checked} onChange={onChange} />
                     {Icon && <Icon size={22} />}
                     <div>
-                        <p className="font-bold text-lg">{title}</p>
+                        <p className="font-bold text-md">{title}</p>
                         {subtitle && <p className="text-md">{subtitle}</p>}
                     </div>
                 </>
@@ -37,7 +37,7 @@ const MultiSelect = ({
                 <>
                     {Icon && <Icon size={30} />}
                     <p className="font-bold text-lg">{title}</p>
-                    {subtitle && <p className="text-md">{subtitle}</p>}
+                    {subtitle && <p className="text-md text-center">{subtitle}</p>}
                 </>
             )}
         </div>

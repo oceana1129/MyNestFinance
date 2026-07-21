@@ -11,7 +11,7 @@ import CardStandard from '../components/data-display/CardStandard.jsx';
 import Button from '../components/actions/Button.jsx';
 import MultiSelect from '../components/actions/MultiSelect.jsx';
 import ProgressBar from '../components/data-input/ProgressBar.jsx';
-
+import Blurb from '../components/data-display/Blurb.jsx';
 
 const TestPage = () => {
   const [checkboxChecked, setCheckboxChecked] = useState(false);
@@ -22,6 +22,7 @@ const TestPage = () => {
     <div className='max-h-screen'>
         Testing!
         <HomeNavBar onboarding={true} defaultPage={false}/>
+        <Blurb icon={Banknote} title="title" text="this is text"/>
         <NavBar />
         
         <CardStandard 
