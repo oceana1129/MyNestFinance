@@ -83,7 +83,7 @@ export async function getCurrentAuthUser(req, res) {
     const authUser = await AuthUser.findOne({
       _firebaseUid: req.user.uid,
     });
-
+    
     if (!authUser) {
       return res.status(404).json({
         message: "User not found",
@@ -108,6 +108,7 @@ export async function getCurrentAuthUser(req, res) {
 
 export async function deleteAuthUser(req, res) {
   try {
+    console.log("authUserController.js: deleteAuthUser()")
     const authUser = await AuthUser.findOne({
       _firebaseUid: req.user.uid,
     });

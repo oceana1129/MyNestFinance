@@ -3,7 +3,7 @@ import Checkbox from './Checkbox'
 
 const CheckmarkTOS = ({ checked, onChange}) => {
   return (
-    <div className='flex gap-4 bg-purple-100 px-2 py-3'>
+    <div className='flex gap-4 bg-purple-100 px-2 py-3 rounded-lg mt-4'>
       <Checkbox checked={checked} onChange={onChange}/>
       <p>
         I agree to the terms and conditions. Your data is never sold.

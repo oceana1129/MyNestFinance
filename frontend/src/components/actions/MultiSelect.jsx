@@ -13,12 +13,13 @@ const MultiSelect = ({
         ? "border-purple-500 bg-purple-100 hover:bg-purple-100"
         : "border-slate-200";
     const orientationStyle = orientation === "horizontal" ? "flex-row" : "flex-col";
+    const borderStyle = orientation === "horizontal" ? "rounded-full" : "rounded-md";
 
     return (
         <div
-            className={`flex items-center gap-4 px-4 py-2 rounded-full border-2 transition
+            className={`flex items-center gap-4 px-4 py-2 border-2 transition
                 cursor-pointer hover:bg-purple-50
-                ${stateStyle} ${textColor} ${orientationStyle}`}
+                ${stateStyle} ${textColor} ${orientationStyle} ${borderStyle}`}
             onClick={() => onChange(!checked)}
         >
             {orientation === "horizontal" && (
@@ -26,7 +27,7 @@ const MultiSelect = ({
                     <Checkbox variant="circle" checked={checked} onChange={onChange} />
                     {Icon && <Icon size={22} />}
                     <div>
-                        <p className="font-bold text-lg">{title}</p>
+                        <p className="font-bold text-md">{title}</p>
                         {subtitle && <p className="text-md">{subtitle}</p>}
                     </div>
                 </>
@@ -36,7 +37,7 @@ const MultiSelect = ({
                 <>
                     {Icon && <Icon size={30} />}
                     <p className="font-bold text-lg">{title}</p>
-                    {subtitle && <p className="text-md">{subtitle}</p>}
+                    {subtitle && <p className="text-md text-center">{subtitle}</p>}
                 </>
             )}
         </div>

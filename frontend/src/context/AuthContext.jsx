@@ -64,16 +64,6 @@ export const AuthContextProvider = ({ children }) => {
       email,
       password,
     );
-
-    const token = await userCredential.user.getIdToken();
-
-    await fetch(`${import.meta.env.VITE_API_URL}/auth/sync`, {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-
     return userCredential;
   };
 
@@ -83,6 +73,32 @@ export const AuthContextProvider = ({ children }) => {
   const logout = async () => {
     console.log("logout(): signing out user");
     return signOut(auth);
+  };
+
+  /**
+   * Delete the current firebase user
+   */
+  const deleteAccount = async () => {
+    console.log("AuthContext.jsx: deleteAccount()");
+
+    if (!auth.currentUser) {
+      throw new Error("No user is currently signed in.");
+    }
+
+    const token = await auth.currentUser.getIdToken();
+
+    const response = await fetch(`${API_URL}/auth/me`, {
+      method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to delete account.");
+    }
+
+    await signOut(auth);
   };
 
   useEffect(() => {
@@ -111,6 +127,7 @@ export const AuthContextProvider = ({ children }) => {
       createUser,
       signIn,
       logout,
+      deleteAccount,
     }),
     [user, loading],
   );
