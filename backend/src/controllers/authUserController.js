@@ -58,9 +58,7 @@ export async function syncAuthUser(req, res) {
       console.log("syncUser(): sync AuthUser signed in");
     }
 
-    /**
-     * User's profile information
-     */
+    // User's profile information
     const profile = await UserProfile.findOne({
       authUser: authUser._id,
     });
@@ -78,12 +76,18 @@ export async function syncAuthUser(req, res) {
   }
 }
 
+/**
+ * Get current auth user
+ * @param {*} req 
+ * @param {*} res 
+ * @returns 
+ */
 export async function getCurrentAuthUser(req, res) {
   try {
     const authUser = await AuthUser.findOne({
       _firebaseUid: req.user.uid,
     });
-    
+
     if (!authUser) {
       return res.status(404).json({
         message: "User not found",
@@ -106,9 +110,14 @@ export async function getCurrentAuthUser(req, res) {
   }
 }
 
+/**
+ * Delete an auth user
+ * @param {*} req 
+ * @param {*} res 
+ * @returns 
+ */
 export async function deleteAuthUser(req, res) {
   try {
-    console.log("authUserController.js: deleteAuthUser()")
     const authUser = await AuthUser.findOne({
       _firebaseUid: req.user.uid,
     });
@@ -132,7 +141,14 @@ export async function deleteAuthUser(req, res) {
   }
 }
 
+/**
+ * gated until admin role is added
+ */
 export async function cleanupAuthUsers(_, res) {
+  if (process.env.NODE_ENV === "production") {
+    return res.status(403).json({ message: "Forbidden" });
+  }
+
   try {
     const authUsers = await AuthUser.find();
 

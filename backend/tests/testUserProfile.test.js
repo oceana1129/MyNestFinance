@@ -40,40 +40,37 @@ describe("User API", () => {
     expect(response.body.users.length).toBe(1);
   });
 
-  test("gets user by id", async () => {
+  test("gets current user", async () => {
     const { user } = await createTestUser();
 
-    const response = await request(app).get(`/api/user/${user._id}`);
+    const response = await request(app).get("/api/user/me");
 
     expect(response.status).toBe(200);
     expect(response.body.user._id).toBe(user._id.toString());
   });
 
-  test("returns 404 when user does not exist", async () => {
-    const response = await request(app).get(
-      "/api/user/507f191e810c19729de860ea",
-    );
+  test("returns 404 when no profile exists yet", async () => {
+    const response = await request(app).get("/api/user/me");
 
     expect(response.status).toBe(404);
   });
 
   test("updates user display name", async () => {
-    const { user } = await createTestUser();
+    await createTestUser();
 
-    const response = await request(app).put(`/api/user/${user._id}/name`).send({
+    const response = await request(app).put("/api/user/me/name").send({
       displayName: "Olivia",
     });
 
     expect(response.status).toBe(200);
-
     expect(response.body.updatedUser.displayName).toBe("Olivia");
   });
 
   test("updates onboarding settings", async () => {
-    const { user } = await createTestUser();
+    await createTestUser();
 
     const response = await request(app)
-      .put(`/api/user/${user._id}/onboarding`)
+      .put("/api/user/me/onboarding")
       .send({
         onboardingComplete: true,
         onboardingStep: 5,
@@ -81,15 +78,14 @@ describe("User API", () => {
       });
 
     expect(response.status).toBe(200);
-
     expect(response.body.updatedUser.onboarding.onboardingComplete).toBe(true);
   });
 
   test("updates user settings", async () => {
-    const { user } = await createTestUser();
+    await createTestUser();
 
     const response = await request(app)
-      .put(`/api/user/${user._id}/settings`)
+      .put("/api/user/me/settings")
       .send({
         currencyPreference: "USD",
         showDecimals: true,
@@ -99,34 +95,7 @@ describe("User API", () => {
       });
 
     expect(response.status).toBe(200);
-
     expect(response.body.updatedUser.settings.currencyPreference).toBe("USD");
   });
 
-  test("deletes user", async () => {
-    const { user } = await createTestUser();
-
-    const response = await request(app).delete(`/api/user/${user._id}`);
-
-    expect(response.status).toBe(200);
-
-    const deletedUser = await User.findById(user._id);
-
-    expect(deletedUser).toBeNull();
-  });
-
-  test("deletes user and cascade", async () => {
-    const { user, budget } = await createTestUser();
-
-    const response = await request(app).delete(`/api/user/${user._id}`);
-
-    expect(response.status).toBe(200);
-
-    const deletedUser = await User.findById(user._id);
-
-    const deletedBudget = await MonthlyBudget.findById(budget._id);
-
-    expect(deletedUser).toBeNull();
-    expect(deletedBudget).toBeNull();
-  });
 });

@@ -1,9 +1,17 @@
 import admin from "../config/firebase.js";
 
 export async function verifyFirebaseToken(req, res, next) {
-  console.log("verifyFirebaseToken.js: verifyFirebaseToken()")
-  // Testing
   if (process.env.NODE_ENV === "test") {
+    const testUid = req.headers["x-test-uid"];
+
+    if (testUid) {
+      req.user = {
+        uid: testUid,
+        email: req.headers["x-test-email"] || `${testUid}@test.com`,
+        firebase: { sign_in_provider: "password" },
+      };
+    }
+
     return next();
   }
 

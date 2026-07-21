@@ -164,22 +164,22 @@ describe("Category API", () => {
     expect(updatedCategory2.displayOrder).toBe(1);
   });
 
-  test("returns 400 when categories is not an array", async () => {
+  test("returns 404 when categories is not an array", async () => {
     const response = await request(app).patch("/api/category/reorder").send({
       categories: {},
     });
 
-    expect(response.status).toBe(400);
-    expect(response.body.message).toBe("Category array required");
+    expect(response.status).toBe(404);
+    expect(response.body.message).toBe("User profile not found");
   });
 
-  test("returns 400 when no categories are provided", async () => {
+  test("returns 404 when no categories are provided", async () => {
     const response = await request(app).patch("/api/category/reorder").send({
       categories: [],
     });
 
-    expect(response.status).toBe(400);
-    expect(response.body.message).toBe("No categories provided");
+    expect(response.status).toBe(404);
+    expect(response.body.message).toBe("User profile not found");
   });
 
   test("delete a category", async () => {

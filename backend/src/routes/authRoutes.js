@@ -4,8 +4,8 @@ import {
   getAllAuthUsers,
   syncAuthUser,
   getCurrentAuthUser,
+  deleteAuthUser,
   cleanupAuthUsers,
-  deleteAuthUser
 } from "../controllers/authUserController.js";
 
 const router = express.Router();
@@ -14,7 +14,7 @@ const router = express.Router();
 router.get("/", getAllAuthUsers);
 router.get("/me", verifyFirebaseToken, getCurrentAuthUser);
 router.post("/sync", verifyFirebaseToken, syncAuthUser);
-router.delete("/cleanup", cleanupAuthUsers);
 router.delete("/me", verifyFirebaseToken, deleteAuthUser);
+router.delete("/cleanup", verifyFirebaseToken, cleanupAuthUsers);
 
 export default router;
