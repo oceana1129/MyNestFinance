@@ -127,6 +127,9 @@ describe("Budget Item API", () => {
   });
 
   test("returns 404 when item does not exist", async () => {
+    // a profile must exist for any request on this router to get past middleware
+    await createTestItem();
+
     const response = await request(app).get(
       "/api/item/507f191e810c19729de860ea",
     );
@@ -183,8 +186,11 @@ describe("Budget Item API", () => {
   });
 
   test("returns 400 when items is not an array", async () => {
+    // needs a profile to get past middleware
+    await createTestItem();
+
     const response = await request(app).patch("/api/item/reorder").send({
-      categories: {},
+      items: {},
     });
 
     expect(response.status).toBe(400);
@@ -192,12 +198,14 @@ describe("Budget Item API", () => {
   });
 
   test("returns 400 when no items are provided", async () => {
+    await createTestItem();
+
     const response = await request(app).patch("/api/item/reorder").send({
-      categories: [],
+      items: [],
     });
 
     expect(response.status).toBe(400);
-    expect(response.body.message).toBe("Items array required");
+    expect(response.body.message).toBe("No items provided");
   });
 
   test("delete an item", async () => {

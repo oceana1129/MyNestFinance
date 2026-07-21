@@ -1,7 +1,7 @@
 import express from "express";
 
 import testRoutes from "./routes/testRoutes.js";
-// import authRoutes from "./routes/authRoutes.js";
+import authRoutes from "./routes/authRoutes.js";
 import userRoutes from "./routes/userRoutes.js";
 import budgetRoutes from "./routes/monthlyBudgetRoutes.js";
 import categoryRoutes from "./routes/categoryRoutes.js";
@@ -15,7 +15,7 @@ const app = express();
 app.use(express.json());
 
 app.use("/api/test", testRoutes);
-// app.use("/api/auth", authRoutes);
+app.use("/api/auth", authRoutes);
 app.use("/api/user", userRoutes);
 app.use("/api/budget", budgetRoutes);
 app.use("/api/category", categoryRoutes);

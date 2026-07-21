@@ -1,17 +1,15 @@
 import User from "../models/UserProfile.js";
-import { deleteUserData } from "../services/deleteUserData.js";
 
 /**
- * Will return all user objects
+ * Returns all user profiles.
  *
- * Notes:
- *  - .find() returns all objects
- *  - .sort({createdAt: -1}) will sort by newly created
- *  - .sort({createdAt: 1}) will sort by oldest created
- * @param {*} req
- * @param {*} res
+ * SECURITY: gates until admin role is added
  */
 export async function getAllUsers(_, res) {
+  if (process.env.NODE_ENV === "production") {
+    return res.status(403).json({ message: "Forbidden" });
+  }
+
   try {
     const users = await User.find().sort({ createdAt: -1 });
     res.status(200).json({ message: "All users found:\n", users });
@@ -22,11 +20,14 @@ export async function getAllUsers(_, res) {
 }
 
 /**
- * Will return a specific user object
+ * Returns the current authenticated user's own profile.
+ * req.profile was already loaded by loadUserProfile middleware,
+ * derived from the verified Firebase token.
  */
-export async function getUserById(req, res) {
+export async function getCurrentUser(req, res) {
+  // res.status(200).json({ message: "Current user found", user: req.profile });
   try {
-    const user = await User.findById(req.params.id);
+    const user = await User.findById(req.profile);
     if (!user) {
       return res.status(404).json({
         message: "User not found",
@@ -34,7 +35,7 @@ export async function getUserById(req, res) {
     }
     res
       .status(200)
-      .json({ message: `User with id ${req.params.id} found`, user });
+      .json({ message: `User with id ${req.profile} found`, user });
   } catch (err) {
     console.error("Error in getUserById controller", err);
     res.status(500).json({ message: "internal server error" });
@@ -42,13 +43,13 @@ export async function getUserById(req, res) {
 }
 
 /**
- * Will update a specific user object
+ * Updates the current authenticated user's display name.
  */
 export async function updateUserName(req, res) {
   try {
     const { displayName } = req.body;
     const updatedUser = await User.findByIdAndUpdate(
-      req.params.id,
+      req.profile._id,
       { displayName },
       { new: true, runValidators: true },
     );
@@ -64,7 +65,7 @@ export async function updateUserName(req, res) {
 }
 
 /**
- * Updates a user's onboarding information
+ * Updates the current authenticated user's onboarding information.
  *
  * Can update the following:
  *  - onboardingComplete
@@ -76,7 +77,7 @@ export async function updateUserOnboarding(req, res) {
     const { onboardingComplete, onboardingStep, budgetStylePreference } =
       req.body;
     const updatedUser = await User.findByIdAndUpdate(
-      req.params.id,
+      req.profile._id,
       {
         "onboarding.onboardingComplete": onboardingComplete,
         "onboarding.onboardingStep": onboardingStep,
@@ -97,7 +98,7 @@ export async function updateUserOnboarding(req, res) {
 }
 
 /**
- * Updates a user's setting
+ * Updates the current authenticated user's settings.
  *
  * Can update the following:
  *  - currencyPreference
@@ -116,7 +117,7 @@ export async function updateUserSettings(req, res) {
       colorMode,
     } = req.body;
     const updatedUser = await User.findByIdAndUpdate(
-      req.params.id,
+      req.profile._id,
       {
         "settings.currencyPreference": currencyPreference,
         "settings.showDecimals": showDecimals,
@@ -135,33 +136,5 @@ export async function updateUserSettings(req, res) {
   } catch (err) {
     console.error("Error in updateUserSettings controller", err);
     res.status(500).json({ message: "internal server error" });
-  }
-}
-
-/**
- * Will delete a specific user object
- */
-export async function deleteUser(req, res) {
-  try {
-    const deletedUser = await deleteUserData(
-      req.params.id
-    );
-
-    if (!deletedUser) {
-      return res.status(404).json({
-        message: "User not found",
-      });
-    }
-
-    res.status(200).json({
-      message: "User deleted successfully!",
-      deletedUser,
-    });
-  } catch (err) {
-    console.error("deleteUser()", err);
-
-    res.status(500).json({
-      message: "internal server error",
-    });
   }
 }

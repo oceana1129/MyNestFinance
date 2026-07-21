@@ -9,6 +9,15 @@ beforeAll(async () => {
   await mongoose.connect(mongoServer.getUri());
 });
 
+// clears all db collections for testing
+beforeEach(async () => {
+  const collections = mongoose.connection.collections;
+
+  for (const key in collections) {
+    await collections[key].deleteMany();
+  }
+});
+
 afterEach(async () => {
   const collections = mongoose.connection.collections;
 
