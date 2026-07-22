@@ -13,6 +13,7 @@ import ExportPage from './pages/ExportPage.jsx'
 import OnboardingPage from './pages/OnboardingPage.jsx'
 
 import ProtectedRoute from './components/protected/ProtectedRoute.jsx'
+import RequireAuth from './components/protected/RequireAuth.jsx'
 import { AuthContextProvider } from './context/AuthContext.jsx'
 
 
@@ -51,9 +52,9 @@ const App = () => {
               </ProtectedRoute>
               } />
             <Route path="/onboarding" element={
-              <ProtectedRoute>
+              <RequireAuth>
                 <OnboardingPage />
-              </ProtectedRoute>
+              </RequireAuth>
               } />
         </Routes>
       </AuthContextProvider>
