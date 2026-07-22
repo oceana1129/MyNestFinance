@@ -1,17 +1,55 @@
 import React from 'react'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 
 import CardStandard from '../data-display/CardStandard'
 import HeaderStandard from '../data-display/HeaderStandard';
 import InfoDisplay from '../data-display/InfoDisplay';
 import Toggle from '../actions/toggle';
 import { Mail, Bell } from "lucide-react";
+import { UserAuth } from '../../context/AuthContext';
+import toast from "react-hot-toast"
 
 const SettingsNotifications = () => {
+    const { profile, updateSettings } = UserAuth();
+
   const [emailNotification, setEmailNotification] = useState(true)
   const [inAppNotification, setInAppNotification] = useState(true)
-    // TODO: change user settings in backend
-    // should have toast every time a change is made
+    
+  useEffect(() => {
+        if (profile?.settings) {
+            setEmailNotification(profile.settings.emailNotifications);
+            setInAppNotification(profile.settings.appNotifications);
+        }
+    }, [profile]);
+
+    const handleEmailChange = async (checked) => {
+        const previous = emailNotification;
+        setEmailNotification(checked);
+
+        try {
+            await updateSettings({ emailNotifications: checked });
+            toast.success("Settings updated");
+        } catch (error) {
+            console.error("Failed to update email notification setting:", error);
+            setEmailNotification(previous); // revert on failure
+            toast.error("Couldn't update settings");
+        }
+    };
+
+    const handleAppChange = async (checked) => {
+        const previous = inAppNotification;
+        setEmailNotification(checked);
+
+        try {
+            await updateSettings({ appNotifications: checked });
+            toast.success("Settings updated");
+        } catch (error) {
+            console.error("Failed to update in app notification setting:", error);
+            setInAppNotification(previous); // revert on failure
+            toast.error("Couldn't update settings");
+        }
+    };
+
 
   return (
     <CardStandard 
@@ -30,7 +68,7 @@ const SettingsNotifications = () => {
                             header="Email notifications"
                             text="Reminders sent to your inbox."
                             content={
-                                <Toggle checked={emailNotification} onChange={setEmailNotification}/>
+                                <Toggle checked={emailNotification} onChange={handleEmailChange}/>
                             }
                         />
                     </div>
@@ -40,7 +78,7 @@ const SettingsNotifications = () => {
                             header="In-app notifications"
                             text={`Alerts inside MyNest`}
                             content={
-                                <Toggle checked={inAppNotification} onChange={setInAppNotification}/>
+                                <Toggle checked={inAppNotification} onChange={handleAppChange}/>
                             }
                         />
                     </div>

@@ -1,5 +1,5 @@
 import React from 'react'
-import { getColorTheme } from '../../ColorThemeLight';
+import { getColorTheme } from '../../utils/ColorThemeLight';
 
 // the category callout at the top of each "setting up categories"
 const Blurb = ({ icon: Icon, title, text, color = "purple" }) => {

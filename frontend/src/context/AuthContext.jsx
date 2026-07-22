@@ -13,6 +13,7 @@ const API_URL = import.meta.env.VITE_API_URL;
 
 export const AuthContextProvider = ({ children }) => {
   const [user, setUser] = useState(null);
+  const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
 
   /**
@@ -101,6 +102,38 @@ export const AuthContextProvider = ({ children }) => {
     await signOut(auth);
   };
 
+  /**
+   * Update the current user's settings (currency, decimals, etc).
+   */
+  const updateSettings = async (settingsChanges) => {
+    console.log("AuthContext.jsx: updateSettings()", settingsChanges);
+
+    if (!auth.currentUser) {
+      throw new Error("No user is currently signed in.");
+    }
+
+    const token = await auth.currentUser.getIdToken();
+
+    const mergedSettings = { ...profile?.settings, ...settingsChanges };
+    
+    const response = await fetch(`${API_URL}/user/me/settings`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(mergedSettings),
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to update settings.");
+    }
+
+    const data = await response.json();
+    setProfile(data.updatedUser);
+    return data.updatedUser;
+  };
+
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
       try {
@@ -108,7 +141,10 @@ export const AuthContextProvider = ({ children }) => {
         setUser(currentUser);
 
         if (currentUser) {
-          await syncUser(currentUser);
+          const result = await syncUser(currentUser);
+          setProfile(result.profile);
+        } else {
+          setProfile(null);
         }
       } catch (error) {
         console.error(error);
@@ -123,13 +159,15 @@ export const AuthContextProvider = ({ children }) => {
   const value = useMemo(
     () => ({
       user,
+      profile,
       loading,
       createUser,
       signIn,
       logout,
       deleteAccount,
+      updateSettings,
     }),
-    [user, loading],
+    [user, profile, loading],
   );
 
   return <UserContext.Provider value={value}>{children}</UserContext.Provider>;
