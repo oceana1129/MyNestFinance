@@ -33,6 +33,14 @@ const userProfileSchema = new mongoose.Schema(
      */
     onboarding: {
       /**
+       * Onboarding answers the user gave
+       */
+      onboardingAnswers: {
+        type: Object,
+        default: null,
+      },
+
+      /**
        * Whether the user has completed onboarding.
        */
       onboardingComplete: {

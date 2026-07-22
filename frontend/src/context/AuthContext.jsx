@@ -134,6 +134,70 @@ export const AuthContextProvider = ({ children }) => {
     return data.updatedUser;
   };
 
+  /**
+   * Update the current user's settings (currency, decimals, etc).
+   */
+  const updateOnboarding = async (onboardingChanges) => {
+    console.log("AuthContext.jsx: updateOnboarding()", onboardingChanges);
+
+    if (!auth.currentUser) {
+      throw new Error("No user is currently signed in.");
+    }
+
+    const token = await auth.currentUser.getIdToken();
+
+    const mergedOnboarding = { ...profile?.onboarding, ...onboardingChanges };
+    
+    const response = await fetch(`${API_URL}/user/me/onboarding`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(mergedOnboarding),
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to update onboarding.");
+    }
+
+    const data = await response.json();
+    setProfile(data.updatedUser);
+    return data.updatedUser;
+  };
+
+  /**
+   * Update the current user's display name
+   * @param {*} nameChange 
+   * @returns 
+   */
+  const updateDisplayName = async (nameChange) => {
+    console.log("AuthContext.jsx: updateDisplayName()", nameChange);
+
+    if (!auth.currentUser) {
+      throw new Error("No user is currently signed in.");
+    }
+
+    const token = await auth.currentUser.getIdToken();
+
+    const response = await fetch(`${API_URL}/user/me/name`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(nameChange),
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to update name.");
+    }
+
+    const data = await response.json();
+    setProfile(data.updatedUser);
+    return data.updatedUser;
+};
+
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
       try {
@@ -142,6 +206,7 @@ export const AuthContextProvider = ({ children }) => {
 
         if (currentUser) {
           const result = await syncUser(currentUser);
+
           setProfile(result.profile);
         } else {
           setProfile(null);
@@ -166,6 +231,8 @@ export const AuthContextProvider = ({ children }) => {
       logout,
       deleteAccount,
       updateSettings,
+      updateOnboarding, 
+      updateDisplayName
     }),
     [user, profile, loading],
   );

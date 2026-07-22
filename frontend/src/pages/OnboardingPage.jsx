@@ -13,10 +13,11 @@ import Button from '../components/actions/Button.jsx';
 import OnboardBlock from '../components/forms/OnboardBlock.jsx';
 import Blurb from '../components/data-display/Blurb.jsx';
 import { getVisibleSteps } from '../onboardingSteps.js';
+import toast from "react-hot-toast"
 
 const OnboardingPage = () => {
     // local storage
-    const { user } = UserAuth();
+    const { user, updateOnboarding, updateDisplayName } = UserAuth();
     const storageKey = user ? `onboarding-${user.uid}` : null;
     const [hydrated, setHydrated] = useState(false);
 
@@ -124,18 +125,17 @@ const OnboardingPage = () => {
         handleNextStep();
     };
 
+    // NEXT STEPS
     // save current onboarding progress to the backend, then advance
     const handleNextStep = async () => {
         try {
-            // TODO: persist `answers` (or just this step's slice of it) to
-            // your backend here, e.g.:
-            // await fetch(`${API_URL}/users/me/onboarding`, {
-            //     method: "PATCH",
-            //     headers: { Authorization: `Bearer ${token}` },
-            //     body: JSON.stringify(answers),
-            // });
+            await updateOnboarding({
+                onboardingAnswers: answers, 
+                onboardingStep: currentStep,
+            });
         } catch (error) {
             console.error("Failed to save onboarding progress:", error);
+            toast.error("Couldn't update onboarding");
         }
         handleContinue();
     };
@@ -145,6 +145,10 @@ const OnboardingPage = () => {
     const handleFinish = async () => {
         try {
             console.log("Onboarding complete, answers:", answers);
+            
+            let name = answers.name || "";
+            await updateDisplayName({displayName: name})
+            await updateOnboarding({ onboardingComplete: true })
             navigate("/plan");
         } catch (error) {
             console.error("Failed to save onboarding answers:", error);
@@ -177,7 +181,7 @@ const OnboardingPage = () => {
 
     return (
         <DefaultPageDisplay
-            nav={<HomeNavBar defaultPage={false} onboarding={true} />}
+            nav={<HomeNavBar defaultPage={false} onboarding={true} onClick={handleFinish} />}
             progress={
                 <ProgressBar
                     value={progress}

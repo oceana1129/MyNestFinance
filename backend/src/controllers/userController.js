@@ -25,21 +25,7 @@ export async function getAllUsers(_, res) {
  * derived from the verified Firebase token.
  */
 export async function getCurrentUser(req, res) {
-  // res.status(200).json({ message: "Current user found", user: req.profile });
-  try {
-    const user = await User.findById(req.profile);
-    if (!user) {
-      return res.status(404).json({
-        message: "User not found",
-      });
-    }
-    res
-      .status(200)
-      .json({ message: `User with id ${req.profile} found`, user });
-  } catch (err) {
-    console.error("Error in getUserById controller", err);
-    res.status(500).json({ message: "internal server error" });
-  }
+  res.status(200).json({ message: "Current user found", user: req.profile });
 }
 
 /**
@@ -74,11 +60,12 @@ export async function updateUserName(req, res) {
  */
 export async function updateUserOnboarding(req, res) {
   try {
-    const { onboardingComplete, onboardingStep, budgetStylePreference } =
+    const { onboardingAnswers, onboardingComplete, onboardingStep, budgetStylePreference } =
       req.body;
     const updatedUser = await User.findByIdAndUpdate(
       req.profile._id,
       {
+        "onboarding.onboardingAnswers": onboardingAnswers,
         "onboarding.onboardingComplete": onboardingComplete,
         "onboarding.onboardingStep": onboardingStep,
         "onboarding.budgetStylePreference": budgetStylePreference,

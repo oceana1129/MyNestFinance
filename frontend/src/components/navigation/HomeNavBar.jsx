@@ -2,7 +2,7 @@ import { Link } from "react-router";
 import { ArrowRight } from "lucide-react";
 import Button from "../actions/Button";
 
-const HomeNavBar = ({defaultPage=true, signupPage=false, loginPage=false, onboarding=false}) => {
+const HomeNavBar = ({defaultPage=true, signupPage=false, loginPage=false, onboarding=false, onClick}) => {
     return (
         <header className="bg-white bg-opacity-70 border-b border-white">
             <div className="mx-auto max-w-6xl p-4 flex items-center justify-between">
@@ -32,7 +32,7 @@ const HomeNavBar = ({defaultPage=true, signupPage=false, loginPage=false, onboar
                     <div className="flex items-center">
                         <Button variant="ghost" text="Skip setup" 
                             iconRight={ArrowRight}
-                            to={"/plan"}/>
+                            onClick={onClick}/>
                     </div> }
             </div>
         </header>
