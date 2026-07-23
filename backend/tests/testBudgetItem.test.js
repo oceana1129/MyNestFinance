@@ -37,7 +37,7 @@ async function createTestItem(count = 3) {
     displayOrder: 0,
     name: `Category 1`,
     emoji: "heart",
-    color: "FFFFFF",
+    color: "purple",
     categoryType: "income",
   });
 
@@ -46,7 +46,7 @@ async function createTestItem(count = 3) {
     displayOrder: 1,
     name: `Category 2`,
     emoji: "money-with-wings",
-    color: "FFFFFF",
+    color: "purple",
     categoryType: "expense",
   });
 

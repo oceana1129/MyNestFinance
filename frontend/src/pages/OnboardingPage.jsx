@@ -1,5 +1,14 @@
 import React, { useState, useEffect } from 'react'
 import { UserAuth } from '../context/AuthContext.jsx'
+import { createBudget } from '../services/BudgetApi.jsx';
+import { createCategory, reorderCategories } from '../services/CategoryApi.jsx';
+import { createItem, reorderItem } from '../services/ItemApi.jsx';
+import {
+    CATEGORY_EXPENSES, 
+    CATEGORY_DEBT, 
+    CATEGORY_INCOME, 
+    CATEGORY_HOUSING} from "../onboardingSteps.js"
+
 import { useNavigate } from 'react-router'
 import { ChevronLeft, ChevronRight, Home as HomeIcon } from 'lucide-react'
 
@@ -14,6 +23,7 @@ import OnboardBlock from '../components/forms/OnboardBlock.jsx';
 import Blurb from '../components/data-display/Blurb.jsx';
 import { getVisibleSteps } from '../onboardingSteps.js';
 import toast from "react-hot-toast"
+
 
 const OnboardingPage = () => {
     // local storage
@@ -99,6 +109,7 @@ const OnboardingPage = () => {
     const isCompleteStep = step.id === "complete"; // are we on the complete step
     const isLastStep = currentStep === totalSteps - 1; // are we on the last step
 
+    // if question has been answered
     const isAnswered = (value) =>
         Array.isArray(value) ? value.length > 0 : value !== undefined && value !== "";
 
@@ -140,6 +151,57 @@ const OnboardingPage = () => {
         handleContinue();
     };
 
+    const createdAnswers = (answers) => {
+        const selectedCategories = [];
+
+        // Expense categories
+        for (const categoryId of answers.categories ?? []) {
+            const category = CATEGORY_EXPENSES[categoryId];
+
+            selectedCategories.push({
+                ...category,
+                items: (answers[`${categoryId}Items`] ?? []).map((itemId) => ({
+                    id: itemId,
+                    ...category.categoryChoices[itemId],
+                })),
+            });
+            }
+
+        // Debt
+        if (answers.debt?.length) {
+            selectedCategories.push({
+                ...CATEGORY_DEBT,
+                items: answers.debt.map((itemId) => ({
+                    id: itemId,
+                    ...CATEGORY_DEBT.categoryChoices[itemId],
+                })),
+            });
+        }
+
+        // Income
+        if (answers.income?.includes("working")) {
+            selectedCategories.push({
+                ...CATEGORY_INCOME,
+                items: [{
+                    itemName: CATEGORY_INCOME.itemName,
+                    itemIcon: CATEGORY_INCOME.itemIcon,
+                }],
+            });
+        }
+
+        // Housing
+        if (answers.livingSituation) {
+            selectedCategories.push({
+                ...CATEGORY_HOUSING,
+                items: [{
+                    itemName: CATEGORY_HOUSING.itemName,
+                    itemIcon: CATEGORY_HOUSING.itemIcon,
+                }],
+            });
+        }
+        return selectedCategories;
+    }
+
     // when the user has finished onboarding
     // send answers to the backend
     const handleFinish = async () => {
@@ -147,11 +209,41 @@ const OnboardingPage = () => {
             console.log("Onboarding complete, answers:", answers);
             
             let name = answers.name || "";
+            let budget = await createBudget({ month: 6,year: 2026,});
+            const selectedCategories = createdAnswers(answers)
+            // console.log(selectedCategories)
+            let categoryCount = 0;
+            
+            for (const category of selectedCategories) {
+                categoryCount++; 
+                let itemCount = 0;
+                const createdCategory = await createCategory({
+                    monthlyBudget: budget.savedBudget._id,
+                    name: category.title,
+                    color: category.color,
+                    emoji: category.emoji,
+                    displayOrder: categoryCount,
+                    categoryType: category.categoryType,
+                });
+
+                await Promise.all(
+                    category.items.map((item) =>{
+                        createItem({
+                            monthlyBudget: budget.savedBudget._id,
+                            budgetCategory: createdCategory.savedCategory._id,
+                            name: item.itemName,
+                            emoji: item.itemIcon,
+                        })
+                        itemCount++;}
+                    )
+                );
+            }
+
             await updateDisplayName({displayName: name})
             await updateOnboarding({ onboardingComplete: true })
             navigate("/plan");
         } catch (error) {
-            console.error("Failed to save onboarding answers:", error);
+            console.error("Failed to save profile after onboarding:", error);
         }
     };
 

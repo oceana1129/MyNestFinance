@@ -10,7 +10,7 @@ import {
     ShieldCheck, Tablets, Shapes, PackageOpen, Book, PencilLine,
     School, Backpack, University, Video, Palette, Plane, RotateCcw,
     Gift, Package, HeartPlus, TriangleAlert, HandCoins, Umbrella,
-    Wallet, Sprout, Leaf, MirrorRound, BrushCleaning, ParkingCircle
+    Wallet, Sprout, Leaf, MirrorRound, BrushCleaning, ParkingCircle, DollarSign
 } from "lucide-react";
 
 
@@ -44,23 +44,36 @@ import {
 // A step can also have `blurb: { title, text, icon }`
 // the purple callout shown at the top of each category-detail screen.
 // ---------------------------------------------------------------------------
-
+// { value: "utilities", label: "Utilities", icon: Lightbulb },
+//                     { value: "transportation", label: "Transportation", icon: Car },
+//                     { value: "food", label: "Food", icon: Apple },
+//                     { value: "healthcare", label: "Medical needs", icon: Stethoscope },
+//                     { value: "pets", label: "Pet needs", icon: PawPrint },
+//                     { value: "personal-needs", label: "Personal needs", icon: UserRound },
+//                     { value: "child-care", label: "Child care", icon: Baby },
+//                     { value: "education", label: "Education", icon: LibraryBig },
+//                     { value: "savings", label: "Savings", icon: PiggyBank },
+//                     { value: "special-equipment", label: "Special equipment", icon: Accessibility },
+//                     { value: "entertainment", label: "Entertainment", icon: Gamepad2 },
+//                     { value: "miscellaneous", label: "Other", icon: Sparkles },
 // maps a base category value (from the "base-category" step) to the id of
 // the detail step that should follow if that category was selected
 const categoryStepMap = {
     utilities: "utilities",
     transportation: "transportation",
     food: "food",
-    medical: "healthcare",
-    pet: "pets",
+    healthcare: "healthcare",
+    pets: "pets",
     personal: "personal-needs",
-    child: "child-care",
+    "child-care": "child-care",
     education: "education",
     savings: "savings",
-    equipment: "special-equipment",
+    "special-equipment": "special-equipment",
     entertainment: "entertainment",
-    other: "miscellaneous",
+    miscellaneous: "miscellaneous",
 };
+
+
 
 // steps that are always shown before the category detail screens
 const coreSteps = [
@@ -272,15 +285,15 @@ const coreSteps = [
                     { value: "utilities", label: "Utilities", icon: Lightbulb },
                     { value: "transportation", label: "Transportation", icon: Car },
                     { value: "food", label: "Food", icon: Apple },
-                    { value: "medical", label: "Medical needs", icon: Stethoscope },
-                    { value: "pet", label: "Pet needs", icon: PawPrint },
-                    { value: "personal", label: "Personal needs", icon: UserRound },
-                    { value: "child", label: "Child care", icon: Baby },
+                    { value: "healthcare", label: "Medical needs", icon: Stethoscope },
+                    { value: "pets", label: "Pet needs", icon: PawPrint },
+                    { value: "personal-needs", label: "Personal needs", icon: UserRound },
+                    { value: "child-care", label: "Child care", icon: Baby },
                     { value: "education", label: "Education", icon: LibraryBig },
                     { value: "savings", label: "Savings", icon: PiggyBank },
-                    { value: "equipment", label: "Special equipment", icon: Accessibility },
+                    { value: "special-equipment", label: "Special equipment", icon: Accessibility },
                     { value: "entertainment", label: "Entertainment", icon: Gamepad2 },
-                    { value: "other", label: "Other", icon: Sparkles },
+                    { value: "miscellaneous", label: "Other", icon: Sparkles },
                 ],
             },
         ],
@@ -608,4 +621,70 @@ export function getVisibleSteps(answers) {
               .filter(Boolean);
 
     return [...visibleCoreSteps, ...detailSteps, completeStep];
+}
+
+// create options from entries
+export const CATEGORY_EXPENSES = Object.fromEntries(
+    categoryDetailSteps.map((category) => [
+        category.id,
+        {
+            title: category.blurb.title,
+            color: category.blurb.color,
+            emoji: category.blurb.icon.displayName,
+            categoryType: "expense",
+
+            categoryChoices: Object.fromEntries(
+                category.blocks.flatMap((block) =>
+                    block.options.map((item) => [
+                        item.value,
+                        {
+                            itemName: item.label,
+                            itemIcon: item.icon.displayName,
+                        },
+                    ])
+                )
+            ),
+        },
+    ])
+);
+
+const debtStep = coreSteps
+    .find((step) => step.id === "debt")
+    .blocks[0]
+    .options
+    .slice(0, -1);
+
+export const CATEGORY_DEBT = {
+    title: "Debt",
+    color: "red",
+    emoji: "Banknote",
+    categoryType: "debt",
+
+    categoryChoices: Object.fromEntries(
+        debtStep.map((debt) => [
+            debt.value,
+            {
+                itemName: debt.label,
+                itemIcon: debt.icon.displayName,
+            },
+        ])
+    ),
+};
+
+export const CATEGORY_INCOME = {
+    title: "Income",
+    color: "green",
+    emoji: "DollarSign",
+    categoryType: "income",
+    itemName: "Income",
+    itemIcon: "DollarSign"
+}
+
+export const CATEGORY_HOUSING = {
+    title: "Housing",
+    color: "blue",
+    emoji: "Building",
+    categoryType: "income",
+    itemName: "Housing",
+    itemIcon: "DollarSign"
 }

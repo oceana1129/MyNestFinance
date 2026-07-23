@@ -6,15 +6,21 @@ import { deleteItemData } from "../services/deleteItemData.js";
 // create a budget item
 export async function createBudgetItem(req, res) {
   try {
-    const { budgetCategory, name, emoji } = req.body;
+    const { budgetCategory, monthlyBudget, name, emoji } = req.body;
 
     // does category exist
-    const category = await Category.findById(budgetCategory);
+    const category = await Category.findById(budgetCategory)
+      .populate("monthlyBudget");
 
     if (!category)
       return res.status(404).json({
         message: "Category not found",
       });
+    
+    // make sure budget -> category -> belongs to user
+    if (!category.monthlyBudget.userProfile.equals(req.profile._id)) {
+      return res.status(403).json({ message: "Forbidden" });
+    }
 
     // create the display order by display order
     const lastItem = await BudgetItem.findOne({
@@ -23,10 +29,19 @@ export async function createBudgetItem(req, res) {
 
     // if a previous item exists, display order is +1
     // otherwise its the first item so display is 0
-    const displayOrder = lastItem ? lastItem.displayOrder + 1 : 0;
+    let { displayOrder } = req.body;
+
+    if (displayOrder === undefined) {
+        const lastItem = await BudgetItem.findOne({
+            budgetCategory,
+        }).sort({ displayOrder: -1 });
+
+        displayOrder = lastItem ? lastItem.displayOrder + 1 : 0;
+    }
 
     const savedItem = await BudgetItem.create({
       budgetCategory,
+      monthlyBudget,
       displayOrder,
       name,
       emoji,
@@ -34,7 +49,7 @@ export async function createBudgetItem(req, res) {
 
     res
       .status(200)
-      .json({ message: "Budget item created successfully!", savedItem });
+      .json({ savedItem });
   } catch (err) {
     console.error("createBudgetItem(): ", err);
 
@@ -53,7 +68,7 @@ export async function createBudgetItem(req, res) {
 export async function getAllBudgetItems(_, res) {
   try {
     const items = await BudgetItem.find().sort({ createdAt: -1 });
-    res.status(200).json({ message: "All items found:\n", items });
+    res.status(200).json({ items });
   } catch (err) {
     console.error("getAllBudgetItems(): ", err);
     res.status(500).json({ message: "internal server error" });
@@ -67,7 +82,7 @@ export async function getBudgetItemById(req, res) {
     if (!item) return res.status(404).json({ message: "Item not found" });
     res
       .status(200)
-      .json({ message: `Item with id ${req.params.id} found`, item });
+      .json({ item });
   } catch (err) {
     console.error("getBudgetItemById(): ", err);
     res.status(500).json({ message: "internal server error" });
@@ -82,7 +97,7 @@ export async function getBudgetItemByCategory(req, res) {
     }).sort({
       displayOrder: 1,
     });
-    res.status(200).json({ message: "Items found", items });
+    res.status(200).json({ items });
   } catch (err) {
     console.error("getBudgetItemByCategory(): ", err);
     res.status(500).json({ message: "internal server error" });
@@ -97,7 +112,7 @@ export async function getBudgetItemByBudget(req, res) {
     }).sort({
       displayOrder: 1,
     });
-    res.status(200).json({ message: "Items found", items });
+    res.status(200).json({ items });
   } catch (err) {
     console.error("getBudgetItemByBudget(): ", err);
     res.status(500).json({ message: "internal server error" });
@@ -131,7 +146,6 @@ export async function updateBudgetItem(req, res) {
     if (!updatedItem)
       return res.status(404).json({ message: "Item not found" });
     res.status(200).json({
-      message: "Item updated successfully!",
       updatedItem,
     });
   } catch (err) {
@@ -192,7 +206,7 @@ export async function deleteBudgetItem(req, res) {
       return res.status(404).json({ message: "Item not found" });
     res
       .status(200)
-      .json({ message: "Item deleted successfully!", deletedItem });
+      .json({ deletedItem });
   } catch (err) {
     console.error("deleteBudgetItem(): ", err);
     res.status(500).json({ message: "internal server error" });

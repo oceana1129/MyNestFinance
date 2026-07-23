@@ -39,7 +39,6 @@ export async function createBudgetPlan(req, res) {
     });
 
     res.status(201).json({
-      message: "Budget plan created successfully!",
       savedBudgetPlan,
     });
   } catch (err) {
@@ -66,7 +65,6 @@ export async function getAllBudgetPlans(_, res) {
     });
 
     res.status(200).json({
-      message: "All budget plans found",
       budgetPlans,
     });
   } catch (err) {
@@ -90,7 +88,6 @@ export async function getBudgetPlanById(req, res) {
     }
 
     res.status(200).json({
-      message: `Budget plan with id ${req.params.id} found`,
       budgetPlan,
     });
   } catch (err) {
@@ -116,7 +113,6 @@ export async function getBudgetPlanByBudgetItem(req, res) {
     }
 
     res.status(200).json({
-      message: "Budget plan found",
       budgetPlan,
     });
   } catch (err) {
@@ -168,7 +164,6 @@ export async function updateBudgetPlan(req, res) {
     }
 
     res.status(200).json({
-      message: "Budget plan updated successfully!",
       updatedBudgetPlan,
     });
   } catch (err) {
@@ -193,7 +188,6 @@ export async function deleteBudgetPlan(req, res) {
     }
 
     res.status(200).json({
-      message: "Budget plan deleted successfully!",
       deletedBudgetPlan,
     });
   } catch (err) {
@@ -219,7 +213,6 @@ export async function deleteBudgetPlanByBudgetItem(req, res) {
     }
 
     res.status(200).json({
-      message: "Budget plan deleted successfully!",
       deletedBudgetPlan,
     });
   } catch (err) {

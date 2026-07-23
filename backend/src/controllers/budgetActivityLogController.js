@@ -8,7 +8,7 @@ export async function createActivityLog(req, res) {
     const { budgetItem, name, amount, activityDate, notes } =
       req.body;
 
-    // does budgetItem exist?
+    // does budgetItem exist
     const item = await BudgetItem.findById(budgetItem);
 
     if (!item) return res.status(404).json({ message: "Item not found" });
@@ -22,7 +22,6 @@ export async function createActivityLog(req, res) {
     });
 
     res.status(200).json({
-      message: "Activity log created successfully!",
       savedActivityLog,
     });
   } catch (err) {
@@ -43,7 +42,7 @@ export async function createActivityLog(req, res) {
 export async function getAllActivityLogs(req, res) {
   try {
     const activityLogs = await ActivityLog.find().sort({ createdAt: -1 });
-    res.status(200).json({ message: "All activity logs:\n", activityLogs });
+    res.status(200).json({ activityLogs });
   } catch (err) {
     console.error("getAllActivityLogs(): ", err);
     res.status(500).json({ message: "internal server error" });
@@ -57,7 +56,6 @@ export async function getActivityLogById(req, res) {
     if (!activityLog)
       return res.status(404).json({ message: "Activity log not found" });
     res.status(200).json({
-      message: `Activity log with id ${req.params.id} found`,
       activityLog,
     });
   } catch (err) {
@@ -74,7 +72,7 @@ export async function getActivityLogsByBudget(req, res) {
     }).sort({
       activityDate: -1,
     });
-    res.status(200).json({ message: "Activity logs found", activityLogs });
+    res.status(200).json({ activityLogs });
   } catch (err) {
     console.error("getActivityLogsByBudget(): ", err);
     res.status(500).json({ message: "internal server error" });
@@ -100,7 +98,6 @@ export async function updateActivityLog(req, res) {
     if (!updatedActivityLog)
       return res.status(404).json({ message: "Activity log not found" });
     res.status(200).json({
-      message: "Activity log updated successfully!",
       updatedActivityLog,
     });
   } catch (err) {
@@ -119,7 +116,6 @@ export async function deleteActivityLog(req, res) {
     if (!deletedActivityLog)
       return res.status(404).json({ message: "Activity log not found" });
     res.status(200).json({
-      message: "Activity log deleted successfully!",
       deletedActivityLog,
     });
   } catch (err) {
@@ -135,7 +131,6 @@ export async function deleteActivityLogByBudget(req, res) {
       budgetItem: req.params.budgetItemId,
     });
     res.status(200).json({
-      message: "ActivityLogs deleted successfully!",
       deletedCount: deletedActivityLogs.deletedCount,
     });
   } catch (err) {

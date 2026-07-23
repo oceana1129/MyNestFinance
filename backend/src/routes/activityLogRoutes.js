@@ -11,6 +11,7 @@ import {
   updateActivityLog,
 } from "../controllers/budgetActivityLogController.js";
 
+
 const router = express.Router();
 
 router.use(verifyFirebaseToken);

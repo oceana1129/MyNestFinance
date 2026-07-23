@@ -35,7 +35,6 @@ export async function createDebtItem(req, res) {
     });
 
     res.status(201).json({
-      message: "Debt item created successfully!",
       savedDebtItem,
     });
   } catch (err) {
@@ -187,7 +186,6 @@ export async function deleteDebtItem(req, res) {
     }
 
     res.status(200).json({
-      message: "Debt item deleted successfully!",
       deletedDebtItem,
     });
   } catch (err) {

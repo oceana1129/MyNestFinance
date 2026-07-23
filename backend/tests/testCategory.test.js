@@ -44,7 +44,7 @@ async function createTestCategory(count = 3) {
       displayOrder: i,
       name: `Category ${i}`,
       emoji: "heart",
-      color: "FFFFFF",
+      color: "purple",
       categoryType: "income",
     });
     categories.push(category);
@@ -56,7 +56,7 @@ async function createTestCategory(count = 3) {
       displayOrder: i,
       name: `Category ${i}`,
       emoji: "heart",
-      color: "FFFFFF",
+      color: "purple",
       categoryType: "income",
     });
     categories.push(category);

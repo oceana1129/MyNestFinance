@@ -15,13 +15,11 @@ router.use(verifyFirebaseToken);
 router.use(loadUserProfile);
 
 // the controller routes
-// TODO: change from :id to dynamic auth from user
 router.post("/", createMonthlyBudget);
 router.get("/", getAllBudgets);
 router.get("/:id", getBudgetById);
 router.get("/user/:userProfileId", getBudgetsForUser);
 router.delete("/:id", deleteBudget);
-// router.delete("/user/:userProfileId", deleteBudgetByUser);
 
 
 export default router;

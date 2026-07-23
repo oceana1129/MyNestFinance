@@ -58,7 +58,7 @@ async function createTestBudget(count = 3) {
     displayOrder: 0,
     name: "Category 1",
     emoji: "heart",
-    color: "FFFFFF",
+    color: "purple",
     categoryType: "income",
   });
 

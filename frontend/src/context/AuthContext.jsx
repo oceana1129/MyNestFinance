@@ -1,4 +1,9 @@
-import { createContext, useContext, useEffect, useMemo, useState } from "react";
+import { 
+  createContext, 
+  useContext, 
+  useEffect, 
+  useMemo, 
+  useState } from "react";
 import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
@@ -6,6 +11,11 @@ import {
   onAuthStateChanged,
 } from "firebase/auth";
 import { auth } from "../firebase";
+import {
+    updateSettings,
+    updateOnboarding,
+    updateDisplayName,
+} from "../services/UserApi"
 
 const UserContext = createContext();
 
@@ -101,102 +111,92 @@ export const AuthContextProvider = ({ children }) => {
 
     await signOut(auth);
   };
+  //   console.log("AuthContext.jsx: updateOnboarding()", onboardingChanges);
 
-  /**
-   * Update the current user's settings (currency, decimals, etc).
-   */
-  const updateSettings = async (settingsChanges) => {
-    console.log("AuthContext.jsx: updateSettings()", settingsChanges);
+  //   if (!auth.currentUser) {
+  //     throw new Error("No user is currently signed in.");
+  //   }
 
-    if (!auth.currentUser) {
-      throw new Error("No user is currently signed in.");
-    }
+  //   const token = await auth.currentUser.getIdToken();
 
-    const token = await auth.currentUser.getIdToken();
-
-    const mergedSettings = { ...profile?.settings, ...settingsChanges };
+  //   const mergedOnboarding = { ...profile?.onboarding, ...onboardingChanges };
     
-    const response = await fetch(`${API_URL}/user/me/settings`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify(mergedSettings),
-    });
+  //   const response = await fetch(`${API_URL}/user/me/onboarding`, {
+  //     method: "PUT",
+  //     headers: {
+  //       "Content-Type": "application/json",
+  //       Authorization: `Bearer ${token}`,
+  //     },
+  //     body: JSON.stringify(mergedOnboarding),
+  //   });
 
-    if (!response.ok) {
-      throw new Error("Failed to update settings.");
-    }
+  //   if (!response.ok) {
+  //     throw new Error("Failed to update onboarding.");
+  //   }
 
-    const data = await response.json();
+  //   const data = await response.json();
+  //   setProfile(data.updatedUser);
+  //   return data.updatedUser;
+  // };
+
+  const handleUpdateSettings = async (changes) => {
+    const mergedSettings = {
+        ...profile?.settings,
+        ...changes,
+    };
+
+    const data = await updateSettings(mergedSettings);
+
     setProfile(data.updatedUser);
+
+    return data.updatedUser;
+  };
+  
+  const handleUpdateOnboarding = async (changes) => {
+    const mergedOnboarding = {
+        ...profile?.onboarding,
+        ...changes,
+    };
+
+    const data = await updateOnboarding(mergedOnboarding);
+
+    setProfile(data.updatedUser);
+
     return data.updatedUser;
   };
 
-  /**
-   * Update the current user's settings (currency, decimals, etc).
-   */
-  const updateOnboarding = async (onboardingChanges) => {
-    console.log("AuthContext.jsx: updateOnboarding()", onboardingChanges);
+  const handleUpdateDisplayName = async (changes) => {
+    const data = await updateDisplayName(changes);
 
-    if (!auth.currentUser) {
-      throw new Error("No user is currently signed in.");
-    }
-
-    const token = await auth.currentUser.getIdToken();
-
-    const mergedOnboarding = { ...profile?.onboarding, ...onboardingChanges };
-    
-    const response = await fetch(`${API_URL}/user/me/onboarding`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify(mergedOnboarding),
-    });
-
-    if (!response.ok) {
-      throw new Error("Failed to update onboarding.");
-    }
-
-    const data = await response.json();
     setProfile(data.updatedUser);
+
     return data.updatedUser;
   };
+  //   console.log("AuthContext.jsx: updateDisplayName()", nameChange);
 
-  /**
-   * Update the current user's display name
-   * @param {*} nameChange 
-   * @returns 
-   */
-  const updateDisplayName = async (nameChange) => {
-    console.log("AuthContext.jsx: updateDisplayName()", nameChange);
+  //   if (!auth.currentUser) {
+  //     throw new Error("No user is currently signed in.");
+  //   }
 
-    if (!auth.currentUser) {
-      throw new Error("No user is currently signed in.");
-    }
+  //   const token = await auth.currentUser.getIdToken();
 
-    const token = await auth.currentUser.getIdToken();
+  //   const response = await fetch(`${API_URL}/user/me/name`, {
+  //     method: "PUT",
+  //     headers: {
+  //       "Content-Type": "application/json",
+  //       Authorization: `Bearer ${token}`,
+  //     },
+  //     body: JSON.stringify(nameChange),
+  //   });
 
-    const response = await fetch(`${API_URL}/user/me/name`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify(nameChange),
-    });
+  //   if (!response.ok) {
+  //     throw new Error("Failed to update name.");
+  //   }
 
-    if (!response.ok) {
-      throw new Error("Failed to update name.");
-    }
-
-    const data = await response.json();
-    setProfile(data.updatedUser);
-    return data.updatedUser;
-};
+  //   const data = await response.json();
+  //   setProfile(data.updatedUser);
+  //   return data.updatedUser;
+  // };
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
@@ -230,9 +230,9 @@ export const AuthContextProvider = ({ children }) => {
       signIn,
       logout,
       deleteAccount,
-      updateSettings,
-      updateOnboarding, 
-      updateDisplayName
+      updateSettings: handleUpdateSettings,
+      updateOnboarding: handleUpdateOnboarding,
+      updateDisplayName: handleUpdateDisplayName,
     }),
     [user, profile, loading],
   );

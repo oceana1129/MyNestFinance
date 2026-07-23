@@ -9,7 +9,7 @@ import mongoose from "mongoose";
  * Examples:
  * - Income
  * - Housing
- * - Transportation
+ * - Transportations
  * - Groceries
  * - Entertainment
  */
@@ -55,7 +55,7 @@ const budgetCategorySchema = new mongoose.Schema(
      * converted into visual emojis.
      *
      * Examples:
-     * 🏠 🍔 🚗 💰
+     * Zap, Dropley
      */
     emoji: {
       type: String,
@@ -68,14 +68,16 @@ const budgetCategorySchema = new mongoose.Schema(
      * Hex color used when displaying the category.
      *
      * Examples:
-     * #FF5733
-     * #4CAF50
+     * rose
+     * amber
      */
     color: {
       type: String,
-      required: true,
-      minLength: 6,
-      maxLength: 6,
+      enum: ["red", "orange", "amber", "yellow", "lime", "green",
+         "emerald", "teal", "cyan", "sky", "blue", "indigo", 
+         "violet", "purple", "fuchsia", "pink", "rose", 
+         "slate", "zinc", "stone", "taupe", "mauve"],
+      default: "purple",
     },
 
     /**

@@ -2,14 +2,6 @@ import Budget from "../models/MonthlyBudget.js";
 import UserProfile from "../models/UserProfile.js";
 import { deleteBudgetData } from "../services/deleteBudgetData.js";
 
-// TODO: auth used dynamically for user
-// const authUser = await AuthUser.findOne({
-//   _firebaseUid: req.user.uid,
-// });
-
-// const profile = await UserProfile.findOne({
-//   authUser: authUser._id,
-// });
 
 // CREATE
 /**
@@ -19,31 +11,21 @@ import { deleteBudgetData } from "../services/deleteBudgetData.js";
  */
 export async function createMonthlyBudget(req, res) {
   try {
-    const { userProfile, month, year } = req.body;
-
-    // does the user exist
-    // TODO: user should be dynamic in future based on auth
-    const user = await UserProfile.findById(userProfile);
-
-    if (!user) {
-      return res.status(404).json({
-        message: "User profile not found",
-      });
-    }
-
-    // user exists, continue with req
+    const { month, year } = req.body;
+ 
+    // userProfile is derived from verified token
     const savedBudget = await Budget.create({
-      userProfile,
+      userProfile: req.profile._id,
       month,
       year,
     });
-
+ 
     res
       .status(201)
-      .json({ message: "Monthly Budget created successfully!", savedBudget });
+      .json({ savedBudget });
   } catch (err) {
     console.error("createMonthlyBudget()", err);
-
+ 
     if (err.code === 11000) {
       return res.status(409).json({
         message: "A budget already exists for this month and year.",
@@ -58,6 +40,10 @@ export async function createMonthlyBudget(req, res) {
  * Will return all existing monthly budgets
  */
 export async function getAllBudgets(_, res) {
+  if (process.env.NODE_ENV === "production") {
+    return res.status(403).json({ message: "Forbidden" });
+  }
+ 
   try {
     const budgets = await Budget.find().sort({ createdAt: -1 });
     res.status(200).json({ message: "All budgets found:\n", budgets });
@@ -73,16 +59,14 @@ export async function getAllBudgets(_, res) {
  */
 export async function getBudgetsForUser(req, res) {
   try {
-    // TODO: user should be dynamic in future based on auth
     const budgets = await Budget.find({
-      userProfile: req.params.userProfileId,
+      userProfile: req.profile._id,
     }).sort({
       year: -1,
       month: -1,
     });
 
     res.status(200).json({
-      message: "Budgets found",
       budgets,
     });
   } catch (err) {
@@ -103,9 +87,12 @@ export async function getBudgetById(req, res) {
     if (!budget) {
       return res.status(404).json({ message: "Budget not found" });
     }
+    if (!budget.userProfile.equals(req.profile._id)) {
+      return res.status(403).json({ message: "Forbidden" });
+    }
     res
       .status(200)
-      .json({ message: `Budget with id ${req.params.id} found`, budget });
+      .json({ budget });
   } catch (err) {
     console.error("getBudgetById(): ", err);
     res.status(500).json({ message: "internal server error" });
@@ -121,8 +108,10 @@ export async function deleteBudget(req, res) {
     const deletedBudget = await deleteBudgetData(req.params.id);
     if (!deletedBudget)
       return res.status(404).json({ message: "Budget not found" });
+    if (!deletedBudget.userProfile.equals(req.profile._id)) {
+      return res.status(403).json({ message: "Forbidden" });
+    }
     res.status(200).json({
-      message: "Budget deleted successfully!",
       deletedBudget,
     });
   } catch (err) {

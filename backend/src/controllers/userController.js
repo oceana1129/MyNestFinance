@@ -12,7 +12,7 @@ export async function getAllUsers(_, res) {
 
   try {
     const users = await User.find().sort({ createdAt: -1 });
-    res.status(200).json({ message: "All users found:\n", users });
+    res.status(200).json({ users });
   } catch (err) {
     console.error("Error in getAllUsers controller", err);
     res.status(500).json({ message: "internal server error" });
@@ -43,7 +43,7 @@ export async function updateUserName(req, res) {
       return res.status(404).json({ message: "User not found" });
     res
       .status(200)
-      .json({ message: "User updated successfully!", updatedUser });
+      .json({ updatedUser });
   } catch (err) {
     console.error("Error in updateUser controller", err);
     res.status(500).json({ message: "internal server error" });
@@ -75,7 +75,6 @@ export async function updateUserOnboarding(req, res) {
     if (!updatedUser)
       return res.status(404).json({ message: "User not found" });
     res.status(200).json({
-      message: "User onboarding status updated successfully!",
       updatedUser,
     });
   } catch (err) {
@@ -117,7 +116,6 @@ export async function updateUserSettings(req, res) {
     if (!updatedUser)
       return res.status(404).json({ message: "User not found" });
     res.status(200).json({
-      message: "User settings updated successfully!",
       updatedUser,
     });
   } catch (err) {

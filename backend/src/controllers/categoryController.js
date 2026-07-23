@@ -9,7 +9,8 @@ import { deleteCategoryData } from "../services/deleteCategoryData.js";
  */
 export async function createCategory(req, res) {
   try {
-    const { monthlyBudget, name, emoji, color, categoryType } = req.body;
+    const { monthlyBudget, name, emoji, color, categoryType } 
+      = req.body;
 
     // does the budget exist
     const budget = await Budget.findById(monthlyBudget);
@@ -20,6 +21,11 @@ export async function createCategory(req, res) {
       });
     }
 
+    // category must belong to the user
+    if (!budget.userProfile.equals(req.profile._id)) {
+      return res.status(403).json({ message: "Forbidden" });
+    }
+
     // create the display order by display order
     const lastCategory = await Category.findOne({
       monthlyBudget,
@@ -27,9 +33,17 @@ export async function createCategory(req, res) {
 
     // if a previous category exists, display order is +1
     // otherwise its the first category so display is 0
-    const displayOrder = lastCategory ? lastCategory.displayOrder + 1 : 0;
+    let { displayOrder } = req.body;
 
-    // budget exists, continue with req
+    if (displayOrder === undefined) {
+        const lastCategory = await BudgetItem.findOne({
+            budgetCategory,
+        }).sort({ displayOrder: -1 });
+
+        displayOrder = lastCategory ? lastCategory.displayOrder + 1 : 0;
+    }
+
+    // budget exists and belongs to user, continue with req
     const savedCategory = await Category.create({
       monthlyBudget,
       displayOrder,
@@ -40,7 +54,6 @@ export async function createCategory(req, res) {
     });
 
     res.status(201).json({
-      message: "Budget Category created successfully!",
       savedCategory,
     });
   } catch (err) {
@@ -60,7 +73,7 @@ export async function createCategory(req, res) {
 export async function getAllCategories(_, res) {
   try {
     const categories = await Category.find().sort({ createdAt: -1 });
-    res.status(200).json({ message: "All categories found:\n", categories });
+    res.status(200).json({ categories });
   } catch (err) {
     console.error("getAllCategories(): ", err);
     res.status(500).json({ message: "internal server error" });
@@ -75,7 +88,7 @@ export async function getCategoryById(req, res) {
       return res.status(404).json({ message: "Category not found" });
     res
       .status(200)
-      .json({ message: `Category with id ${req.params.id} found`, category });
+      .json({ category });
   } catch (err) {
     console.error("getCategoryById(): ", err);
     res.status(500).json({ message: "internal server error" });
@@ -90,7 +103,7 @@ export async function getCategoriesByBudget(req, res) {
     }).sort({
       displayOrder: 1,
     });
-    res.status(200).json({ message: "Categories found", categories });
+    res.status(200).json({ categories });
   } catch (err) {
     console.error("getCategoriesByBudget(): ", err);
     res.status(500).json({ message: "internal server error" });
@@ -116,7 +129,6 @@ export async function updateCategory(req, res) {
     if (!updatedCategory)
       return res.status(404).json({ message: "category not found" });
     res.status(200).json({
-      message: "category updated successfully!",
       updatedCategory,
     });
   } catch (err) {
@@ -179,7 +191,6 @@ export async function deleteCategory(req, res) {
     if (!deletedCategory)
       return res.status(404).json({ message: "Category not found" });
     res.status(200).json({
-      message: "Category deleted successfully!",
       deletedCategory,
     });
   } catch (err) {

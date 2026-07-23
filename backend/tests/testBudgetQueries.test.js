@@ -46,7 +46,7 @@ async function createTestDatabase() {
         displayOrder: 0,
         name: "Income",
         emoji: "money-bag",
-        color: "4CAF50",
+        color: "purple",
         categoryType: "income",
     });
 
@@ -55,7 +55,7 @@ async function createTestDatabase() {
         displayOrder: 1,
         name: "Home",
         emoji: "house",
-        color: "2196F3",
+        color: "purple",
         categoryType: "expense",
     });
 
@@ -64,7 +64,7 @@ async function createTestDatabase() {
         displayOrder: 2,
         name: "Utilities",
         emoji: "electric-plug",
-        color: "FF9800",
+        color: "purple",
         categoryType: "expense",
     });
 
@@ -73,7 +73,7 @@ async function createTestDatabase() {
         displayOrder: 3,
         name: "Transportation",
         emoji: "car",
-        color: "9C27B0",
+        color: "purple",
         categoryType: "expense",
     });
 
@@ -82,7 +82,7 @@ async function createTestDatabase() {
         displayOrder: 4,
         name: "Food",
         emoji: "fork-and-knife",
-        color: "F44336",
+        color: "purple",
         categoryType: "expense",
     });
 
@@ -91,7 +91,7 @@ async function createTestDatabase() {
         displayOrder: 5,
         name: "Personal Care",
         emoji: "sparkles",
-        color: "E91E63",
+        color: "purple",
         categoryType: "expense",
     });
 
@@ -100,7 +100,7 @@ async function createTestDatabase() {
         displayOrder: 6,
         name: "Debt",
         emoji: "credit-card",
-        color: "607D8B",
+        color: "purple",
         categoryType: "debt",
     });
 
@@ -498,7 +498,7 @@ describe("Budget Queries", () => {
             displayOrder: 0,
             name: "Debt",
             emoji: "credit-card",
-            color: "607D8B",
+            color: "purple",
             categoryType: "debt",
         });
 
@@ -541,7 +541,7 @@ describe("Budget Queries", () => {
             displayOrder: 0,
             name: "Debt",
             emoji: "credit-card",
-            color: "607D8B",
+            color: "purple",
             categoryType: "debt",
         });
 
