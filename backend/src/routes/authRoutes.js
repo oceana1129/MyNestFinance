@@ -15,6 +15,6 @@ router.get("/", getAllAuthUsers);
 router.get("/me", verifyFirebaseToken, getCurrentAuthUser);
 router.post("/sync", verifyFirebaseToken, syncAuthUser);
 router.delete("/me", verifyFirebaseToken, deleteAuthUser);
-router.delete("/cleanup", verifyFirebaseToken, cleanupAuthUsers);
+router.delete("/cleanup", cleanupAuthUsers);
 
 export default router;

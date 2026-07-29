@@ -78,9 +78,9 @@ export async function syncAuthUser(req, res) {
 
 /**
  * Get current auth user
- * @param {*} req 
- * @param {*} res 
- * @returns 
+ * @param {*} req
+ * @param {*} res
+ * @returns
  */
 export async function getCurrentAuthUser(req, res) {
   try {
@@ -112,9 +112,9 @@ export async function getCurrentAuthUser(req, res) {
 
 /**
  * Delete an auth user
- * @param {*} req 
- * @param {*} res 
- * @returns 
+ * @param {*} req
+ * @param {*} res
+ * @returns
  */
 export async function deleteAuthUser(req, res) {
   try {
@@ -128,7 +128,7 @@ export async function deleteAuthUser(req, res) {
       });
     }
 
-    await deleteAuthUserData(authUser._id)
+    await deleteAuthUserData(authUser._id);
 
     res.status(200).json({
       message: "Account deleted",
@@ -167,7 +167,7 @@ export async function cleanupAuthUsers(_, res) {
         if (err.code === "auth/user-not-found") {
           console.log(`Deleting orphaned user: ${authUser._firebaseUid}`);
 
-          await deleteAuthUserData(authUser._id)
+          await deleteAuthUserData(authUser._id);
 
           deletedCount++;
         } else {

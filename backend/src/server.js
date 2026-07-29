@@ -13,7 +13,7 @@ import categoryRoutes from "./routes/categoryRoutes.js";
 import budgetItemRoutes from "./routes/budgetItemRoutes.js";
 import activityLogRoutes from "./routes/activityLogRoutes.js";
 import debtItemRoutes from "./routes/budgetDebtItemRoutes.js";
-import budgetPlanRoutes from "./routes/budgetPlanRoutes.js"
+import budgetPlanRoutes from "./routes/budgetPlanRoutes.js";
 
 // set up .env config
 dotenv.config();
@@ -32,7 +32,6 @@ app.use(express.json());
 // set up rate limiter
 // rate limiter needs to be set up again
 // app.use(rateLimiter);
-
 
 // set up routes
 app.use("/api/test", testRoutes);
