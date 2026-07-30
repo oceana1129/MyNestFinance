@@ -7,6 +7,7 @@ import MonthDisplay from "../data-display/MonthDisplay";
 import BudgetCard from "../data-display/BudgetCard.jsx";
 import BudgetCardAdd from "../data-display/BudgetCardAdd.jsx";
 import CategoryDisplay from "../data-display/CategoryDisplay.jsx";
+import GlassDisplay from "../data-display/GlassDisplay.jsx";
 
 const Dashboard = () => {
   const { user } = UserAuth();
@@ -63,8 +64,10 @@ const Dashboard = () => {
       <HeaderStandard
         header={`Hi ${displayName}, you're doing great.`}
         text={"Here's your nest this month"}
+        textAlign="center"
         className={"font-serif"}
       />
+      <GlassDisplay />
       <CategoryDisplay
         title="Income"
         subtitle="income"
@@ -97,6 +100,7 @@ const Dashboard = () => {
         currentAmount={0}
         targetAmount={0}
       />
+      <BudgetCardAdd text="add category + "/>
     </div>
   );
 };

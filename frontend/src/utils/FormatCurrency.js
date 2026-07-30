@@ -5,7 +5,7 @@
  * @param {{ currencyPreference?: string, showDecimals?: boolean, showNegative?: boolean }} settings
  * @returns {string} e.g. "$1,234.50" or "$1,235" or "-$246.12"
  */
-export function formatCurrency(amount, settings = {}, showNegative) {
+export function formatCurrency(amount, settings = {}, showNegative, showPositive) {
     const { currencyPreference = "$", showDecimals = true } = settings;
 
     const numericAmount = Number(amount) || 0;
@@ -22,5 +22,5 @@ export function formatCurrency(amount, settings = {}, showNegative) {
     const numberPart = decimal ? `${wholeWithCommas}.${decimal}` : wholeWithCommas;
 
     // minus sign goes before the currency symbol
-    return `${isNegative ? "-" : ""}${currencyPreference}${numberPart}`;
+    return `${showPositive ? "+" : ""}${isNegative ? "-" : ""}${currencyPreference}${numberPart}`;
 }
