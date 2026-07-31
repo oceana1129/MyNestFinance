@@ -21,7 +21,7 @@ export async function getAllAuthUsers(_, res) {
  */
 export async function syncAuthUser(req, res) {
   try {
-    console.log("syncAuthUser(): syncing user for auth");
+    //console.log("syncAuthUser(): syncing user for auth");
 
     const { uid, email, firebase } = req.user;
 
@@ -48,14 +48,14 @@ export async function syncAuthUser(req, res) {
         authUser: authUser._id,
       });
 
-      console.log("syncUser(): created AuthUser");
+      // console.log("syncUser(): created AuthUser");
     }
     // EXISTING USER
     else {
       // update most recent sign in
       authUser.lastSignIn = new Date();
       await authUser.save();
-      console.log("syncUser(): sync AuthUser signed in");
+      // console.log("syncUser(): sync AuthUser signed in");
     }
 
     // User's profile information
@@ -161,11 +161,11 @@ export async function cleanupAuthUsers(_, res) {
         await admin.auth().getUser(authUser._firebaseUid);
 
         // firebase user exists
-        console.log(`Firebase user exists: ${authUser._firebaseUid}`);
+        // console.log(`Firebase user exists: ${authUser._firebaseUid}`);
       } catch (err) {
         // firebase user does not exist
         if (err.code === "auth/user-not-found") {
-          console.log(`Deleting orphaned user: ${authUser._firebaseUid}`);
+          // console.log(`Deleting orphaned user: ${authUser._firebaseUid}`);
 
           await deleteAuthUserData(authUser._id);
 

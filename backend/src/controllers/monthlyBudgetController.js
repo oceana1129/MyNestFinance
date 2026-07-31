@@ -40,6 +40,7 @@ export async function createMonthlyBudget(req, res) {
  * Will return all existing monthly budgets
  */
 export async function getAllBudgets(_, res) {
+  // authorization
   if (process.env.NODE_ENV === "production") {
     return res.status(403).json({ message: "Forbidden" });
   }
@@ -84,12 +85,16 @@ export async function getBudgetsForUser(req, res) {
 export async function getBudgetById(req, res) {
   try {
     const budget = await Budget.findById(req.params.id);
+
     if (!budget) {
       return res.status(404).json({ message: "Budget not found" });
     }
+
+    // authorization
     if (!budget.userProfile.equals(req.profile._id)) {
       return res.status(403).json({ message: "Forbidden" });
     }
+
     res
       .status(200)
       .json({ budget });
@@ -105,15 +110,20 @@ export async function getBudgetById(req, res) {
  */
 export async function deleteBudget(req, res) {
   try {
-    const deletedBudget = await deleteBudgetData(req.params.id);
-    if (!deletedBudget)
-      return res.status(404).json({ message: "Budget not found" });
-    if (!deletedBudget.userProfile.equals(req.profile._id)) {
-      return res.status(403).json({ message: "Forbidden" });
+    const budget = await Budget.findById(req.params.id);
+
+    if (!budget) {
+        return res.status(404).json({ message: "Budget not found" });
     }
-    res.status(200).json({
-      deletedBudget,
-    });
+
+    // authorization
+    if (!budget.userProfile.equals(req.profile._id)) {
+        return res.status(403).json({ message: "Forbidden" });
+    }
+
+    const deletedBudget = await deleteBudgetData(req.params.id);
+
+    res.status(200).json({ deletedBudget });
   } catch (err) {
     console.error("deleteBudget(): ", err);
     res.status(500).json({ message: "internal server error" });

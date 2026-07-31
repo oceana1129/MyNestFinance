@@ -1,9 +1,15 @@
 import BudgetItem from "../models/BudgetItem.js";
 import Category from "../models/BudgetCategory.js";
+import Budget from "../models/MonthlyBudget.js";
 import { deleteItemData } from "../services/deleteItemData.js";
 
 // CREATE
-// create a budget item
+/**
+ * create a budget item
+ * @param {*} req 
+ * @param {*} res 
+ * @returns 
+ */
 export async function createBudgetItem(req, res) {
   try {
     const { budgetCategory, monthlyBudget, name, emoji } = req.body;
@@ -64,8 +70,18 @@ export async function createBudgetItem(req, res) {
 }
 
 // READ
-// get all budget items
+/**
+ * get all budget items
+ * @param {*} _ 
+ * @param {*} res 
+ * @returns 
+ */
 export async function getAllBudgetItems(_, res) {
+  // authorization
+  if (process.env.NODE_ENV === "production") {
+    return res.status(403).json({ message: "Forbidden" });
+  }
+
   try {
     const items = await BudgetItem.find().sort({ createdAt: -1 });
     res.status(200).json({ items });
@@ -75,28 +91,55 @@ export async function getAllBudgetItems(_, res) {
   }
 }
 
-// get budget item by id
+/**
+ * get budget item by id
+ * @param {*} req 
+ * @param {*} res 
+ * @returns 
+ */
 export async function getBudgetItemById(req, res) {
   try {
-    const item = await BudgetItem.findById(req.params.id);
-    if (!item) return res.status(404).json({ message: "Item not found" });
-    res
-      .status(200)
-      .json({ item });
+    const item = await BudgetItem.findById(req.params.id)
+      .populate("monthlyBudget");
+
+    if (!item) {
+      return res.status(404).json({ message: "Item not found" });
+    }
+
+    // authorization
+    if (!item.monthlyBudget.userProfile.equals(req.profile._id)) {
+      return res.status(403).json({ message: "Forbidden" });
+    }
+
+    res.status(200).json({ item });
   } catch (err) {
     console.error("getBudgetItemById(): ", err);
     res.status(500).json({ message: "internal server error" });
   }
 }
 
-// get budget item from by category
+/**
+ * get budget item from by category
+ * @param {*} req 
+ * @param {*} res 
+ * @returns 
+ */
 export async function getBudgetItemByCategory(req, res) {
   try {
     const items = await BudgetItem.find({
-      budgetCategory: req.params.budgetCategoryId,
-    }).sort({
-      displayOrder: 1,
-    });
+        budgetCategory: req.params.budgetCategoryId,
+      }).sort({
+        displayOrder: 1,
+      });
+
+    const category = await Category.findById(req.params.budgetCategoryId)
+    .populate("monthlyBudget");
+
+    // authorization error
+    if (!category.monthlyBudget.userProfile.equals(req.profile._id))  {
+      return res.status(403).json({ message: "Forbidden" });
+    }
+
     res.status(200).json({ items });
   } catch (err) {
     console.error("getBudgetItemByCategory(): ", err);
@@ -104,7 +147,12 @@ export async function getBudgetItemByCategory(req, res) {
   }
 }
 
-// get budget item from by category
+/**
+ * get budget item from by category
+ * @param {*} req 
+ * @param {*} res 
+ * @returns 
+ */
 export async function getBudgetItemByBudget(req, res) {
   try {
     const items = await BudgetItem.find({
@@ -112,6 +160,14 @@ export async function getBudgetItemByBudget(req, res) {
     }).sort({
       displayOrder: 1,
     });
+
+    const budget = await Budget.findById(req.params.monthlyBudgetId);
+
+    // authorization
+    if (!budget.userProfile.equals(req.profile._id)) {
+      return res.status(403).json({ message: "Forbidden" });
+    }
+
     res.status(200).json({ items });
   } catch (err) {
     console.error("getBudgetItemByBudget(): ", err);
@@ -120,9 +176,31 @@ export async function getBudgetItemByBudget(req, res) {
 }
 
 // UPDATE
-// update budget item
+/**
+ * update budget item
+ * @param {*} req 
+ * @param {*} res 
+ * @returns 
+ */
 export async function updateBudgetItem(req, res) {
   try {
+     const item = await BudgetItem.findById(req.params.id)
+      .populate({
+        path:"budgetCategory",
+        populate:{
+            path:"monthlyBudget"
+        }
+    });
+
+    if (!item) {
+      return res.status(404).json({ message: "Item not found" });
+    }
+
+    // authorization
+    if (!item.budgetCategory.monthlyBudget.userProfile.equals(req.profile._id)) {
+      return res.status(404).json({ message: "Access forbidden" });
+    }
+
     const {
       name,
       emoji,
@@ -143,8 +221,11 @@ export async function updateBudgetItem(req, res) {
       },
       { new: true, runValidators: true },
     );
+
     if (!updatedItem)
       return res.status(404).json({ message: "Item not found" });
+
+    // updated item
     res.status(200).json({
       updatedItem,
     });
@@ -159,7 +240,12 @@ export async function updateBudgetItem(req, res) {
   }
 }
 
-// update budget item display order
+/**
+ * pdate budget item display order
+ * @param {*} req 
+ * @param {*} res 
+ * @returns 
+ */
 export async function reorderBudgetItems(req, res) {
   try {
     const { items } = req.body;
@@ -175,6 +261,27 @@ export async function reorderBudgetItems(req, res) {
         message: "No items provided",
       });
     }
+    const ids = items.map(i => i.id);
+
+    const foundItems = await BudgetItem.find({
+        _id: { $in: ids }
+      })
+      .populate({
+          path:"budgetCategory",
+          populate:{
+              path:"monthlyBudget"
+          }
+      });
+
+      // authorization
+    for (const item of foundItems) {
+      if (!item.budgetCategory.monthlyBudget.userProfile.equals(req.profile._id)) {
+        return res.status(403).json({
+          message:"Forbidden"
+        });
+      }
+    }
+
     await BudgetItem.bulkWrite(
       items.map((item) => ({
         updateOne: {
@@ -198,9 +305,24 @@ export async function reorderBudgetItems(req, res) {
 }
 
 // DELETE
-// delete budget item
+/**
+ * delete budget item
+ * @param {*} req 
+ * @param {*} res 
+ * @returns 
+ */
 export async function deleteBudgetItem(req, res) {
   try {
+    const item = await BudgetItem.findById(req.params.id)
+      .populate({
+          path:"budgetCategory",
+          populate:{
+              path:"monthlyBudget"
+          }
+      });
+    if (!item.budgetCategory.monthlyBudget.userProfile.equals(req.profile._id)) {
+      return res.status(404).json({ message: "Deletion forbidden" });
+    }
     const deletedItem = await deleteItemData(req.params.id);
     if (!deletedItem)
       return res.status(404).json({ message: "Item not found" });

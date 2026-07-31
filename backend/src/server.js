@@ -14,6 +14,7 @@ import budgetItemRoutes from "./routes/budgetItemRoutes.js";
 import activityLogRoutes from "./routes/activityLogRoutes.js";
 import debtItemRoutes from "./routes/budgetDebtItemRoutes.js";
 import budgetPlanRoutes from "./routes/budgetPlanRoutes.js";
+import dashboardRoutes from "./routes/dashboardRoutes.js"
 
 // set up .env config
 dotenv.config();
@@ -43,6 +44,7 @@ app.use("/api/item", budgetItemRoutes);
 app.use("/api/activity", activityLogRoutes);
 app.use("/api/debt", debtItemRoutes);
 app.use("/api/plan", budgetPlanRoutes);
+app.use("/api/dashboard", budgetPlanRoutes);
 
 // connect to the database
 connectDB().then(() => {
