@@ -14,9 +14,16 @@ import ProgressBar from "../components/data-input/ProgressBar.jsx";
 import Blurb from "../components/data-display/Blurb.jsx";
 import AppPageDisplay from "../components/data-display/AppPageDisplay.jsx";
 import Dashboard from "../components/forms/Dashboard.jsx";
+import MonthOverview from "../components/data-display/MonthOverview.jsx";
 
 const TestPage = () => {
-  return <AppPageDisplay nav={<NavBar />} contentPrimary={<Dashboard />} />;
+  return (
+    <AppPageDisplay
+      nav={<NavBar />}
+      contentPrimary={<Dashboard />}
+      contentSecondary={<MonthOverview />}
+    />
+  );
 };
 
 export default TestPage;

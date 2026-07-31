@@ -67,7 +67,15 @@ const Dashboard = () => {
         textAlign="center"
         className={"font-serif"}
       />
-      <GlassDisplay />
+      <div className="flex gap-4">
+        <GlassDisplay />
+        <GlassDisplay color="slate" />
+        <GlassDisplay color="blue" />
+      </div>
+      <GlassDisplay
+        subtext=""
+        text="Every dollar tracked is a small win. Keep going!"
+      />
       <CategoryDisplay
         title="Income"
         subtitle="income"
@@ -100,7 +108,7 @@ const Dashboard = () => {
         currentAmount={0}
         targetAmount={0}
       />
-      <BudgetCardAdd text="add category + "/>
+      <BudgetCardAdd text="add category + " />
     </div>
   );
 };
