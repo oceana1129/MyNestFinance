@@ -11,7 +11,7 @@ import { deleteUserData } from "./deleteUserData.js";
  * @returns {Object|null} deleted AuthUser
  */
 export async function deleteAuthUserData(authId) {
-  console.log("deleteAuthUser.js: deleteAuthUserData()")
+  // console.log("deleteAuthUser.js: deleteAuthUserData()")
   // find auth user
   const authUser = await AuthUser.findById(authId);
 

@@ -3,7 +3,6 @@ import Budget from "../models/MonthlyBudget.js";
 import { deleteCategoryData } from "../services/deleteCategoryData.js";
 
 // CREATE
-// create a category
 /**
  * Will create a budget category for a user.
  */
@@ -21,7 +20,7 @@ export async function createCategory(req, res) {
       });
     }
 
-    // category must belong to the user
+    // authorization: category must belong to the user
     if (!budget.userProfile.equals(req.profile._id)) {
       return res.status(403).json({ message: "Forbidden" });
     }
@@ -69,8 +68,18 @@ export async function createCategory(req, res) {
 }
 
 // READ
-// get all categories
+/**
+ * get all categories
+ * @param {*} _ 
+ * @param {*} res 
+ * @returns 
+ */
 export async function getAllCategories(_, res) {
+  // authorization
+  if (process.env.NODE_ENV === "production") {
+    return res.status(403).json({ message: "Forbidden" });
+  }
+
   try {
     const categories = await Category.find().sort({ createdAt: -1 });
     res.status(200).json({ categories });
@@ -80,12 +89,23 @@ export async function getAllCategories(_, res) {
   }
 }
 
-// get category by id
+/**
+ * get category by id
+ * @param {*} req 
+ * @param {*} res 
+ * @returns 
+ */
 export async function getCategoryById(req, res) {
   try {
-    const category = await Category.findById(req.params.id);
+    const category = await Category.findById(req.params.id)
+      .populate("monthlyBudget");
+    
     if (!category)
       return res.status(404).json({ message: "Category not found" });
+
+    if (!category.monthlyBudget.userProfile.equals(req.profile._id))
+        return res.status(403).json({ message: "Forbidden" });
+    
     res
       .status(200)
       .json({ category });
@@ -95,15 +115,31 @@ export async function getCategoryById(req, res) {
   }
 }
 
-// get all categories by month
+/**
+ * get all categories by month
+ * @param {*} req 
+ * @param {*} res 
+ * @returns 
+ */
 export async function getCategoriesByBudget(req, res) {
   try {
-    const categories = await Category.find({
-      monthlyBudget: req.params.monthlyBudgetId,
-    }).sort({
-      displayOrder: 1,
-    });
-    res.status(200).json({ categories });
+    const budget = await Budget.findById(req.params.monthlyBudgetId);
+
+  if (!budget) {
+    return res.status(404).json({ message: "Budget not found" });
+  }
+
+  if (!budget.userProfile.equals(req.profile._id)) {
+    return res.status(403).json({ message: "Forbidden" });
+  }
+
+  const categories = await Category.find({
+    monthlyBudget: budget._id,
+  }).sort({
+    displayOrder: 1,
+  });
+
+  res.status(200).json({ categories });
   } catch (err) {
     console.error("getCategoriesByBudget(): ", err);
     res.status(500).json({ message: "internal server error" });
@@ -111,26 +147,45 @@ export async function getCategoriesByBudget(req, res) {
 }
 
 // UPDATE
-// update category
+/**
+ * update category
+ * @param {*} req 
+ * @param {*} res 
+ * @returns 
+ */
 export async function updateCategory(req, res) {
   try {
-    const { name, emoji, color, categoryType } =
-      req.body;
-    const updatedCategory = await Category.findByIdAndUpdate(
-      req.params.id,
-      {
-        name,
-        emoji,
-        color,
-        categoryType,
-      },
-      { new: true, runValidators: true },
-    );
-    if (!updatedCategory)
-      return res.status(404).json({ message: "category not found" });
-    res.status(200).json({
-      updatedCategory,
-    });
+    const category = await Category.findById(req.params.id)
+    .populate("monthlyBudget");
+
+  if (!category) {
+    return res.status(404).json({ message: "Category not found" });
+  }
+
+  if (!category.monthlyBudget.userProfile.equals(req.profile._id)) {
+    return res.status(403).json({ message: "Forbidden" });
+  }
+
+  const { name, emoji, color, categoryType } =
+    req.body;
+
+  const updatedCategory = await Category.findByIdAndUpdate(
+    req.params.id,
+    {
+      name,
+      emoji,
+      color,
+      categoryType,
+    },
+    { new: true, runValidators: true },
+  );
+
+  if (!updatedCategory)
+    return res.status(404).json({ message: "category not found" });
+  
+  res.status(200).json({
+    updatedCategory,
+  });
   } catch (err) {
     console.error("updateCategory()", err);
     if (err.code === 11000) {
@@ -157,6 +212,20 @@ export async function reorderCategories(req, res) {
       return res.status(400).json({
         message: "No categories provided",
       });
+    }
+    const ids = categories.map(c => c.id);
+
+    const foundCategories = await Category.find({
+      _id: { $in: ids },
+    }).populate("monthlyBudget");
+
+    // authorization
+    for (const category of foundCategories) {
+      if (!category.monthlyBudget.userProfile.equals(req.profile._id)) {
+        return res.status(403).json({
+          message: "Forbidden",
+        });
+      }
     }
 
     await Category.bulkWrite(
@@ -187,9 +256,21 @@ export async function reorderCategories(req, res) {
 // delete category by id
 export async function deleteCategory(req, res) {
   try {
-    const deletedCategory = await deleteCategoryData(req.params.id);
-    if (!deletedCategory)
+    const category = await Category.findById(req.params.id);
+
+    if (!category) {
       return res.status(404).json({ message: "Category not found" });
+    }
+
+    const budget = await Budget.findById(category.monthlyBudget);
+
+    // authorization
+    if (!budget.userProfile.equals(req.profile._id)) {
+      return res.status(403).json({ message: "Forbidden" });
+    }
+
+    const deletedCategory = await deleteCategoryData(category._id);
+
     res.status(200).json({
       deletedCategory,
     });

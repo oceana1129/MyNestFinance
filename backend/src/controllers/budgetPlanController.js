@@ -2,7 +2,12 @@ import BudgetPlan from "../models/BudgetPlan.js";
 import BudgetItem from "../models/BudgetItem.js";
 
 // CREATE
-// create a budget plan
+/**
+ * create a budget plan
+ * @param {*} req 
+ * @param {*} res 
+ * @returns 
+ */
 export async function createBudgetPlan(req, res) {
   try {
     const {
@@ -17,12 +22,19 @@ export async function createBudgetPlan(req, res) {
       startDate,
     } = req.body;
 
-    // does the budget item exist?
-    const item = await BudgetItem.findById(budgetItem);
+    // does the budget item exist
+    const item = await BudgetItem.findById(budgetItem)
+      .populate("monthlyBudget");
 
     if (!item) {
       return res.status(404).json({
         message: "Budget item not found",
+      });
+    }
+
+    if (!item.monthlyBudget.userProfile.equals(req.profile._id)) {
+      return res.status(403).json({
+        message: "Forbidden",
       });
     }
 
@@ -57,8 +69,18 @@ export async function createBudgetPlan(req, res) {
 }
 
 // READ
-// get all budget plans
+/**
+ * get all budget plans
+ * @param {*} _ 
+ * @param {*} res 
+ * @returns 
+ */
 export async function getAllBudgetPlans(_, res) {
+  // authorization
+  if (process.env.NODE_ENV === "production") {
+    return res.status(403).json({ message: "Forbidden" });
+  }
+
   try {
     const budgetPlans = await BudgetPlan.find().sort({
       createdAt: -1,
@@ -76,14 +98,31 @@ export async function getAllBudgetPlans(_, res) {
   }
 }
 
-// get budget plan by id
+/**
+ * get budget plan by id
+ * @param {*} req 
+ * @param {*} res 
+ * @returns 
+ */
 export async function getBudgetPlanById(req, res) {
   try {
-    const budgetPlan = await BudgetPlan.findById(req.params.id);
+    const budgetPlan = await BudgetPlan.findById(req.params.id)
+      .populate({
+        path: "budgetItem",
+        populate: {
+          path: "monthlyBudget",
+        },
+      });
 
     if (!budgetPlan) {
       return res.status(404).json({
         message: "Budget plan not found",
+      });
+    }
+
+    if (!budgetPlan.budgetItem.monthlyBudget.userProfile.equals(req.profile._id)) {
+      return res.status(403).json({
+        message: "Forbidden",
       });
     }
 
@@ -99,9 +138,29 @@ export async function getBudgetPlanById(req, res) {
   }
 }
 
-// get budget plan by budget item
+/**
+ * get budget plan by budget item
+ * @param {*} req 
+ * @param {*} res 
+ * @returns 
+ */
 export async function getBudgetPlanByBudgetItem(req, res) {
   try {
+    const item = await BudgetItem.findById(req.params.budgetItemId)
+    .populate("monthlyBudget");
+
+    if (!item) {
+      return res.status(404).json({
+        message: "Item not found",
+      });
+    }
+
+    if (!item.monthlyBudget.userProfile.equals(req.profile._id)) {
+      return res.status(403).json({
+        message: "Forbidden",
+      });
+    }
+
     const budgetPlan = await BudgetPlan.findOne({
       budgetItem: req.params.budgetItemId,
     });
@@ -125,9 +184,34 @@ export async function getBudgetPlanByBudgetItem(req, res) {
 }
 
 // UPDATE
-// update budget plan
+/**
+ * update budget plan
+ * @param {*} req 
+ * @param {*} res 
+ * @returns 
+ */
 export async function updateBudgetPlan(req, res) {
   try {
+    const plan = await BudgetPlan.findById(req.params.id)
+    .populate({
+        path:"budgetItem",
+        populate:{
+            path:"monthlyBudget",
+        }
+    });
+
+    if (!plan) {
+      return res.status(404).json({
+        message: "Plan not found",
+      });
+    }
+
+    if (!plan.budgetItem.monthlyBudget.userProfile.equals(req.profile._id)) {
+        return res.status(403).json({
+            message:"Forbidden",
+        });
+    }
+
     const {
       scheduleType,
       dayOfWeek,
@@ -176,9 +260,34 @@ export async function updateBudgetPlan(req, res) {
 }
 
 // DELETE
-// delete budget plan
+/**
+ * delete budget plan
+ * @param {*} req 
+ * @param {*} res 
+ * @returns 
+ */
 export async function deleteBudgetPlan(req, res) {
   try {
+    const plan = await BudgetPlan.findById(req.params.id)
+      .populate({
+        path:"budgetItem",
+        populate:{
+            path:"monthlyBudget",
+        }
+    });
+
+    if (!plan){
+      return res.status(404).json({
+        message: "Debt item not found",
+      });
+    }
+
+    if (!plan.budgetItem.monthlyBudget.userProfile.equals(req.profile._id)) {
+        return res.status(403).json({
+            message:"Forbidden",
+        });
+    }
+
     const deletedBudgetPlan = await BudgetPlan.findByIdAndDelete(req.params.id);
 
     if (!deletedBudgetPlan) {
@@ -202,6 +311,21 @@ export async function deleteBudgetPlan(req, res) {
 // delete budget plan by budget item
 export async function deleteBudgetPlanByBudgetItem(req, res) {
   try {
+    const item = await BudgetItem.findById(req.params.budgetItemId)
+    .populate("monthlyBudget");
+
+    if (!item) {
+      return res.status(404).json({
+        message: "Item not found",
+      });
+    }
+
+    if (!item.monthlyBudget.userProfile.equals(req.profile._id)) {
+        return res.status(403).json({
+            message:"Forbidden",
+        });
+    }
+    
     const deletedBudgetPlan = await BudgetPlan.findOneAndDelete({
       budgetItem: req.params.budgetItemId,
     });

@@ -2,7 +2,12 @@ import BudgetDebtItem from "../models/BudgetDebtItem.js";
 import BudgetItem from "../models/BudgetItem.js";
 
 // CREATE
-// create a debt item
+/**
+ * create a debt item
+ * @param {*} req 
+ * @param {*} res 
+ * @returns 
+ */
 export async function createDebtItem(req, res) {
   try {
     const {
@@ -15,12 +20,20 @@ export async function createDebtItem(req, res) {
       preferredPayoffInYears,
     } = req.body;
 
-    // does the budget item exist?
-    const item = await BudgetItem.findById(budgetItem);
+    // does budgetItem exist
+    const item = await BudgetItem.findById(budgetItem)
+      .populate("monthlyBudget");
+
 
     if (!item) {
       return res.status(404).json({
         message: "Budget item not found",
+      });
+    }
+
+    if (!item.monthlyBudget.userProfile.equals(req.profile._id)) {
+      return res.status(403).json({
+        message: "Forbidden",
       });
     }
 
@@ -53,8 +66,18 @@ export async function createDebtItem(req, res) {
 }
 
 // READ
-// get all debt items
+/**
+ * get all debt items
+ * @param {*} _ 
+ * @param {*} res 
+ * @returns 
+ */
 export async function getAllDebtItems(_, res) {
+  // authorization
+  if (process.env.NODE_ENV === "production") {
+    return res.status(403).json({ message: "Forbidden" });
+  }
+
   try {
     const debtItems = await BudgetDebtItem.find().sort({
       createdAt: -1,
@@ -73,14 +96,31 @@ export async function getAllDebtItems(_, res) {
   }
 }
 
-// get debt item by id
+/**
+ * get debt item by id
+ * @param {*} req 
+ * @param {*} res 
+ * @returns 
+ */
 export async function getDebtItemById(req, res) {
   try {
-    const debtItem = await BudgetDebtItem.findById(req.params.id);
+    const debtItem = await BudgetDebtItem.findById(req.params.id)
+      .populate({
+        path: "budgetItem",
+        populate: {
+          path: "monthlyBudget",
+        },
+      });
 
     if (!debtItem) {
       return res.status(404).json({
         message: "Debt item not found",
+      });
+    }
+
+    if (!debtItem.budgetItem.monthlyBudget.userProfile.equals(req.profile._id)) {
+      return res.status(403).json({
+        message: "Forbidden",
       });
     }
 
@@ -97,9 +137,29 @@ export async function getDebtItemById(req, res) {
   }
 }
 
-// get debt item by budget item
+/**
+ * get debt item by budget item
+ * @param {*} req 
+ * @param {*} res 
+ * @returns 
+ */
 export async function getDebtItemByBudgetItem(req, res) {
   try {
+    const item = await BudgetItem.findById(req.params.budgetItemId)
+    .populate("monthlyBudget");
+
+    if (!item) {
+      return res.status(404).json({
+        message: "Item not found",
+      });
+    }
+
+    if (!item.monthlyBudget.userProfile.equals(req.profile._id)) {
+      return res.status(403).json({
+        message: "Forbidden",
+      });
+    }
+
     const debtItem = await BudgetDebtItem.findOne({
       budgetItem: req.params.budgetItemId,
     });
@@ -124,9 +184,34 @@ export async function getDebtItemByBudgetItem(req, res) {
 }
 
 // UPDATE
-// update debt item
+/**
+ * update debt item
+ * @param {*} req 
+ * @param {*} res 
+ * @returns 
+ */
 export async function updateDebtItem(req, res) {
   try {
+    const debtItem = await BudgetDebtItem.findById(req.params.id)
+    .populate({
+        path:"budgetItem",
+        populate:{
+            path:"monthlyBudget",
+        }
+    });
+
+    if (!debtItem) {
+      return res.status(404).json({
+        message: "Debt item not found",
+      });
+    }
+
+    if (!debtItem.budgetItem.monthlyBudget.userProfile.equals(req.profile._id)) {
+        return res.status(403).json({
+            message:"Forbidden",
+        });
+    }
+
     const {
       debtType,
       originalBalance,
@@ -172,9 +257,34 @@ export async function updateDebtItem(req, res) {
 }
 
 // DELETE
-// delete debt item
+/**
+ * delete debt item
+ * @param {*} req 
+ * @param {*} res 
+ * @returns 
+ */
 export async function deleteDebtItem(req, res) {
   try {
+    const debtItem = await BudgetDebtItem.findById(req.params.id)
+      .populate({
+        path:"budgetItem",
+        populate:{
+            path:"monthlyBudget",
+        }
+    });
+
+    if (!debtItem){
+      return res.status(404).json({
+        message: "Debt item not found",
+      });
+    }
+
+    if (!debtItem.budgetItem.monthlyBudget.userProfile.equals(req.profile._id)) {
+        return res.status(403).json({
+            message:"Forbidden",
+        });
+    }
+
     const deletedDebtItem = await BudgetDebtItem.findByIdAndDelete(
       req.params.id,
     );
@@ -197,9 +307,29 @@ export async function deleteDebtItem(req, res) {
   }
 }
 
-// delete debt item by budget item
+/**
+ * delete debt item by budget item
+ * @param {*} req 
+ * @param {*} res 
+ * @returns 
+ */
 export async function deleteDebtItemByBudgetItem(req, res) {
   try {
+    const item = await BudgetItem.findById(req.params.budgetItemId)
+    .populate("monthlyBudget");
+
+    if (!item) {
+      return res.status(404).json({
+        message: "Item not found",
+      });
+    }
+
+    if (!item.monthlyBudget.userProfile.equals(req.profile._id)) {
+        return res.status(403).json({
+            message:"Forbidden",
+        });
+    }
+    
     const deletedDebtItem = await BudgetDebtItem.findOneAndDelete({
       budgetItem: req.params.budgetItemId,
     });
