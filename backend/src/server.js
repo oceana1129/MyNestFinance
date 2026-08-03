@@ -28,6 +28,8 @@ app.use(
     origin: "http://localhost:5173",
   }),
 );
+
+console.log("cors added")
 // can read json sent from client
 app.use(express.json());
 // set up rate limiter
@@ -44,7 +46,7 @@ app.use("/api/item", budgetItemRoutes);
 app.use("/api/activity", activityLogRoutes);
 app.use("/api/debt", debtItemRoutes);
 app.use("/api/plan", budgetPlanRoutes);
-app.use("/api/dashboard", budgetPlanRoutes);
+app.use("/api/dashboard", dashboardRoutes);
 
 // connect to the database
 connectDB().then(() => {

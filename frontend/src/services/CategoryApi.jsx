@@ -37,6 +37,24 @@ export async function getCategory(categoryId) {
 }
 
 /**
+ * Get all categories under a budget
+ */
+export async function getCategoryByBudget(budgetId) {
+    const response = await fetch(
+        `${API_URL}/category/budget/${budgetId}`,
+        {
+            headers: await authHeaders(),
+        }
+    );
+
+    if (!response.ok) {
+        throw new Error("Failed to fetch category.");
+    }
+
+    return response.json();
+}
+
+/**
  * Create a new category.
  */
 export async function createCategory(categoryData) {

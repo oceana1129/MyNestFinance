@@ -79,7 +79,7 @@ async function sumItemPlannedAmounts(itemsIds) {
 
   const result = await BudgetItem.aggregate([
     { $match: { _id: {$in: itemsIds} } },
-    { $group: { _id: null, total: { $sum: "plannedAmount" } } }
+    { $group: { _id: null, total: { $sum: "$plannedAmount" } } }
   ]);
 
   return result[0]?.total ?? 0;

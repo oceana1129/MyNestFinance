@@ -21,7 +21,7 @@ export async function getAllAuthUsers(_, res) {
  */
 export async function syncAuthUser(req, res) {
   try {
-    //console.log("syncAuthUser(): syncing user for auth");
+    console.log("syncAuthUser(): syncing user for auth");
 
     const { uid, email, firebase } = req.user;
 

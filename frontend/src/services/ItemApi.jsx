@@ -37,10 +37,46 @@ export async function getItem(itemId) {
 }
 
 /**
+ * Get all items by category
+ */
+export async function getItemByCategory(categoryId) {
+    const response = await fetch(
+        `${API_URL}/item/category/${categoryId}`,
+        {
+            headers: await authHeaders(),
+        }
+    );
+
+    if (!response.ok) {
+        throw new Error("Failed to fetch item.");
+    }
+
+    return response.json();
+}
+
+/**
+ * Get all items by budget
+ */
+export async function getItemsByBudget(budgetId) {
+    const response = await fetch(
+        `${API_URL}/item/budge/${budgetId}`,
+        {
+            headers: await authHeaders(),
+        }
+    );
+
+    if (!response.ok) {
+        throw new Error("Failed to fetch item.");
+    }
+
+    return response.json();
+}
+
+/**
  * Create a new item.
  */
 export async function createItem(itemData) {
-    console.log(JSON.stringify(itemData))
+    // console.log(JSON.stringify(itemData))
     const response = await fetch(`${API_URL}/item`, {
         method: "POST",
         headers: await authHeaders(true),

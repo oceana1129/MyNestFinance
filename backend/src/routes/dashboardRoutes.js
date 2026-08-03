@@ -8,7 +8,7 @@ import {
     getTotalCategoryDifference,
     getTotalItemDifference,
     getMonthlyActivity,
-} from "../services/budgetQuerySe rvice.js";
+} from "../services/budgetQueryService.js";
 
 const router = express.Router();
 

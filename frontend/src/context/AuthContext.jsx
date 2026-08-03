@@ -34,6 +34,8 @@ export const AuthContextProvider = ({ children }) => {
       console.log("syncUser(): syncing a user");
       const token = await firebaseUser.getIdToken();
 
+      console.log(token)
+
       const response = await fetch(`${API_URL}/auth/sync`, {
         method: "POST",
         headers: {
