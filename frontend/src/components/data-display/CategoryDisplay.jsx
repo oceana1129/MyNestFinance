@@ -11,6 +11,9 @@ const CategoryDisplay = ({
   targetAmount = 0,
   color = "green",
   items = [],
+  currentItem,
+  setCurrentItem,
+  onClick,
 }) => {
   const [hidden, setHidden] = useState(true);
 
@@ -61,10 +64,20 @@ const CategoryDisplay = ({
       {!hidden && (
         <div className="flex flex-col gap-5">
           {items.map((item) => (
-            <BudgetCard key={item.id} {...item} />
+            <BudgetCard
+              key={item._id}
+              item={item}
+              color={color}
+              active={currentItem?._id === item._id}
+              onClick={() => setCurrentItem(item)}
+            />
           ))}
 
-          <BudgetCardAdd text={`add ${subtitle} +`} color={color} />
+          <BudgetCardAdd
+            text={`add ${subtitle} +`}
+            color={color}
+            onClick={onClick}
+          />
         </div>
       )}
     </div>

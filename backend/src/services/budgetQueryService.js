@@ -8,7 +8,7 @@ import BudgetCategory from "../models/BudgetCategory.js";
 ///////////////////////////////////////
 
 export function calculatePercentage(dividend, divisor) {
-    return divisor === 0 ? 0 : Number(((dividend / divisor) * 100).toFixed(2));
+  return divisor === 0 ? 0 : Number(((dividend / divisor) * 100).toFixed(2));
 }
 
 /**
@@ -53,7 +53,7 @@ async function getItemIds(monthlyBudgetId, categoryTypes = null) {
  * @returns {Promise<number>}
  */
 async function sumActivityLogs(itemIds) {
-    // if no item ids return 0
+  // if no item ids return 0
   if (!itemIds.length) return 0;
 
   const result = await BudgetActivityLog.aggregate([
@@ -74,12 +74,12 @@ async function sumActivityLogs(itemIds) {
  * @returns {Promise<number>}
  */
 async function sumItemPlannedAmounts(itemsIds) {
-    // if no item ids return 0
+  // if no item ids return 0
   if (!itemsIds.length) return 0;
 
   const result = await BudgetItem.aggregate([
-    { $match: { _id: {$in: itemsIds} } },
-    { $group: { _id: null, total: { $sum: "$plannedAmount" } } }
+    { $match: { _id: { $in: itemsIds } } },
+    { $group: { _id: null, total: { $sum: "$plannedAmount" } } },
   ]);
 
   return result[0]?.total ?? 0;
@@ -105,9 +105,12 @@ async function sumItemPlannedAmounts(itemsIds) {
  * @param {"income" | "expense" | "debt"} categoryType
  * @returns {{ reaction: string, isActive: boolean, percentage: number }}
  */
-export function getBudgetReaction({ planned, actual, difference }, categoryType) {
+export function getBudgetReaction(
+  { planned, actual, difference },
+  categoryType,
+) {
   let reaction = "on-target";
- 
+
   if (difference !== 0) {
     if (categoryType === "expense") {
       // for difference higher than 1 is positive
@@ -117,13 +120,13 @@ export function getBudgetReaction({ planned, actual, difference }, categoryType)
       reaction = difference < 0 ? "ahead" : "behind";
     }
   }
- 
+
   // whether the activity has been logged
   const isActive = actual > 0;
- 
+
   // planned amount versus actual amount progression
   const percentage = calculatePercentage(actual, planned);
- 
+
   return { reaction, isActive, percentage };
 }
 
@@ -232,8 +235,12 @@ export async function getMonthlyDashboardSummary(monthlyBudgetId) {
 
   // sum actual and planned
   const [
-    actualIncome, actualExpenses, actualPayments,
-    plannedIncome, plannedExpenses, plannedPayments,
+    actualIncome,
+    actualExpenses,
+    actualPayments,
+    plannedIncome,
+    plannedExpenses,
+    plannedPayments,
   ] = await Promise.all([
     sumActivityLogs(incomeIds),
     sumActivityLogs(expenseIds),
@@ -252,16 +259,21 @@ export async function getMonthlyDashboardSummary(monthlyBudgetId) {
     plannedExpenses,
     plannedPayments,
     percentageUsedIncome: calculatePercentage(actualIncome, plannedIncome),
-    percentageUsedExpenses: calculatePercentage(actualExpenses, plannedExpenses),
-    percentageUsedPayments: calculatePercentage(actualPayments, plannedPayments),
+    percentageUsedExpenses: calculatePercentage(
+      actualExpenses,
+      plannedExpenses,
+    ),
+    percentageUsedPayments: calculatePercentage(
+      actualPayments,
+      plannedPayments,
+    ),
     percentageUsedAllExpenses: calculatePercentage(
       actualExpenses + actualPayments,
-      plannedExpenses + plannedPayments
+      plannedExpenses + plannedPayments,
     ),
   };
 }
 
- 
 /**
  * Returns all categories for a monthly budget with their full summary
  * data: planned total, actual total, difference, reaction, item count,
@@ -296,78 +308,113 @@ export async function getMonthlyDashboardSummary(monthlyBudgetId) {
  * //   ...
  * // ]
  */
+/**
+ * Returns all categories for a monthly budget with their summary data
+ * and all items with their summary data.
+ */
 export async function getCategoryBreakdown(monthlyBudgetId) {
-  // fetch all categories for the budget
+  // Fetch categories
   const categories = await BudgetCategory.find({
     monthlyBudget: monthlyBudgetId,
   })
     .sort({ displayOrder: 1 })
     .lean();
- 
-    // no categories found
+
   if (!categories.length) return [];
-   
-  // get all id values
+
   const categoryIds = categories.map((c) => c._id);
- 
-  // aggregate planned totals and item counts per category
-  const itemAgg = await BudgetItem.aggregate([
-    { $match: { budgetCategory: { $in: categoryIds } } },
+
+  // Fetch all items
+  const items = await BudgetItem.find({
+    budgetCategory: { $in: categoryIds },
+  })
+    .sort({ displayOrder: 1 })
+    .lean();
+
+  const itemIds = items.map((item) => item._id);
+
+  // Aggregate activity totals for every item
+  const activityTotals = await BudgetActivityLog.aggregate([
+    {
+      $match: {
+        budgetItem: { $in: itemIds },
+      },
+    },
     {
       $group: {
-        _id: "$budgetCategory",
-        planned: { $sum: "$plannedAmount" },
-        itemCount: { $sum: 1 },
-        // collect item ids for later
-        itemIds: { $push: "$_id" },
+        _id: "$budgetItem",
+        actual: { $sum: "$amount" },
       },
     },
   ]);
- 
-  // index aggregation results by id
-  const itemDataByCat = Object.fromEntries(
-    itemAgg.map((row) => [row._id.toString(), row])
-  );
- 
-  // collect item ids for categories and sum activity logs by item
-  const allItemIds = itemAgg.flatMap((row) => row.itemIds);
- 
-  const logAgg = await BudgetActivityLog.aggregate([
-    { $match: { budgetItem: { $in: allItemIds } } },
-    { $group: { _id: "$budgetItem", actual: { $sum: "$amount" } } },
-  ]);
- 
-  // index actual amounts by id
+
+  // Map item id -> actual amount
   const actualByItem = Object.fromEntries(
-    logAgg.map((row) => [row._id.toString(), row.actual])
+    activityTotals.map((row) => [row._id.toString(), row.actual]),
   );
- 
-  // sum the actuals of items
-  return categories.map((cat) => {
-    const catData = itemDataByCat[cat._id.toString()] ?? { planned: 0, itemCount: 0, itemIds: [] };
-    const planned = catData.planned;
-    const itemCount = catData.itemCount;
- 
-    // sum actuals for id
-    const actual = catData.itemIds.reduce((sum, itemId) => {
-      return sum + (actualByItem[itemId.toString()] ?? 0);
-    }, 0);
- 
+
+  // Group items by category and attach actual amounts
+  const itemsByCategory = {};
+
+  for (const item of items) {
+    const categoryId = item.budgetCategory.toString();
+
+    const actual = actualByItem[item._id.toString()] ?? 0;
+
+    const itemSummary = {
+      _id: item._id,
+      name: item.name,
+      emoji: item.emoji,
+      color: item.color,
+      displayOrder: item.displayOrder,
+      planned: item.plannedAmount,
+      actual,
+      difference: item.plannedAmount - actual,
+      budgetPlan: item.budgetPlan,
+      hasReminder: item.hasReminder,
+      reminderDaysBefore: item.reminderDaysBefore,
+      isAutomatic: item.isAutomatic,
+    };
+
+    if (!itemsByCategory[categoryId]) {
+      itemsByCategory[categoryId] = [];
+    }
+
+    itemsByCategory[categoryId].push(itemSummary);
+  }
+
+  // Build category summaries
+  return categories.map((category) => {
+    const categoryItems = itemsByCategory[category._id.toString()] ?? [];
+
+    const planned = categoryItems.reduce((sum, item) => sum + item.planned, 0);
+
+    const actual = categoryItems.reduce((sum, item) => sum + item.actual, 0);
+
     const difference = planned - actual;
-    const reaction = getBudgetReaction({ planned, actual, difference }, cat.categoryType);
- 
+
+    const reaction = getBudgetReaction(
+      { planned, actual, difference },
+      category.categoryType,
+    );
+
     return {
-      _id: cat._id,
-      name: cat.name,
-      emoji: cat.emoji,
-      color: cat.color,
-      categoryType: cat.categoryType,
-      displayOrder: cat.displayOrder,
-      itemCount,
+      _id: category._id,
+      name: category.name,
+      emoji: category.emoji,
+      color: category.color,
+      categoryType: category.categoryType,
+      displayOrder: category.displayOrder,
+
       planned,
       actual,
       difference,
+
+      itemCount: categoryItems.length,
+
       ...reaction,
+
+      items: categoryItems,
     };
   });
 }
@@ -389,7 +436,9 @@ export async function getCategoryBreakdown(monthlyBudgetId) {
  */
 export async function getTotalCategoryPlanned(budgetCategoryId) {
   const result = await BudgetItem.aggregate([
-    { $match: { budgetCategory: new mongoose.Types.ObjectId(budgetCategoryId) } },
+    {
+      $match: { budgetCategory: new mongoose.Types.ObjectId(budgetCategoryId) },
+    },
     { $group: { _id: null, total: { $sum: "$plannedAmount" } } },
   ]);
 
@@ -436,15 +485,18 @@ export async function getTotalCategoryDifference(budgetCategoryId) {
     getTotalCategoryPlanned(budgetCategoryId),
     getTotalCategoryActual(budgetCategoryId),
   ]);
- 
-  if (!category) throw new Error(`BudgetCategory not found: ${budgetCategoryId}`);
- 
+
+  if (!category)
+    throw new Error(`BudgetCategory not found: ${budgetCategoryId}`);
+
   const difference = planned - actual;
-  const reaction = getBudgetReaction({ planned, actual, difference }, category.categoryType);
- 
+  const reaction = getBudgetReaction(
+    { planned, actual, difference },
+    category.categoryType,
+  );
+
   return { planned, actual, difference, ...reaction };
 }
-
 
 ///////////////////////////////////////
 // ITEM SERVICES
@@ -486,24 +538,30 @@ export async function getTotalItemActual(budgetItemId) {
 export async function getTotalItemDifference(budgetItemId) {
   // get item with reference to see its category type
   // get plannedAmount and budget category
-  const item = await BudgetItem.findById(budgetItemId).select("plannedAmount budgetCategory");
- 
+  const item = await BudgetItem.findById(budgetItemId).select(
+    "plannedAmount budgetCategory",
+  );
+
   if (!item) throw new Error(`BudgetItem not found: ${budgetItemId}`);
- 
+
   // get its actual total
   const [category, actual] = await Promise.all([
     BudgetCategory.findById(item.budgetCategory).select("categoryType"),
     getTotalItemActual(budgetItemId),
   ]);
- 
+
   // category is not found
-  if (!category) throw new Error(`BudgetCategory not found for item: ${budgetItemId}`);
- 
+  if (!category)
+    throw new Error(`BudgetCategory not found for item: ${budgetItemId}`);
+
   // find the planned amount, difference, and get the reaction
   const planned = item.plannedAmount ?? 0;
   const difference = planned - actual;
-  const reaction = getBudgetReaction({ planned, actual, difference }, category.categoryType);
- 
+  const reaction = getBudgetReaction(
+    { planned, actual, difference },
+    category.categoryType,
+  );
+
   return { planned, actual, difference, ...reaction };
 }
 
@@ -527,11 +585,13 @@ export async function getMonthlyActivity(monthlyBudgetId) {
 
   if (!itemIds.length) return [];
 
-  return BudgetActivityLog.find({ budgetItem: { $in: itemIds } })
-    .sort({ activityDate: -1 })
-    // attach parent info name, emoji, and budgetcategory
-    .populate("budgetItem", "name emoji budgetCategory")
-    .lean();
+  return (
+    BudgetActivityLog.find({ budgetItem: { $in: itemIds } })
+      .sort({ activityDate: -1 })
+      // attach parent info name, emoji, and budgetcategory
+      .populate("budgetItem", "name emoji budgetCategory")
+      .lean()
+  );
 }
 
 /**
@@ -551,8 +611,12 @@ export async function getMonthlyActivity(monthlyBudgetId) {
  *   new Date("2026-06-15")
  * );
  */
-export async function getMonthlyActivitiesByRange(monthlyBudgetId, startDate, endDate) {
-    // get all item ids in the budget
+export async function getMonthlyActivitiesByRange(
+  monthlyBudgetId,
+  startDate,
+  endDate,
+) {
+  // get all item ids in the budget
   const itemIds = await getItemIds(monthlyBudgetId);
 
   // if no items return []
@@ -561,10 +625,10 @@ export async function getMonthlyActivitiesByRange(monthlyBudgetId, startDate, en
   return BudgetActivityLog.find({
     budgetItem: { $in: itemIds },
     activityDate: {
-        $gte: startDate,
-        $lte: endDate,
-        },
-    })
+      $gte: startDate,
+      $lte: endDate,
+    },
+  })
     .sort({ activityDate: -1 })
     .populate("budgetItem", "name emoji budgetCategory")
     .lean();

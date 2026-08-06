@@ -1,9 +1,4 @@
-import { 
-  createContext, 
-  useContext, 
-  useEffect, 
-  useMemo, 
-  useState } from "react";
+import { createContext, useContext, useEffect, useMemo, useState } from "react";
 import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
@@ -12,10 +7,10 @@ import {
 } from "firebase/auth";
 import { auth } from "../firebase";
 import {
-    updateSettings,
-    updateOnboarding,
-    updateDisplayName,
-} from "../services/UserApi"
+  updateSettings,
+  updateOnboarding,
+  updateDisplayName,
+} from "../services/UserApi";
 
 const UserContext = createContext();
 
@@ -34,7 +29,7 @@ export const AuthContextProvider = ({ children }) => {
       console.log("syncUser(): syncing a user");
       const token = await firebaseUser.getIdToken();
 
-      console.log(token)
+      // / console.log(token)
 
       const response = await fetch(`${API_URL}/auth/sync`, {
         method: "POST",
@@ -122,7 +117,7 @@ export const AuthContextProvider = ({ children }) => {
   //   const token = await auth.currentUser.getIdToken();
 
   //   const mergedOnboarding = { ...profile?.onboarding, ...onboardingChanges };
-    
+
   //   const response = await fetch(`${API_URL}/user/me/onboarding`, {
   //     method: "PUT",
   //     headers: {
@@ -143,8 +138,8 @@ export const AuthContextProvider = ({ children }) => {
 
   const handleUpdateSettings = async (changes) => {
     const mergedSettings = {
-        ...profile?.settings,
-        ...changes,
+      ...profile?.settings,
+      ...changes,
     };
 
     const data = await updateSettings(mergedSettings);
@@ -153,11 +148,11 @@ export const AuthContextProvider = ({ children }) => {
 
     return data.updatedUser;
   };
-  
+
   const handleUpdateOnboarding = async (changes) => {
     const mergedOnboarding = {
-        ...profile?.onboarding,
-        ...changes,
+      ...profile?.onboarding,
+      ...changes,
     };
 
     const data = await updateOnboarding(mergedOnboarding);

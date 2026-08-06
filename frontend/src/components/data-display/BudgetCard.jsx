@@ -1,22 +1,14 @@
 import { CircleAlert, Zap } from "lucide-react";
 import { getColorTheme } from "../../utils/ColorThemeLight";
+import { ICONS } from "../../utils/IconMap.js";
 import ProgressBar from "../data-input/ProgressBar";
 
-const BudgetCard = ({
-  icon: Icon = Zap,
-  title = "Expense",
-  subtitle = "on track",
-  currentAmount = "0",
-  targetAmount = "0",
-  overBudget = false,
-  income = false,
-  color = "green",
-  active = false,
-}) => {
-  const progress = Math.min((currentAmount / targetAmount) * 100, 100);
+const BudgetCard = ({ item, color, active = false, onClick }) => {
+  const progress = Math.min((item.actual / item.planned) * 100, 100);
   const colors = getColorTheme(color);
   const overBudgetColors = getColorTheme("rose");
 
+  const overBudget = item.difference < 0;
   const textColor = overBudget ? overBudgetColors.text : colors.text;
   const iconBg = overBudget
     ? overBudgetColors.bgExtraLight
@@ -25,33 +17,42 @@ const BudgetCard = ({
          ${iconBg} shadow-sm`;
   const moneyStyling = `text-lg font-bold  ${overBudget ? overBudgetColors.text : textColor}`;
   const budgetCardStyling = `flex flex-col gap-4 rounded-2xl bg-[#FBF6F8] p-4 shadow-sm border-2  
-        hover:bg-[#FFFBFD] ${active ? "bg-white border-purple-500" : "bg-"}  hover:cursor-pointer`;
+        hover:bg-[#FFFBFD] ${
+          active
+            ? "bg-white border-purple-500 shadow-md"
+            : "bg-[#FBF6F8] border-transparent hover:bg-[#FFFBFD]"
+        } hover:cursor-pointer`;
 
+  // console.log(item);
+
+  const Icon = ICONS[item.emoji] || ICONS["CircleHelp"];
   return (
-    <div className={budgetCardStyling}>
+    <div className={budgetCardStyling} onClick={onClick}>
       <div className="flex gap-4">
         {/* Icon */}
         <div className="flex items-start">
-          <div className={iconStyling}>{Icon && <Icon size={32} />}</div>
+          <div className={iconStyling}>{item.emoji && <Icon size={32} />}</div>
         </div>
         {/* card information */}
         <div className="flex flex-col gap grow">
-          <h3 className="text-lg font-bold text-slate-900">{title}</h3>
+          <h3 className="text-lg font-bold text-slate-900">
+            {item.name || "Item"}
+          </h3>
           {overBudget ? (
             <div className="flex items-center gap-2 text-md font-semibold text-pink-600">
               <CircleAlert size={18} />
               Over budget
             </div>
           ) : (
-            <p className="text-md text-slate-700">{subtitle}</p>
+            <p className="text-md text-slate-700">{"on track"}</p>
           )}
         </div>
         {/* current and target amounts */}
         <div className="flex gap flex-col text-right ">
           {/* current amount */}
-          <div className={moneyStyling}>${currentAmount}</div>
+          <div className={moneyStyling}>${item.actual}</div>
           {/* target amount */}
-          <div className="text-md text-slate-500">of ${targetAmount}</div>
+          <div className="text-md text-slate-500">of ${item.planned}</div>
         </div>
       </div>
 
