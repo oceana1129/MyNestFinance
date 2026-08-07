@@ -21,7 +21,7 @@ export async function getAllAuthUsers(_, res) {
  */
 export async function syncAuthUser(req, res) {
   try {
-    console.log("syncAuthUser(): syncing user for auth");
+    //console.log("syncAuthUser(): syncing user for auth");
 
     const { uid, email, firebase } = req.user;
 
@@ -68,7 +68,7 @@ export async function syncAuthUser(req, res) {
       profile,
     });
   } catch (err) {
-    console.error("syncAuthUser(): ", err);
+    // console.error("syncAuthUser(): ", err);
 
     res.status(500).json({
       message: err.message,

@@ -21,8 +21,8 @@ router.post("/", createCategory);
 router.get("/", getAllCategories);
 router.get("/:id", getCategoryById);
 router.get("/budget/:monthlyBudgetId", getCategoriesByBudget);
-router.put("/:id", updateCategory);
 router.patch("/reorder", reorderCategories);
+router.put("/:id", updateCategory);
 router.delete("/:id", deleteCategory);
 // router.delete("/budget/:monthlyBudgetId", deleteCategoryByBudget);
 

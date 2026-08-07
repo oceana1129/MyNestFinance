@@ -227,7 +227,7 @@ export async function reorderCategories(req, res) {
         });
       }
     }
-
+    console.log("categories authorized")
     await Category.bulkWrite(
       categories.map((category) => ({
         updateOne: {

@@ -1,9 +1,10 @@
 import { CircleAlert, Zap } from "lucide-react";
 import { getColorTheme } from "../../utils/ColorThemeLight";
 import { ICONS } from "../../utils/IconMap.js";
+import { formatCurrency } from "../../utils/FormatCurrency.js";
 import ProgressBar from "../data-input/ProgressBar";
 
-const BudgetCard = ({ item, color, active = false, onClick }) => {
+const BudgetCard = ({ item, color, active = false, onClick, userSettings }) => {
   const progress = Math.min((item.actual / item.planned) * 100, 100);
   const colors = getColorTheme(color);
   const overBudgetColors = getColorTheme("rose");
@@ -50,9 +51,9 @@ const BudgetCard = ({ item, color, active = false, onClick }) => {
         {/* current and target amounts */}
         <div className="flex gap flex-col text-right ">
           {/* current amount */}
-          <div className={moneyStyling}>${item.actual}</div>
+          <div className={moneyStyling}>{formatCurrency(item.actual, userSettings)}</div>
           {/* target amount */}
-          <div className="text-md text-slate-500">of ${item.planned}</div>
+          <div className="text-md text-slate-500">of {formatCurrency(item.planned, userSettings)}</div>
         </div>
       </div>
 

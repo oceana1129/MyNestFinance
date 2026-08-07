@@ -101,13 +101,12 @@ export async function deleteCategory(categoryId) {
 /**
  * Reorder categories.
  */
-export async function reorderCategories(monthlyBudgetId, categoryOrder) {
+export async function reorderCategories(categories) {
   const response = await fetch(`${API_URL}/category/reorder`, {
-    method: "PUT",
-    headers: await authHeaders(),
+    method: "PATCH",
+    headers: await authHeaders(true),
     body: JSON.stringify({
-      monthlyBudgetId,
-      categoryOrder,
+      categories,
     }),
   });
 

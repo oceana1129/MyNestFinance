@@ -7,7 +7,7 @@ import DisplayActivities from "../data-display/DisplayActivities";
 import DashboardSection from "./DashboardSection";
 import { Zap, Home, Car } from "lucide-react";
 
-const MonthOverview = ({ dashboardMetrics, monthlyActivity }) => {
+const MonthOverview = ({ dashboardMetrics, monthlyActivity, userSettings }) => {
   // console.log(monthlyActivity);
   console.log(dashboardMetrics);
 
@@ -19,8 +19,8 @@ const MonthOverview = ({ dashboardMetrics, monthlyActivity }) => {
       />
       <BudgetMetricCard
         color="white"
-        spent={dashboardMetrics?.actualExpenses}
-        income={dashboardMetrics?.plannedExpenses}
+        spent={dashboardMetrics?.actual}
+        income={dashboardMetrics?.planned}
       />
 
       <DashboardSection

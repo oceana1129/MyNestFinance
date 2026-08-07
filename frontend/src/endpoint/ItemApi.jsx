@@ -115,13 +115,12 @@ export async function deleteItem(itemId) {
 /**
  * Reorder items.
  */
-export async function reorderItem(categoryId, itemOrder) {
+export async function reorderItems(items) {
   const response = await fetch(`${API_URL}/item/reorder`, {
-    method: "PUT",
-    headers: await authHeaders(),
+    method: "PATCH",
+    headers: await authHeaders(true),
     body: JSON.stringify({
-      categoryId,
-      itemOrder,
+      items,
     }),
   });
 

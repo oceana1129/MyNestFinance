@@ -1,19 +1,19 @@
 import Button from "../actions/Button";
-import { MoveLeft, Ellipsis } from "lucide-react";
+import { MoveLeft, Ellipsis, Pencil } from "lucide-react";
 
 export default function InspectorPage({
   backText,
   header,
   metric,
   children,
-
+  userSettings,
   primaryButton,
   dangerButton,
 
   onBack,
 }) {
   return (
-    <div className="flex flex-col gap-8 px-8 py-10 h-screen sticky top-0">
+    <div className="flex flex-col gap-8">
       <div className="flex justify-between">
         <Button
           iconLeft={MoveLeft}

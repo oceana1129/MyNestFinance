@@ -4,14 +4,20 @@ import { formatCurrency } from "../../utils/FormatCurrency";
 
 const BudgetMetricCard = ({
   title = "Planned Expenses",
-  spent = 1000,
-  income = 2000,
+  actual = 0,
+  planned = 0,
   color = "pink",
+  userSettings
 }) => {
-  const leftover = formatCurrency(income - spent);
-  const leftoverPercentage = (((income - spent) / income) * 100).toFixed(2);
-  const formatSpent = formatCurrency(spent);
-  const formatIncome = formatCurrency(income);
+
+  const leftover = formatCurrency((planned - actual), userSettings);
+  const leftoverPercentage =
+    planned === 0
+      ? 0
+      : Math.max(0, ((planned - actual) / planned) * 100);
+  
+  const formatActual = formatCurrency(actual, userSettings);
+  const formatPlanned = formatCurrency(planned, userSettings);
 
   return (
     <div
@@ -28,18 +34,18 @@ const BudgetMetricCard = ({
       {/* Main Amount */}
       <div className="mt-4">
         <p className={`text-3xl font-bold tracking-tight text-slate-800`}>
-          {formatSpent}
+          {formatActual}
         </p>
 
         <p className="mt-1 text-lg text-slate-500">
-          of <span className="font-medium">{formatIncome}</span> planned
+          of <span className="font-medium">{formatPlanned}</span> planned
         </p>
       </div>
 
       {/* Progress */}
       <div className="mt-8">
         <ProgressBar
-          value={(spent / income) * 100}
+          value={(actual / planned) * 100}
           color="from-pink-500"
           colorTwo="to-fuchsia-500"
         />
@@ -49,10 +55,10 @@ const BudgetMetricCard = ({
       <div className="mt-3">
         <p
           className={`font-semibold ${
-            spent > income ? "text-pink-500" : "text-emerald-500"
+            actual > planned ? "text-pink-500" : "text-emerald-500"
           }`}
         >
-          {spent > income ? (
+          {actual > planned ? (
             <>
               {leftover} over • {leftoverPercentage}% over budget
             </>

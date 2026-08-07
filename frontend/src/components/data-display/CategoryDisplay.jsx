@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { ChevronUp, ChevronDown } from "lucide-react";
 import { getColorTheme } from "../../utils/ColorThemeLight";
+import { formatCurrency } from "../../utils/FormatCurrency";
 import BudgetCard from "./BudgetCard";
 import BudgetCardAdd from "./BudgetCardAdd";
 
@@ -14,20 +15,24 @@ const CategoryDisplay = ({
   currentItem,
   setCurrentItem,
   onClick,
+  onClickItem,
+  onClickButton,
+  userSettings
 }) => {
   const [hidden, setHidden] = useState(true);
 
   const colors = getColorTheme(color);
 
   return (
-    <div className="flex flex-col gap-6 rounded-3xl bg-white p-6 shadow-sm">
+    <div className="flex flex-col gap-6 rounded-3xl bg-white p-6 shadow-sm"
+      >
       {/* Header */}
       <div
         className="flex justify-between hover:cursor-pointer"
         onClick={() => setHidden((prev) => !prev)}
       >
         <div className="flex flex-col gap-2">
-          <h2 className="text-3xl font-bold text-slate-900">{title}</h2>
+          <h2 className="text-3xl font-bold text-slate-900 hover:text-slate-500 transition" onClick={onClick}>{title}</h2>
 
           <div className="flex items-center gap-3">
             <span
@@ -48,10 +53,10 @@ const CategoryDisplay = ({
             <div
               className={`text-3xl font-bold ${subtitle === "income" ? colors.text : "text-slate-900"}`}
             >
-              ${currentAmount}
+              {formatCurrency(currentAmount, userSettings)}
             </div>
 
-            <div className="text-xl text-slate-500">of ${targetAmount}</div>
+            <div className="text-xl text-slate-500">of {formatCurrency(targetAmount, userSettings)}</div>
           </div>
 
           <button className="mt-2 rounded-lg p-1 transition hover:bg-slate-100">
@@ -69,14 +74,15 @@ const CategoryDisplay = ({
               item={item}
               color={color}
               active={currentItem?._id === item._id}
-              onClick={() => setCurrentItem(item)}
+              onClick={() => onClickItem(item)}
+              userSettings={userSettings}
             />
           ))}
 
           <BudgetCardAdd
             text={`add ${subtitle} +`}
             color={color}
-            onClick={onClick}
+            onClick={onClickButton}
           />
         </div>
       )}

@@ -13,22 +13,23 @@ const viewMap = {
 /**
  * Renders whichever view is on top of the navigation stack.
  *
- * The stack itself is now owned by Dashboard (not Inspector), since clicks
- * in the main dashboard panel (e.g. clicking a category card) need to push
- * onto the *same* stack as clicks inside the inspector's own views (e.g.
- * clicking an item inside CategoryView) — that only works if both places
- * call the same `pushView`.
+ * The stack itself is now owned by Dashboard since clicks happen in the 
+ * dashboard
  *
  * onAddItem / onRecordActivity / onDeleteCategory / onDeleteItem /
  * onDeleteActivity are just forwarded to the active view, since the actual
- * create/delete overlays live in Dashboard, not here.
+ * create/delete overlays live in Dashboard
  */
 export default function Inspector({
   stack,
   pushView,
+  userSettings,
   goBack,
   onAddItem,
-  onRecordActivity,
+  onAddActivity,
+  onEditCategory,
+  onEditItem,
+  onEditActivity,
   onDeleteCategory,
   onDeleteItem,
   onDeleteActivity,
@@ -43,8 +44,12 @@ export default function Inspector({
       data={current.data}
       pushView={pushView}
       goBack={goBack}
+      userSettings={userSettings}
       onAddItem={onAddItem}
-      onRecordActivity={onRecordActivity}
+      onAddActivity={onAddActivity}
+      onEditCategory={onEditCategory}
+      onEditItem={onEditItem}
+      onEditActivity={onEditActivity}
       onDeleteCategory={onDeleteCategory}
       onDeleteItem={onDeleteItem}
       onDeleteActivity={onDeleteActivity}

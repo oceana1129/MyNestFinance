@@ -51,6 +51,7 @@ export default function CreateActivity({
   onClose,
   onCreate,
   bugdetItemId,
+  emoji,
   month,
   year,
   displayOrder,
@@ -102,11 +103,10 @@ export default function CreateActivity({
 
       await onCreate({
         budgetItem: bugdetItemId,
-        displayOrder,
         name: name.trim(),
-        emoji,
-        color,
-        categoryType,
+        spent,
+        date: activityDate,
+        note,
       });
 
       onClose();

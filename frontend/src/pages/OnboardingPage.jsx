@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { UserAuth } from "../context/AuthContext.jsx";
-import { createBudget } from "../services/BudgetApi.jsx";
-import { createCategory, reorderCategories } from "../services/CategoryApi.jsx";
-import { createItem, reorderItem } from "../services/ItemApi.jsx";
+import { createBudget } from "../endpoint/BudgetApi.jsx";
+import { createCategory, reorderCategories } from "../endpoint/CategoryApi.jsx";
+import { createItem, reorderItems } from "../endpoint/ItemApi.jsx";
 import {
   CATEGORY_EXPENSES,
   CATEGORY_DEBT,

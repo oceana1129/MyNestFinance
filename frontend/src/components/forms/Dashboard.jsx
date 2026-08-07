@@ -1,17 +1,17 @@
 import { useState, useEffect } from "react";
 import { UserAuth } from "../../context/AuthContext.jsx";
-import { getCurrentUser } from "../../services/UserApi.jsx";
-import { getUserBudgets } from "../../services/BudgetApi.jsx";
+import { getCurrentUser } from "../../endpoint/UserApi.jsx";
+import { getUserBudgets } from "../../endpoint/BudgetApi.jsx";
 import {
   getCategoryByBudget,
   createCategory,
-} from "../../services/CategoryApi.jsx";
+} from "../../endpoint/CategoryApi.jsx";
 import {
   getMonthlyDashboardSummary,
   getMonthlyActivity,
   getCategoryBreakdown,
-} from "../../services/DashboardApi.jsx";
-import { createItem } from "../../services/ItemApi.jsx";
+} from "../../endpoint/DashboardApi.jsx";
+import { createItem } from "../../endpoint/ItemApi.jsx";
 import { CircleAlert, Zap } from "lucide-react";
 import { ICONS } from "../../utils/IconMap.js";
 import HeaderStandard from "../data-display/HeaderStandard";

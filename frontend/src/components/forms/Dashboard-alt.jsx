@@ -1,18 +1,35 @@
 import { useState, useEffect } from "react";
 import { UserAuth } from "../../context/AuthContext.jsx";
-import { getCurrentUser } from "../../services/UserApi.jsx";
-import { getUserBudgets } from "../../services/BudgetApi.jsx";
+import { getCurrentUser } from "../../endpoint/UserApi.jsx";
+import { getUserBudgets } from "../../endpoint/BudgetApi.jsx";
 import {
   getCategoryByBudget,
   createCategory,
-} from "../../services/CategoryApi.jsx";
+  updateCategory, 
+  deleteCategory, 
+  reorderCategories
+} from "../../endpoint/CategoryApi.jsx";
+import { 
+  createItem,
+  getItem,
+  updateItem,
+  deleteItem,
+  reorderItems
+} from "../../endpoint/ItemApi.jsx";
+import {
+  createActivityLog,
+  getActivityLog,
+  updateActivityLog,
+  deleteActivityLog
+} from "../../endpoint/ActivityApi.jsx"
 import {
   getMonthlyDashboardSummary,
   getMonthlyActivity,
   getCategoryBreakdown,
-} from "../../services/DashboardApi.jsx";
-import { createItem } from "../../services/ItemApi.jsx";
-import { CircleAlert, Zap } from "lucide-react";
+} from "../../endpoint/DashboardApi.jsx";
+
+
+import { CircleAlert, User, Zap } from "lucide-react";
 import { ICONS } from "../../utils/IconMap.js";
 import HeaderStandard from "../data-display/HeaderStandard";
 import MonthDisplay from "../data-display/MonthDisplay";
@@ -22,6 +39,7 @@ import GlassDisplay from "../data-display/GlassDisplay.jsx";
 import CreateCategory from "../forms/CreateCategory.jsx";
 import CreateItem from "../forms/CreateItem.jsx";
 import CreateActivity from "../forms/CreateActivity.jsx";
+import { formatCurrency } from "../../utils/FormatCurrency.js";
 
 import BudgetMetricCard from "../data-display/BudgetMetricCard.jsx";
 import Button from "../actions/Button.jsx";
@@ -35,18 +53,10 @@ const REACTION_COLOR = {
   "on-target": "blue",
 };
 
-function formatCurrency(amount) {
-  return (amount ?? 0).toLocaleString("en-US", {
-    style: "currency",
-    currency: "USD",
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0,
-  });
-}
-
 const Dashboard = () => {
   const { user } = UserAuth(); // the current user
   const [displayName, setDisplayName] = useState("Friend"); // the user display name
+  const [userSettings, setUserSettings] = useState();
   const [budgets, setBudgets] = useState([]); // the user's historical budgets
 
   const [currentBudget, setCurrentBudget] = useState(null); // the user's currently displayed budget
@@ -95,7 +105,7 @@ const Dashboard = () => {
 
         const currentUser = await getCurrentUser();
         setDisplayName(currentUser.displayName ?? "Friend");
-
+        setUserSettings(currentUser.settings ?? {currencyPreference: "$", showDecimals: true})
         const budgets = await getUserBudgets(currentUser._id);
         setBudgets(budgets);
       } catch (error) {
@@ -153,14 +163,12 @@ const Dashboard = () => {
 
   const hasBudget = Boolean(currentBudget);
 
-  // reset the inspector back to the month view whenever the selected
-  // budget changes, so you're not looking at, say, July's category detail
-  // while the main panel now shows August
+  // reset the inspector back to the month view whenever the budget changes
   useEffect(() => {
     setStack((prev) => [prev[0]]);
   }, [currentBudget?._id]);
 
-  // keep the inspector's base "month" frame in sync with fresh dashboard
+  // keep the inspector's base month frame in sync with fresh dashboard
   // data, without disturbing how deep the user has navigated
   useEffect(() => {
     setStack((prev) => {
@@ -180,7 +188,7 @@ const Dashboard = () => {
     });
   }, [dashboardMetrics, currentCategories, monthlyActivity]);
 
-  // creat a category under the current budget
+  // create a category under the current budget
   async function handleCreateCategory(categoryData) {
     try {
       let created = await createCategory(categoryData);
@@ -190,7 +198,7 @@ const Dashboard = () => {
         [...prev, created].sort((a, b) => a.displayOrder - b.displayOrder),
       );
     } catch (error) {
-      console.error(error);
+      console.error("Failed to create category:", error);
     }
   }
 
@@ -215,40 +223,124 @@ const Dashboard = () => {
         }),
       );
     } catch (error) {
-      console.error(error);
+      console.error("Failed to create item:", error);
     }
   }
 
   async function handleCreateActivity(activityData) {
-    console.log(activityData);
-    // TODO: call the real create-activity endpoint and merge the result
-    // into currentCategories/monthlyActivity, same pattern as above.
+    try {
+      console.log(activityData);
+
+      // TODO:
+      // const created = await createActivity(activityData);
+      // Merge into currentCategories and monthlyActivity.
+    } catch (error) {
+      console.error("Failed to create activity:", error);
+    }
   }
 
-  // Inspector action callbacks — these open the same overlays Dashboard
-  // already owns, just triggered from deep inside the inspector stack
-  // instead of directly from the main panel.
+  // add an item to a category
   function handleAddItem(category) {
     setCurrentCategory(category);
     setShowCreateItem(true);
   }
 
-  function handleRecordActivity(item) {
+  function handleAddActivity(item) {
     setCurrentItem(item);
     setShowCreateActivity(true);
   }
 
-  // TODO: wire these to real delete endpoints once they exist.
-  function handleDeleteCategory(category) {
-    console.log("TODO: delete category", category);
+  // edit category
+  async function handleEditCategory(category) {
+    try {
+      console.log("TODO: edit category", category);
+
+      // const updated = await updateCategory(...);
+      // Update currentCategories state.
+    } catch (error) {
+      console.error("Failed to update category:", error);
+    }
   }
 
-  function handleDeleteItem(item) {
-    console.log("TODO: delete item", item);
+  // edit item
+  async function handleEditItem(item) {
+    try {
+      console.log("TODO: edit item", item);
+
+      // const updated = await updateItem(...);
+      // Update currentCategories state.
+    } catch (error) {
+      console.error("Failed to update item:", error);
+    }
   }
 
-  function handleDeleteActivity(activity) {
-    console.log("TODO: delete activity", activity);
+  // edit activity
+  async function handleEditActivity(activity) {
+    try {
+      console.log("TODO: edit activity", activity);
+
+      // const updated = await updateActivity(...);
+      // Update currentCategories/monthlyActivity state.
+    } catch (error) {
+      console.error("Failed to update activity:", error);
+    }
+  }
+
+  // delete category
+  async function handleDeleteCategory(category) {
+  try {
+    console.log(currentCategories)
+    const deletedCategory = await deleteCategory(category._id);
+
+    if (deletedCategory) {
+      const reorderedCategories = currentCategories
+      .filter((c) => c._id !== category._id)
+      .map((c, index) => ({
+        ...c,
+        displayOrder: index,
+      }));
+
+      await reorderCategories(
+        reorderedCategories.map((c) => ({
+          id: c._id,
+          displayOrder: c.displayOrder,
+        }))
+      );
+
+      setCurrentCategories(reorderedCategories);
+
+      if (currentCategory?._id === category._id) {
+        setCurrentCategory(null);
+      }
+    }
+    
+    } catch (error) {
+      console.error("Failed to delete category:", error);
+    }
+  }
+  // delete item
+  async function handleDeleteItem(item) {
+    try {
+      console.log("TODO: delete item", item);
+
+      const deletedItem = await deleteItem(item._id);
+      console.log(deletedItem)
+
+    } catch (error) {
+      console.error("Failed to delete item:", error);
+    }
+  }
+
+  // delete activity
+  async function handleDeleteActivity(activity) {
+    try {
+      console.log("TODO: delete activity", activity);
+
+      // await deleteActivity(activity._id);
+      // Remove from currentCategories/monthlyActivity.
+    } catch (error) {
+      console.error("Failed to delete activity:", error);
+    }
   }
 
   return (
@@ -274,6 +366,7 @@ const Dashboard = () => {
               subtext="Create a category to start tracking"
               color="slate"
               align="text-center"
+              flexGrow={false}
             />
             <BudgetCardAdd
               text="add category + "
@@ -301,17 +394,17 @@ const Dashboard = () => {
             <div className="flex gap-4">
               <GlassDisplay
                 text="earned"
-                subtext={formatCurrency(dashboardMetrics.actualIncome)}
+                subtext={formatCurrency(dashboardMetrics.actualIncome, userSettings)}
               />
               <GlassDisplay
                 color="slate"
                 text="spent"
-                subtext={formatCurrency(dashboardMetrics.actualExpenses)}
+                subtext={formatCurrency(dashboardMetrics.actualExpenses, userSettings)}
               />
               <GlassDisplay
                 color="blue"
                 text="saved"
-                subtext={formatCurrency(dashboardMetrics.actualRemaining)}
+                subtext={formatCurrency(dashboardMetrics.actualRemaining, userSettings)}
               />
             </div>
 
@@ -323,11 +416,16 @@ const Dashboard = () => {
             {/* map out categories the user has */}
             {currentCategories?.map((category) => (
               <CategoryDisplay
-                // Clicking a category card now navigates the inspector to
-                // CategoryView, instead of opening item-creation (that used
-                // to happen here — "add item" now lives on CategoryView's
-                // own "Add Expense" button, via handleAddItem below).
+              // clicking category changes the view
                 onClick={() => pushView("category", category)}
+                onClickItem={(item) => {
+                  pushView("item", item);
+                  setCurrentItem(item);
+                }}
+                onClickButton={() => {
+                  setCurrentCategory(category);
+                  setShowCreateItem(true);
+                }}
                 key={category._id}
                 title={category.name}
                 subtitle={category.categoryType}
@@ -337,6 +435,7 @@ const Dashboard = () => {
                 items={category.items}
                 currentItem={currentItem}
                 setCurrentItem={setCurrentItem}
+                userSettings={userSettings}
               />
             ))}
 
@@ -371,6 +470,7 @@ const Dashboard = () => {
             onClose={() => setShowCreateActivity(false)}
             onCreate={handleCreateActivity}
             budgetItemId={currentItem?._id}
+            emoji={currentItem?.emoji}
             month={currentBudget.month}
             year={currentBudget.year}
           />
@@ -380,15 +480,19 @@ const Dashboard = () => {
       <aside className="sticky top-0 self-start h-screen min-w-[200px] ">
         <div
           className="flex h-full flex-col gap-8 border-2 border-white
-               bg-white/70 px-8 py-10 text-slate-700"
+               bg-white/70 px-8 py-10 text-slate-700 overflow-auto"
         >
           {hasBudget ? (
             <Inspector
               stack={stack}
               pushView={pushView}
               goBack={goBack}
+              userSettings={userSettings}
               onAddItem={handleAddItem}
-              onRecordActivity={handleRecordActivity}
+              onAddActivity={handleAddActivity}
+              onEditCategory={handleEditCategory}
+              onEditItem={handleEditItem}
+              onEditActivity={handleEditActivity}
               onDeleteCategory={handleDeleteCategory}
               onDeleteItem={handleDeleteItem}
               onDeleteActivity={handleDeleteActivity}

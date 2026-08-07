@@ -10,7 +10,7 @@ import {
   updateSettings,
   updateOnboarding,
   updateDisplayName,
-} from "../services/UserApi";
+} from "../endpoint/UserApi";
 
 const UserContext = createContext();
 

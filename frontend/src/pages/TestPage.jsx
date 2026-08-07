@@ -23,7 +23,7 @@ import Insights from "../components/inspector/sections/Insights.jsx";
 import month from "./MockInspectorData.js";
 import { Home, Zap, Car, Lightbulb } from "lucide-react";
 
-import { getDisplayName } from "../services/UserApi.jsx";
+import { getDisplayName } from "../endpoint/UserApi.jsx";
 import { UserAuth } from "../context/AuthContext.jsx";
 
 const TestPage = () => {

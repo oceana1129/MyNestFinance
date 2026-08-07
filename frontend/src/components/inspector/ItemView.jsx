@@ -9,9 +9,11 @@ export default function ItemView({
   data,
   pushView,
   goBack,
-  onRecordActivity,
+  onAddActivity,
   onDeleteItem,
+  userSettings
 }) {
+
   return (
     <InspectorPage
       backText="Back to Category"
@@ -24,12 +26,12 @@ export default function ItemView({
         />
       }
       metric={
-        <BudgetMetricCard actual={data?.actual} planned={data?.planned} />
+        <BudgetMetricCard actual={data?.actual} planned={data?.planned} userSettings={userSettings}/>
       }
       primaryButton={
         <Button
           text="Record Activity"
-          onClick={() => onRecordActivity?.(data)}
+          onClick={() => onAddActivity?.(data)}
         />
       }
       dangerButton={
@@ -40,10 +42,7 @@ export default function ItemView({
         />
       }
     >
-      {/* ItemDetails already wraps itself in a "Item Details" DashboardSection
-          — the original double-wrapped it with an outer one too, which would
-          have rendered the "Item Details" heading twice. */}
-      <ItemDetails item={data} />
+      <ItemDetails item={data} userSettings={userSettings}/>
 
       <RecentActivity
         activities={data?.activities ?? []}

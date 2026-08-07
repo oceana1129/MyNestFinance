@@ -1,4 +1,5 @@
 import React from "react";
+import { getColorTheme } from "../../utils/ColorThemeLight";
 
 // displays icon, header, text, extra content (dropdown, toggle, button)
 const InfoDisplay = ({
@@ -11,8 +12,9 @@ const InfoDisplay = ({
   content, // dropdown, toggle, or button
   borderTop=false
 }) => {
-  const bgColor = `bg-${color}-100`;
-  const iconColor = `text-${color}-700`;
+  const colors = getColorTheme(color)
+  const bgColor = colors.bgExtraLight
+  const iconColor = colors.text
   const headerTextColor =
     variant === "detail" ? "text-slate-500" : "text-slate-700";
   const iconRounded = variant === "default" ? "rounded-md" : "rounded-full";
@@ -20,11 +22,11 @@ const InfoDisplay = ({
     variant === "default" || variant === "item" || variant === "activity" 
       ? "flex-col"
       : "flex-col-reverse";
-
+  const bgStyling = variant === "detail" ? "rounded-2xl bg-white p-4" : "";
   const borderStyle = borderTop? "border-t-2 border-slate-300 pt-4" : ""
 
   return (
-    <div className={`flex gap-4 items-center ${borderStyle}`}>
+    <div className={`flex gap-4 items-center ${bgStyling} ${borderStyle}`}>
       {/* Icon */}
       {Icon && (
         <div>

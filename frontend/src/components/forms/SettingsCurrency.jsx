@@ -27,7 +27,7 @@ const SettingsCurrency = () => {
     const { profile, updateSettings } = UserAuth();
 
     // load from user profile first and set as the use state
-    console.log(profile)
+    // console.log(profile)
     const [currency, setCurrency] = useState("USD - $");
     const [showDecimals, setShowDecimals] = useState(true);
 

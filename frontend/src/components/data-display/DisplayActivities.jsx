@@ -1,14 +1,18 @@
 import React from "react";
 import InfoDisplay from "./InfoDisplay";
-import { Info } from "lucide-react";
+import { ICONS } from "../../utils/IconMap"
+import { formatDate } from "../../utils/FormatDate";
+import { formatCurrency } from "../../utils/FormatCurrency";
 
 const DisplayActivities = ({
   activities,
   variant,
   maxActivities = activities.length,
+  userSettings
 }) => {
   {
-    // console.log(activities);
+    console.log("Activities", activities);
+
     return (
       <>
         {activities && activities.length > 0 ? (
@@ -18,10 +22,10 @@ const DisplayActivities = ({
               <InfoDisplay
                 key={activity._id}
                 variant={variant}
-                icon={activity.budgetItem.emoji}
+                icon={ICONS[activity.emoji] || ICONS["CircleHelp"]}
                 header={activity.name}
-                text={`$${activity.amount}`}
-                subtitle={formatDate(activity.activityDate)}
+                subtitle={formatCurrency(activity.amount, userSettings)}
+                text={activity.activityDate? formatDate(activity.activityDate) : ""}
               />
             ))
         ) : (

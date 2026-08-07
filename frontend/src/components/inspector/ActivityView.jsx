@@ -4,7 +4,7 @@ import DashboardSection from "./DashboardSection";
 import ActivityDetails from "./sections/ActivityDetails";
 import Button from "../actions/Button";
 
-export default function ActivityView({ data, goBack, onDeleteActivity }) {
+export default function ActivityView({ data, goBack, onDeleteActivity, userSettings }) {
   return (
     <InspectorPage
       backText="Back to Item"
