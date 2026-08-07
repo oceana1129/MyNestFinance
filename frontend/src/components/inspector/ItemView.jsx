@@ -4,16 +4,19 @@ import BudgetMetricCard from "../data-display/BudgetMetricCard";
 import ItemDetails from "./sections/ItemDetails";
 import RecentActivity from "./sections/RecentActivity";
 import Button from "../actions/Button";
+import { getActivityLogsByBudget } from "../../endpoint/ActivityApi";
+import { Plus, Pencil } from "lucide-react";
 
 export default function ItemView({
   data,
   pushView,
   goBack,
   onAddActivity,
+  onEditItem,
   onDeleteItem,
-  userSettings
+  userSettings,
 }) {
-
+  console.log(data);
   return (
     <InspectorPage
       backText="Back to Category"
@@ -26,12 +29,25 @@ export default function ItemView({
         />
       }
       metric={
-        <BudgetMetricCard actual={data?.actual} planned={data?.planned} userSettings={userSettings}/>
+        <BudgetMetricCard
+          actual={data?.actual}
+          planned={data?.planned}
+          userSettings={userSettings}
+        />
       }
       primaryButton={
         <Button
           text="Record Activity"
+          iconLeft={Plus}
           onClick={() => onAddActivity?.(data)}
+        />
+      }
+      secondaryButton={
+        <Button
+          variant="ghost"
+          text="Edit"
+          iconLeft={Pencil}
+          onClick={() => onEditItem?.(data)}
         />
       }
       dangerButton={
@@ -42,7 +58,7 @@ export default function ItemView({
         />
       }
     >
-      <ItemDetails item={data} userSettings={userSettings}/>
+      <ItemDetails item={data} userSettings={userSettings} />
 
       <RecentActivity
         activities={data?.activities ?? []}

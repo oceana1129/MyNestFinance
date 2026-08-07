@@ -13,7 +13,7 @@ const viewMap = {
 /**
  * Renders whichever view is on top of the navigation stack.
  *
- * The stack itself is now owned by Dashboard since clicks happen in the 
+ * The stack itself is now owned by Dashboard since clicks happen in the
  * dashboard
  *
  * onAddItem / onRecordActivity / onDeleteCategory / onDeleteItem /
@@ -38,6 +38,8 @@ export default function Inspector({
   const View = viewMap[current.type];
 
   if (!View) return null;
+
+  // console.log(current.data);
 
   return (
     <View

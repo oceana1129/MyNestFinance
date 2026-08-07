@@ -5,7 +5,7 @@ import DashboardSection from "./DashboardSection";
 import TopItems from "./sections/TopItems";
 import Insights from "./sections/Insights";
 import Button from "../actions/Button";
-import { Plus } from "lucide-react";
+import { Plus, Pencil } from "lucide-react";
 import { use } from "react";
 
 export default function CategoryView({
@@ -13,6 +13,7 @@ export default function CategoryView({
   pushView,
   goBack,
   onAddItem,
+  onEditCategory,
   onDeleteCategory,
   userSettings,
 }) {
@@ -37,10 +38,14 @@ export default function CategoryView({
         />
       }
       primaryButton={
+        <Button text="Add" iconLeft={Plus} onClick={() => onAddItem?.(data)} />
+      }
+      secondaryButton={
         <Button
-          text="Add Expense"
-          iconLeft={Plus}
-          onClick={() => onAddItem?.(data)}
+          variant="ghost"
+          text="Edit"
+          iconLeft={Pencil}
+          onClick={() => onEditCategory?.(data)}
         />
       }
       dangerButton={

@@ -406,8 +406,30 @@ const labelClass = "mb-1 block text-sm font-medium text-slate-700";
  * @param {"expense"|"debt"} categoryType - determines whether the debt
  *   fields section is shown (only if the parent category is debt type)
  */
+/**
+ * Overlay for creating OR editing a budget item.
+ *
+ * Only `name` is required. Everything else is optional and gets a sane
+ * default if left blank.
+ *
+ * @param {boolean} open
+ * @param {boolean} edit - true when editing an existing item
+ * @param {object} editData - the item being edited. Only read when `edit`
+ *   is true. Shape matches what this component already sends on create:
+ *   { _id, name, plannedAmount, emoji, debt: {...}|null, plan: {...}|null }
+ * @param {function} onClose
+ * @param {function} onCreate async payload — in edit mode, includes
+ *   `_id: editData._id` so the parent can tell create/update apart
+ * @param {string} budgetCategoryId
+ * @param {string} monthlyBudgetId
+ * @param {number} displayOrder
+ * @param {"expense"|"debt"} categoryType - determines whether the debt
+ *   fields section is shown (only if the parent category is debt type)
+ */
 export default function CreateItem({
   open,
+  edit = false,
+  editData,
   onClose,
   onCreate,
   budgetCategoryId,
@@ -415,11 +437,6 @@ export default function CreateItem({
   displayOrder,
   categoryType = "expense",
 }) {
-  // console.log({
-  //   monthlyBudgetId,
-  //   budgetCategoryId,
-  //   categoryType,
-  // });
   const isDebt = categoryType === "debt";
 
   const [name, setName] = useState("");
@@ -447,30 +464,80 @@ export default function CreateItem({
   const [intervalUnit, setIntervalUnit] = useState("months");
   const [startDate, setStartDate] = useState("");
 
+  // formats a Date/ISO-string/whatever into the "YYYY-MM-DD" shape
+  // <input type="date"> requires
+  function toDateInputValue(value) {
+    if (!value) return "";
+    return new Date(value).toISOString().split("T")[0];
+  }
+
   useEffect(() => {
     if (!open) return;
 
-    setName("");
-    setPlannedAmount("");
     setError(null);
 
-    setDebtType("other");
-    setOriginalBalance("");
-    setCurrentBalance("");
-    setMinimumPayment("");
-    setInterestRate("");
-    setPreferredPayoffInYears("");
+    if (edit && editData) {
+      setName(editData.name ?? "");
+      setPlannedAmount(
+        editData.planned != null ? String(editData.planned) : "",
+      );
+      setEmoji(editData.emoji ?? null);
 
-    setRecurringEnabled(false);
-    setScheduleType("monthly");
-    setDayOfWeek("sun");
-    setDayOfMonth("1");
-    setLastDayOfMonth(false);
-    setMonthOfYear("1");
-    setInterval_("1");
-    setIntervalUnit("months");
-    setStartDate("");
-  }, [open]);
+      const debt = editData.debt ?? {};
+      setDebtType(debt.debtType ?? "other");
+      setOriginalBalance(
+        debt.originalBalance != null ? String(debt.originalBalance) : "",
+      );
+      setCurrentBalance(
+        debt.currentBalance != null ? String(debt.currentBalance) : "",
+      );
+      setMinimumPayment(
+        debt.minimumPayment != null ? String(debt.minimumPayment) : "",
+      );
+      setInterestRate(
+        debt.interestRate != null ? String(debt.interestRate) : "",
+      );
+      setPreferredPayoffInYears(
+        debt.preferredPayoffInYears != null
+          ? String(debt.preferredPayoffInYears)
+          : "",
+      );
+
+      const plan = editData.plan ?? null;
+      setRecurringEnabled(Boolean(plan));
+      setScheduleType(plan?.scheduleType ?? "monthly");
+      setDayOfWeek(plan?.dayOfWeek ?? "sun");
+      setDayOfMonth(plan?.dayOfMonth != null ? String(plan.dayOfMonth) : "1");
+      setLastDayOfMonth(Boolean(plan?.lastDayOfMonth));
+      setMonthOfYear(
+        plan?.monthOfYear != null ? String(plan.monthOfYear) : "1",
+      );
+      setInterval_(plan?.interval != null ? String(plan.interval) : "1");
+      setIntervalUnit(plan?.intervalUnit ?? "months");
+      setStartDate(toDateInputValue(plan?.startDate));
+    } else {
+      setName("");
+      setPlannedAmount("");
+      setEmoji(null);
+
+      setDebtType("other");
+      setOriginalBalance("");
+      setCurrentBalance("");
+      setMinimumPayment("");
+      setInterestRate("");
+      setPreferredPayoffInYears("");
+
+      setRecurringEnabled(false);
+      setScheduleType("monthly");
+      setDayOfWeek("sun");
+      setDayOfMonth("1");
+      setLastDayOfMonth(false);
+      setMonthOfYear("1");
+      setInterval_("1");
+      setIntervalUnit("months");
+      setStartDate("");
+    }
+  }, [open, edit, editData]);
 
   useEffect(() => {
     if (!open) return;
@@ -535,16 +602,18 @@ export default function CreateItem({
   }
 
   async function handleSubmit() {
+    console.log("handleSumbit()");
     if (!isValid || submitting) return;
-    console.log("budget category id\n", budgetCategoryId);
-    console.log("monthyl budget id\n", monthlyBudgetId);
+
     try {
       setSubmitting(true);
       setError(null);
 
       await onCreate({
+        ...(edit && editData?._id ? { _id: editData._id } : {}),
         budgetCategory: budgetCategoryId,
         monthlyBudget: monthlyBudgetId,
+        displayOrder: edit ? editData?.displayOrder : displayOrder,
         emoji: emoji,
         name: name.trim(),
         plannedAmount: plannedAmount === "" ? 0 : Number(plannedAmount),
@@ -555,13 +624,15 @@ export default function CreateItem({
       onClose();
     } catch (err) {
       console.error(err);
-      setError("Couldn't create the item. Try again.");
+      setError(
+        edit
+          ? "Couldn't save the item. Try again."
+          : "Couldn't create the item. Try again.",
+      );
     } finally {
       setSubmitting(false);
     }
   }
-  // console.log(budgetCategoryId);
-  // console.log(monthlyBudgetId);
   return (
     <div
       className="fixed inset-0 z-[100] flex items-center justify-center bg-black/40 p-4"
@@ -575,7 +646,13 @@ export default function CreateItem({
       >
         <div className="mb-4 flex items-center justify-between">
           <h2 className="font-serif text-2xl text-slate-700 font-bold">
-            {isDebt ? "New debt item" : "New item"}
+            {edit
+              ? isDebt
+                ? "Edit debt item"
+                : "Edit item"
+              : isDebt
+                ? "New debt item"
+                : "New item"}
           </h2>
           <button
             onClick={onClose}
@@ -910,7 +987,13 @@ export default function CreateItem({
               disabled={!isValid || submitting}
               className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
             >
-              {submitting ? "Creating..." : "Create item"}
+              {submitting
+                ? edit
+                  ? "Saving..."
+                  : "Creating..."
+                : edit
+                  ? "Save changes"
+                  : "Create item"}
             </button>
           </div>
         </div>

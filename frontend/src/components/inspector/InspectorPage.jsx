@@ -8,6 +8,7 @@ export default function InspectorPage({
   children,
   userSettings,
   primaryButton,
+  secondaryButton,
   dangerButton,
 
   onBack,
@@ -32,6 +33,8 @@ export default function InspectorPage({
       {children}
 
       {primaryButton}
+
+      {secondaryButton}
 
       {dangerButton}
     </div>

@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { UserAuth } from "../../context/AuthContext.jsx";
 import { getCurrentUser } from "../../endpoint/UserApi.jsx";
-import { getUserBudgets } from "../../endpoint/BudgetApi.jsx";
+import { createBudget, getUserBudgets } from "../../endpoint/BudgetApi.jsx";
 import {
   getCategoryByBudget,
   createCategory,
@@ -64,6 +64,7 @@ const Dashboard = () => {
   const [currentCategories, setCurrentCategories] = useState([]); // the user's currently displayed categories
   const [currentCategory, setCurrentCategory] = useState(null); // which category CreateItem should attach to
   const [currentItem, setCurrentItem] = useState(null); // which item CreateActivity should attach to
+  const [currentActivity, setCurrentActivity] = useState(null); // which item CreateActivity should attach to
 
   const [dashboardMetrics, setDashboardMetrics] = useState(null); // the user's current month metrics
   const [monthlyActivity, setMonthlyActivity] = useState(null); // the user's most recent activity for the month
@@ -80,17 +81,45 @@ const Dashboard = () => {
   const [showCreateItem, setShowCreateItem] = useState(false);
   const [showCreateActivity, setShowCreateActivity] = useState(false);
 
-  // Inspector's navigation stack, owned here so both the main-panel category
-  // cards and the inspector's own internal clicks (category -> item ->
-  // activity) push onto the same stack.
+  const [showEditCategory, setShowEditCategory] = useState(false);
+  const [showEditItem, setShowEditItem] = useState(false);
+  const [showEditActivity, setShowEditActivity] = useState(false);
+
+  // inspector navigation stack
   const [stack, setStack] = useState([{ type: "month", data: {} }]);
 
   function pushView(type, data) {
+    // populate activities
+    if (type === "item" && !data.activities) {
+      data = {
+        ...data,
+        activities: (monthlyActivity ?? []).filter(
+          (a) => idOf(a.budgetItem) === idOf(data._id),
+        ),
+      };
+    }
+
     setStack((prev) => [...prev, { type, data }]);
   }
 
   function goBack() {
     setStack((prev) => (prev.length === 1 ? prev : prev.slice(0, -1)));
+  }
+
+  // patch stack frame matches
+  function updateStack(type, id, updater) {
+    setStack((prev) =>
+      prev.map((view) => {
+        if (view.type !== type || idOf(view.data?._id) !== idOf(id)) {
+          return view;
+        }
+
+        return {
+          ...view,
+          data: updater(view.data),
+        };
+      }),
+    );
   }
 
   // default to the current month
@@ -198,40 +227,18 @@ const Dashboard = () => {
     });
   }, [dashboardMetrics, currentCategories, monthlyActivity]);
 
-  // Normalizes an ID field that might be a plain string/ObjectId in one
-  // response and a populated object ({_id, name, ...}) in another — e.g.
-  // items loaded from getCategoryBreakdown vs. items just returned from
-  // createItem(). Strict `===` between those two shapes silently fails,
-  // which is why "pre-existing" items weren't matching category._id while
-  // freshly-created ones (plain string ids) worked fine.
+  useEffect(() => {
+    console.log(currentCategories);
+  }, [currentCategories]);
+
+  // normalize id fields
   function idOf(value) {
     if (value == null) return value;
     if (typeof value === "object") return String(value._id ?? value);
     return String(value);
   }
 
-  function updateStack(type, id, updater) {
-    setStack((prev) =>
-      prev.map((view) => {
-        if (view.type !== type || idOf(view.data?._id) !== idOf(id)) {
-          return view;
-        }
-
-        return {
-          ...view,
-          data: updater(view.data),
-        };
-      }),
-    );
-  }
-
-  // Re-fetch the real dashboardMetrics + category breakdown and merge them
-  // in. Local optimistic patches (below) only ever touch arrays/counts —
-  // planned/actual/reaction/percentage on categories, and the
-  // earned/spent/saved totals, are computed server-side and were never
-  // being recalculated here, which is why they only updated on a full
-  // refresh. `items` arrays are preserved from existing state since
-  // getCategoryBreakdown doesn't return them.
+  // refetch dashboard metrics
   async function refreshMonthMetrics() {
     if (!currentBudget) return;
 
@@ -250,9 +257,7 @@ const Dashboard = () => {
         }),
       );
 
-      // keep an open CategoryView in sync too, not just the month frame
-      // (the month frame already updates itself via the effect watching
-      // dashboardMetrics/currentCategories)
+      // keep category view in sync
       setStack((prevStack) =>
         prevStack.map((view) => {
           if (view.type !== "category") return view;
@@ -268,10 +273,7 @@ const Dashboard = () => {
     }
   }
 
-  // Re-fetch one item's real planned/actual/reaction/percentage (e.g. after
-  // an activity log is added/edited/deleted against it) and merge it into
-  // both currentCategories and an open ItemView, without needing to
-  // re-fetch every category to get one item's numbers right.
+  // refetch item information
   async function refreshItemMetrics(itemId, categoryId) {
     try {
       const fresh = await getItemSummary(itemId);
@@ -292,6 +294,71 @@ const Dashboard = () => {
       updateStack("item", itemId, (data) => ({ ...data, ...fresh }));
     } catch (error) {
       console.error("Failed to refresh item metrics:", error);
+    }
+  }
+
+  async function handleCreateBudget() {
+    try {
+      console.log("handleCreateBudget()");
+      let createdBudget = await createBudget({
+        month: month.month,
+        year: month.year,
+      });
+
+      console.log("createdBudget", createdBudget);
+      createdBudget = createdBudget.savedBudget;
+
+      const [income, expense] = await Promise.all([
+        createCategory({
+          monthlyBudget: createdBudget._id,
+          displayOrder: 0,
+          name: "Income 2",
+          emoji: "DollarSign",
+          color: "green",
+          categoryType: "income",
+        }),
+        createCategory({
+          monthlyBudget: createdBudget._id,
+          displayOrder: 1,
+          name: "Expenses",
+          emoji: "Wallet",
+          color: "red",
+          categoryType: "expense",
+        }),
+      ]);
+
+      console.log(income);
+
+      const categories = [income.savedCategory, expense.savedCategory];
+
+      // update state
+      setBudgets((prev) => [...prev, createdBudget]);
+      setCurrentBudget(createdBudget);
+      setCurrentCategories(categories);
+      setMonthlyActivity([]);
+      setDashboardMetrics({
+        plannedIncome: 0,
+        actualIncome: 0,
+        plannedExpenses: 0,
+        actualExpenses: 0,
+      });
+
+      // reset inspector to the new month
+      setStack([
+        {
+          type: "month",
+          data: {
+            title: "Your month",
+            subtitle: "A peek at how things are going.",
+            planned: 0,
+            actual: 0,
+            categories,
+            recentActivity: [],
+          },
+        },
+      ]);
+    } catch (error) {
+      console.error("Failed to create budget:", error);
     }
   }
 
@@ -415,46 +482,54 @@ const Dashboard = () => {
   }
 
   // edit category
-  async function handleEditCategory(categoryId, updates) {
+  async function handleEditCategory(updates) {
     try {
-      console.log("TODO: edit category");
-      // let updated = await updateCategory(categoryId, updates);
-      // updated = updated.savedCategory;
+      let updated = await updateCategory(updates._id, updates);
+      updated = updated.updatedCategory;
 
-      // setCurrentCategories((prev) =>
-      //   prev
-      //     .map((c) => (c._id === categoryId ? { ...c, ...updated } : c))
-      //     .sort((a, b) => a.displayOrder - b.displayOrder),
-      // );
-      // updateStack("category", updated._id, () => updated);
+      setCurrentCategories((prev) =>
+        prev
+          .map((c) => (c._id === updated._id ? { ...c, ...updated } : c))
+          .sort((a, b) => a.displayOrder - b.displayOrder),
+      );
+      updateStack("category", updated._id, () => updated);
     } catch (error) {
       console.error("Failed to update category:", error);
     }
   }
 
   // edit item
-  async function handleEditItem(itemId, updates) {
+  async function handleEditItem(updates) {
+    console.log("handleEditItem()");
+    console.log("updates", updates);
     try {
       console.log("TODO: edit item");
-      // let updated = await updateItem(itemId, updates);
-      // updated = updated.savedBudgetItem;
-      // setCurrentCategories((prev) =>
-      //   prev.map((category) => {
-      //     if (!(category.items ?? []).some((item) => item._id === itemId)) {
-      //       return category;
-      //     }
-      //     return {
-      //       ...category,
-      //       items: category.items
-      //         .map((item) =>
-      //           item._id === itemId ? { ...item, ...updated } : item,
-      //         )
-      //         .sort((a, b) => a.displayOrder - b.displayOrder),
-      //     };
-      //   }),
-      // );
+      let updated = await updateItem(updates._id, updates);
+      console.log("updated", updated);
+      updated = updated.updatedItem;
+      setCurrentCategories((prev) =>
+        prev.map((category) => {
+          if (
+            !(category.items ?? []).some(
+              (item) => idOf(item._id) === idOf(updates._id),
+            )
+          ) {
+            return category;
+          }
+          return {
+            ...category,
+            items: category.items
+              .map((item) =>
+                idOf(item._id) === idOf(updates._id)
+                  ? { ...item, ...updated }
+                  : item,
+              )
+              .sort((a, b) => a.displayOrder - b.displayOrder),
+          };
+        }),
+      );
 
-      // updateStack("item", updated._id, () => updated);
+      updateStack("item", updated._id, () => updated);
     } catch (error) {
       console.error("Failed to update item:", error);
     }
@@ -489,6 +564,46 @@ const Dashboard = () => {
     } catch (error) {
       console.error("Failed to update activity:", error);
     }
+  }
+
+  // edit
+  function onEditCategory(category) {
+    console.log("handle edit category");
+    console.log("currentCategory", currentCategory);
+    setCurrentCategory(category);
+    setShowEditCategory(true);
+  }
+
+  function onEditItem(item) {
+    console.log("handle edit item");
+    console.log("currentItem", currentItem);
+    const parentCategory = currentCategories.find((c) =>
+      (c.items ?? []).some((i) => idOf(i._id) === idOf(item._id)),
+    );
+
+    setCurrentCategory(parentCategory ?? null);
+    setCurrentItem(item);
+    setShowEditItem(true);
+  }
+
+  function onEditActivity(activity) {
+    console.log("handle edit activity");
+    console.log("currentActivity", currentActivity);
+    let parentItem = null;
+
+    for (const category of currentCategories) {
+      const found = (category.items ?? []).find((item) =>
+        (item.activities ?? []).some((a) => idOf(a._id) === idOf(activity._id)),
+      );
+      if (found) {
+        parentItem = found;
+        break;
+      }
+    }
+
+    if (parentItem) setCurrentItem(parentItem);
+    setCurrentActivity(activity);
+    setShowEditActivity(true);
   }
 
   function confirmDelete(object, callback) {
@@ -684,15 +799,15 @@ const Dashboard = () => {
           <>
             <GlassDisplay
               text=""
-              subtext="Create a category to start tracking"
+              subtext="Set up a budget to start tracking"
               color="slate"
               align="text-center"
               flexGrow={false}
             />
             <BudgetCardAdd
-              text="add category + "
+              text="create a budget "
               color="green"
-              onClick={() => setShowCreateCategory(true)}
+              onClick={handleCreateBudget}
             />
           </>
         ) : secondaryLoading ? (
@@ -740,6 +855,7 @@ const Dashboard = () => {
 
             <GlassDisplay
               subtext=""
+              flexGrow={false}
               text="Every dollar tracked is a small win. Keep going!"
             />
 
@@ -805,6 +921,43 @@ const Dashboard = () => {
             year={currentBudget.year}
           />
         )}
+        {/* edit category component */}
+        {currentBudget && (
+          <CreateCategory
+            edit={true}
+            editData={currentCategory}
+            open={showEditCategory}
+            onClose={() => setShowEditCategory(false)}
+            onCreate={handleEditCategory}
+            monthlyBudgetId={currentBudget?._id}
+            displayOrder={currentCategories.length}
+          />
+        )}
+        {currentBudget && (
+          <CreateItem
+            edit={true}
+            editData={currentItem}
+            open={showEditItem}
+            onClose={() => setShowEditItem(false)}
+            onCreate={handleEditItem}
+            monthlyBudgetId={currentBudget?._id}
+            budgetCategoryId={currentCategory?._id}
+            categoryType={currentCategory?.categoryType}
+          />
+        )}
+        {currentBudget && (
+          <CreateActivity
+            edit={true}
+            editData={currentActivity}
+            open={showEditActivity}
+            onClose={() => setShowEditActivity(false)}
+            onCreate={handleEditActivity}
+            budgetItemId={currentItem?._id}
+            emoji={currentItem?.emoji}
+            month={currentBudget.month}
+            year={currentBudget.year}
+          />
+        )}
         {showDeleteDialog && (
           <ConfirmDialog
             open={showDeleteDialog}
@@ -845,9 +998,9 @@ const Dashboard = () => {
               userSettings={userSettings}
               onAddItem={handleAddItem}
               onAddActivity={handleAddActivity}
-              onEditCategory={handleEditCategory}
-              onEditItem={handleEditItem}
-              onEditActivity={handleEditActivity}
+              onEditCategory={onEditCategory}
+              onEditItem={onEditItem}
+              onEditActivity={onEditActivity}
               onDeleteCategory={(category) =>
                 confirmDelete(category, () => handleDeleteCategory(category))
               }

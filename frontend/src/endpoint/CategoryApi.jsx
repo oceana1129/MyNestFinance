@@ -52,6 +52,7 @@ export async function getCategoryByBudget(budgetId) {
  * Create a new category.
  */
 export async function createCategory(categoryData) {
+  console.log(categoryData);
   const response = await fetch(`${API_URL}/category`, {
     method: "POST",
     headers: await authHeaders(true),
@@ -61,7 +62,7 @@ export async function createCategory(categoryData) {
   if (!response.ok) {
     throw new Error("Failed to create category.");
   }
-  
+
   return response.json();
 }
 
@@ -69,6 +70,8 @@ export async function createCategory(categoryData) {
  * Update an existing category.
  */
 export async function updateCategory(categoryId, categoryData) {
+  console.log(categoryData);
+  console.log("cat id", categoryId);
   const response = await fetch(`${API_URL}/category/${categoryId}`, {
     method: "PUT",
     headers: await authHeaders(true),

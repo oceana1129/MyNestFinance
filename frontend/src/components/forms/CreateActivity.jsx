@@ -44,7 +44,14 @@ const textareaClass = `
 `;
 
 /**
- * Overlay for creating a new activity log
+ * Overlay for creating OR editing an activity log.
+ *
+ * @param {boolean} edit - true when editing an existing activity log
+ * @param {object} editData - the activity being edited. Only read when
+ *   `edit` is true; shape: { _id, name, amount, date, note }
+ * @param {function} onCreate - async (activityData) => void. In edit mode,
+ *   activityData includes `_id: editData._id` so the parent can tell
+ *   create and update apart.
  */
 export default function CreateActivity({
   edit = false,
@@ -71,15 +78,34 @@ export default function CreateActivity({
 
   const maxDate = new Date(year, month, 0).toISOString().split("T")[0];
 
-  // reset the form each time the overlay opens
+  // reset the form each time the overlay opens — preload from editData
+  // when editing, otherwise default to today (within the current month)
   useEffect(() => {
-    if (open) {
+    if (!open) return;
+
+    setError(null);
+
+    if (edit && editData) {
+      setName(editData.name ?? "");
+      setSpent(editData.amount ?? null);
+      setNote(editData.note ?? null);
+      setActivityDate(
+        editData.date
+          ? new Date(editData.date).toISOString().split("T")[0]
+          : minDate,
+      );
+    } else {
       setName("");
-      setError(null);
-      setActivityDate(null);
-      setActivityDate(new Date());
+      setSpent(null);
+      setNote(null);
+      // NOTE: this used to be `setActivityDate(new Date())` — a raw Date
+      // object, which doesn't work as a controlled <input type="date">
+      // value (that needs a "YYYY-MM-DD" string). Fixed here since edit
+      // mode needs a correctly-formatted string anyway.
+      const today = new Date().toISOString().split("T")[0];
+      setActivityDate(today >= minDate && today <= maxDate ? today : minDate);
     }
-  }, [open]);
+  }, [open, edit, editData]);
 
   // close on Escape
   useEffect(() => {
@@ -104,6 +130,7 @@ export default function CreateActivity({
       setError(null);
 
       await onCreate({
+        ...(edit && editData?._id ? { _id: editData._id } : {}),
         budgetItem: budgetItemId,
         name: name.trim(),
         amount: spent,
@@ -114,7 +141,11 @@ export default function CreateActivity({
       onClose();
     } catch (err) {
       console.error(err);
-      setError("Couldn't create the category. Try again.");
+      setError(
+        edit
+          ? "Couldn't save the activity log. Try again."
+          : "Couldn't create the activity log. Try again.",
+      );
     } finally {
       setSubmitting(false);
     }
@@ -132,7 +163,9 @@ export default function CreateActivity({
         onClick={(event) => event.stopPropagation()}
       >
         <div className="mb-4 flex items-center justify-between">
-          <h2 className="font-serif text-2xl font-bold">New activity log</h2>
+          <h2 className="font-serif text-2xl font-bold">
+            {edit ? "Edit activity log" : "New activity log"}
+          </h2>
           <button
             onClick={onClose}
             className="rounded-full p-1 text-slate-400 hover:bg-slate-100 hover:text-slate-600"
@@ -213,7 +246,15 @@ export default function CreateActivity({
           <div className="mt-2 flex justify-end gap-2">
             <Button variant="ghost" text="Cancel" onClick={onClose} />
             <Button
-              text={submitting ? "Creating..." : "Create activity log"}
+              text={
+                submitting
+                  ? edit
+                    ? "Saving..."
+                    : "Creating..."
+                  : edit
+                    ? "Save changes"
+                    : "Create activity log"
+              }
               onClick={handleSubmit}
               disabled={!isValid || submitting}
             />

@@ -369,19 +369,25 @@ const CATEGORY_TYPES = [
 ];
 
 /**
- * Overlay for creating a new budget category.
+ * Overlay for creating OR editing a budget category.
  *
  * @param {boolean} open - whether the overlay is visible
+ * @param {boolean} edit - true when editing an existing category rather
+ *   than creating a new one
+ * @param {object} editData - the category being edited. Only read when
+ *   `edit` is true; shape: { _id, name, emoji, color, categoryType }
  * @param {function} onClose - called to dismiss the overlay
- * @param {function} onCreate - async (categoryData) => void, where
- *   categoryData is { monthlyBudget, displayOrder, name, emoji, color, categoryType }.
- *   parenttakes care of api call
+ * @param {function} onCreate - async (categoryData) => void. In edit mode,
+ *   categoryData includes `_id: editData._id` so the parent can tell create
+ *   and update apart and route to the right endpoint.
  * @param {string} monthlyBudgetId - the budget this category belongs to
  * @param {number} displayOrder - where this category should sit in the list
- *   pass in from the parent
+ *   (ignored in edit mode — the category keeps its existing position)
  */
 export default function CreateCategory({
   open,
+  edit = false,
+  editData,
   onClose,
   onCreate,
   monthlyBudgetId,
@@ -394,16 +400,25 @@ export default function CreateCategory({
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState(null);
 
-  // reset the form each time the overlay opens
+  // reset the form each time the overlay opens — preload from editData
+  // when editing, otherwise start blank
   useEffect(() => {
-    if (open) {
+    if (!open) return;
+
+    if (edit && editData) {
+      setName(editData.name ?? "");
+      setEmoji(editData.emoji ?? null);
+      setColor(editData.color ?? null);
+      setCategoryType(editData.categoryType ?? null);
+    } else {
       setName("");
       setEmoji(null);
       setColor(null);
       setCategoryType(null);
-      setError(null);
     }
-  }, [open]);
+
+    setError(null);
+  }, [open, edit, editData]);
 
   // close on Escape
   useEffect(() => {
@@ -422,6 +437,7 @@ export default function CreateCategory({
   const isValid = name.trim() && emoji && color && categoryType;
 
   async function handleSubmit() {
+    console.log("HandleSubmit");
     if (!isValid || submitting) return;
 
     try {
@@ -429,8 +445,9 @@ export default function CreateCategory({
       setError(null);
 
       await onCreate({
+        ...(edit && editData?._id ? { _id: editData._id } : {}),
         monthlyBudget: monthlyBudgetId,
-        displayOrder,
+        displayOrder: edit ? editData?.displayOrder : displayOrder,
         name: name.trim(),
         emoji,
         color,
@@ -440,7 +457,11 @@ export default function CreateCategory({
       onClose();
     } catch (err) {
       console.error(err);
-      setError("Couldn't create the category. Try again.");
+      setError(
+        edit
+          ? "Couldn't save the category. Try again."
+          : "Couldn't create the category. Try again.",
+      );
     } finally {
       setSubmitting(false);
     }
@@ -458,7 +479,9 @@ export default function CreateCategory({
         onClick={(event) => event.stopPropagation()}
       >
         <div className="mb-4 flex items-center justify-between">
-          <h2 className="font-serif text-2xl font-bold">New category</h2>
+          <h2 className="font-serif text-2xl font-bold">
+            {edit ? "Edit category" : "New category"}
+          </h2>
           <button
             onClick={onClose}
             className="rounded-full p-1 text-slate-400 hover:bg-slate-100 hover:text-slate-600"
@@ -564,7 +587,15 @@ export default function CreateCategory({
           <div className="mt-2 flex justify-end gap-2">
             <Button variant="ghost" text="Cancel" onClick={onClose} />
             <Button
-              text={submitting ? "Creating..." : "Create category"}
+              text={
+                submitting
+                  ? edit
+                    ? "Saving..."
+                    : "Creating..."
+                  : edit
+                    ? "Save changes"
+                    : "Create category"
+              }
               onClick={handleSubmit}
               disabled={!isValid || submitting}
             />

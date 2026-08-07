@@ -4,7 +4,13 @@ import DashboardSection from "./DashboardSection";
 import ActivityDetails from "./sections/ActivityDetails";
 import Button from "../actions/Button";
 
-export default function ActivityView({ data, goBack, onDeleteActivity, userSettings }) {
+export default function ActivityView({
+  data,
+  goBack,
+  onDeleteActivity,
+  onEditActivity,
+  userSettings,
+}) {
   return (
     <InspectorPage
       backText="Back to Item"
@@ -19,8 +25,7 @@ export default function ActivityView({ data, goBack, onDeleteActivity, userSetti
         />
       }
     >
-      {/* ActivityDetails wraps itself in a "Activity Details" DashboardSection
-          — same double-wrap issue as ItemView had, fixed the same way. */}
+      {/* ActivityDetails wraps itself in a "Activity Details" DashboardSection */}
       <ActivityDetails data={data} />
 
       <DashboardSection title="Notes">
