@@ -47,10 +47,12 @@ const textareaClass = `
  * Overlay for creating a new activity log
  */
 export default function CreateActivity({
+  edit = false,
+  editData,
   open,
   onClose,
   onCreate,
-  bugdetItemId,
+  budgetItemId,
   emoji,
   month,
   year,
@@ -102,9 +104,9 @@ export default function CreateActivity({
       setError(null);
 
       await onCreate({
-        budgetItem: bugdetItemId,
+        budgetItem: budgetItemId,
         name: name.trim(),
-        spent,
+        amount: spent,
         date: activityDate,
         note,
       });

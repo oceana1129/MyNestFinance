@@ -1,6 +1,6 @@
 import React from "react";
 import InfoDisplay from "./InfoDisplay";
-import { ICONS } from "../../utils/IconMap"
+import { ICONS } from "../../utils/IconMap";
 import { formatDate } from "../../utils/FormatDate";
 import { formatCurrency } from "../../utils/FormatCurrency";
 
@@ -8,10 +8,12 @@ const DisplayActivities = ({
   activities,
   variant,
   maxActivities = activities.length,
-  userSettings
+  userSettings,
 }) => {
   {
-    console.log("Activities", activities);
+    // console.log("Activities", activities);]
+    // console.log(activities);
+    // console.log(formatDate(activity.activityDate));
 
     return (
       <>
@@ -25,7 +27,12 @@ const DisplayActivities = ({
                 icon={ICONS[activity.emoji] || ICONS["CircleHelp"]}
                 header={activity.name}
                 subtitle={formatCurrency(activity.amount, userSettings)}
-                text={activity.activityDate? formatDate(activity.activityDate) : ""}
+                color={activity.budgetItem}
+                text={
+                  activity?.activityDate
+                    ? formatDate(activity.activityDate)
+                    : ""
+                }
               />
             ))
         ) : (

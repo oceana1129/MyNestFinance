@@ -17,22 +17,27 @@ const CategoryDisplay = ({
   onClick,
   onClickItem,
   onClickButton,
-  userSettings
+  userSettings,
+  git 
 }) => {
   const [hidden, setHidden] = useState(true);
 
   const colors = getColorTheme(color);
 
   return (
-    <div className="flex flex-col gap-6 rounded-3xl bg-white p-6 shadow-sm"
-      >
+    <div className="flex flex-col gap-6 rounded-3xl bg-white p-6 shadow-sm">
       {/* Header */}
       <div
         className="flex justify-between hover:cursor-pointer"
         onClick={() => setHidden((prev) => !prev)}
       >
         <div className="flex flex-col gap-2">
-          <h2 className="text-3xl font-bold text-slate-900 hover:text-slate-500 transition" onClick={onClick}>{title}</h2>
+          <h2
+            className="text-3xl font-bold text-slate-900 hover:text-slate-500 transition"
+            onClick={onClick}
+          >
+            {title}
+          </h2>
 
           <div className="flex items-center gap-3">
             <span
@@ -56,7 +61,9 @@ const CategoryDisplay = ({
               {formatCurrency(currentAmount, userSettings)}
             </div>
 
-            <div className="text-xl text-slate-500">of {formatCurrency(targetAmount, userSettings)}</div>
+            <div className="text-xl text-slate-500">
+              of {formatCurrency(targetAmount, userSettings)}
+            </div>
           </div>
 
           <button className="mt-2 rounded-lg p-1 transition hover:bg-slate-100">
@@ -73,6 +80,7 @@ const CategoryDisplay = ({
               key={item._id}
               item={item}
               color={color}
+              plannedAmount={item.plannedAmount}
               active={currentItem?._id === item._id}
               onClick={() => onClickItem(item)}
               userSettings={userSettings}

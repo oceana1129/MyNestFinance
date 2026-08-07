@@ -14,7 +14,7 @@ export default function CategoryView({
   goBack,
   onAddItem,
   onDeleteCategory,
-  userSettings
+  userSettings,
 }) {
   const items = data?.items ?? [];
 
@@ -30,7 +30,11 @@ export default function CategoryView({
         />
       }
       metric={
-        <BudgetMetricCard actual={data?.actual} planned={data?.planned} userSettings={userSettings}/>
+        <BudgetMetricCard
+          actual={data?.actual}
+          planned={data?.planned}
+          userSettings={userSettings}
+        />
       }
       primaryButton={
         <Button
@@ -47,7 +51,7 @@ export default function CategoryView({
         />
       }
     >
-      <TopItems items={items} onItemClick={(item) => pushView("item", item)} />
+      {/* <TopItems items={items} onItemClick={(item) => pushView("item", item)} /> */}
 
       {/* {data?.insights && (
         <DashboardSection title="Insights">

@@ -7,15 +7,14 @@ const BudgetMetricCard = ({
   actual = 0,
   planned = 0,
   color = "pink",
-  userSettings
+  userSettings,
 }) => {
-
-  const leftover = formatCurrency((planned - actual), userSettings);
+  const leftover = formatCurrency(planned - actual, userSettings);
   const leftoverPercentage =
     planned === 0
       ? 0
-      : Math.max(0, ((planned - actual) / planned) * 100);
-  
+      : Math.max(0, (((planned - actual) / planned) * 100).toFixed(2));
+
   const formatActual = formatCurrency(actual, userSettings);
   const formatPlanned = formatCurrency(planned, userSettings);
 

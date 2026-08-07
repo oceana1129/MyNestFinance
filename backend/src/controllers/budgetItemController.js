@@ -252,6 +252,7 @@ export async function updateBudgetItem(req, res) {
  * @returns
  */
 export async function reorderBudgetItems(req, res) {
+  console.log("reorder budget item");
   try {
     const { items } = req.body;
     // is an array
@@ -266,8 +267,9 @@ export async function reorderBudgetItems(req, res) {
         message: "No items provided",
       });
     }
-    const ids = items.map((i) => i.id);
 
+    const ids = items.map((i) => i.id);
+    console.log("ids", ids);
     const foundItems = await BudgetItem.find({
       _id: { $in: ids },
     }).populate({

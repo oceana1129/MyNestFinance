@@ -4,7 +4,14 @@ import { ICONS } from "../../utils/IconMap.js";
 import { formatCurrency } from "../../utils/FormatCurrency.js";
 import ProgressBar from "../data-input/ProgressBar";
 
-const BudgetCard = ({ item, color, active = false, onClick, userSettings }) => {
+const BudgetCard = ({
+  item,
+  color,
+  active = false,
+  onClick,
+  userSettings,
+  plannedAmount,
+}) => {
   const progress = Math.min((item.actual / item.planned) * 100, 100);
   const colors = getColorTheme(color);
   const overBudgetColors = getColorTheme("rose");
@@ -51,9 +58,16 @@ const BudgetCard = ({ item, color, active = false, onClick, userSettings }) => {
         {/* current and target amounts */}
         <div className="flex gap flex-col text-right ">
           {/* current amount */}
-          <div className={moneyStyling}>{formatCurrency(item.actual, userSettings)}</div>
+          <div className={moneyStyling}>
+            {formatCurrency(item.actual, userSettings)}
+          </div>
           {/* target amount */}
-          <div className="text-md text-slate-500">of {formatCurrency(item.planned, userSettings)}</div>
+          <div className="text-md text-slate-500">
+            of{" "}
+            {item.planned
+              ? formatCurrency(item.planned, userSettings)
+              : formatCurrency(item.plannedAmount, userSettings)}
+          </div>
         </div>
       </div>
 
