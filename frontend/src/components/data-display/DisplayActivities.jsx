@@ -12,9 +12,6 @@ const DisplayActivities = ({
   userSettings,
 }) => {
   {
-    console.log("Activities", activities);
-    console.log(activities);
-
     return (
       <>
         {activities && activities.length > 0 ? (

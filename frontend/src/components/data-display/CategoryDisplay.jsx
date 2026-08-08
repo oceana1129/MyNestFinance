@@ -18,7 +18,6 @@ const CategoryDisplay = ({
   onClickItem,
   onClickButton,
   userSettings,
-  git 
 }) => {
   const [hidden, setHidden] = useState(true);
 
@@ -83,6 +82,7 @@ const CategoryDisplay = ({
               plannedAmount={item.plannedAmount}
               active={currentItem?._id === item._id}
               onClick={() => onClickItem(item)}
+              isExpense={subtitle === "expense"}
               userSettings={userSettings}
             />
           ))}

@@ -4,7 +4,7 @@ import NavBar from "../components/navigation/NavBar.jsx";
 import Button from "../components/actions/Button.jsx";
 import HeaderStandard from "../components/data-display/HeaderStandard.jsx";
 import Dashboard from "../components/forms/Dashboard.jsx";
-import DashboardAlt from "../components/forms/Dashboard-alt.jsx"
+import DashboardAlt from "../components/forms/Dashboard-alt.jsx";
 import BudgetMetricCard from "../components/data-display/BudgetMetricCard.jsx";
 
 import {
@@ -18,7 +18,7 @@ const PlanPage = () => {
   return (
     <AppPageDisplay
       nav={<NavBar activePage="plan" />}
-      contentPrimary={<DashboardAlt />}
+      contentPrimary={<Dashboard />}
       removePrimaryStyle={true}
     />
   );

@@ -310,17 +310,25 @@ const Dashboard = () => {
         createCategory({
           monthlyBudget: createdBudget._id,
           displayOrder: 0,
-          name: "Income 2",
+          name: "Income",
           emoji: "DollarSign",
           color: "green",
           categoryType: "income",
         }),
         createCategory({
           monthlyBudget: createdBudget._id,
+          displayOrder: 0,
+          name: "Housing",
+          emoji: "House",
+          color: "blue",
+          categoryType: "expense",
+        }),
+        createCategory({
+          monthlyBudget: createdBudget._id,
           displayOrder: 1,
           name: "Expenses",
           emoji: "Wallet",
-          color: "red",
+          color: "rose",
           categoryType: "expense",
         }),
       ]);

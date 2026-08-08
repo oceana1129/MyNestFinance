@@ -11,10 +11,11 @@ const BudgetCard = ({
   onClick,
   userSettings,
   plannedAmount,
+  isExpense = true,
 }) => {
   const progress = Math.min((item.actual / item.planned) * 100, 100);
   const colors = getColorTheme(color);
-  const overBudgetColors = getColorTheme("rose");
+  const overBudgetColors = isExpense ? getColorTheme("rose") : colors;
 
   const overBudget = item.difference < 0;
   const textColor = overBudget ? overBudgetColors.text : colors.text;
@@ -31,7 +32,7 @@ const BudgetCard = ({
             : "bg-[#FBF6F8] border-transparent hover:bg-[#FFFBFD]"
         } hover:cursor-pointer`;
 
-  // console.log(item);
+  console.log(item);
 
   const Icon = ICONS[item.emoji] || ICONS["CircleHelp"];
   return (
@@ -46,7 +47,7 @@ const BudgetCard = ({
           <h3 className="text-lg font-bold text-slate-900">
             {item.name || "Item"}
           </h3>
-          {overBudget ? (
+          {overBudget && isExpense ? (
             <div className="flex items-center gap-2 text-md font-semibold text-pink-600">
               <CircleAlert size={18} />
               Over budget

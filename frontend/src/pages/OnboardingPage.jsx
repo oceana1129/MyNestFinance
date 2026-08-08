@@ -160,42 +160,16 @@ const OnboardingPage = () => {
   const createdAnswers = (answers) => {
     const selectedCategories = [];
 
-    // Expense categories
-    for (const categoryId of answers.categories ?? []) {
-      const category = CATEGORY_EXPENSES[categoryId];
-
-      selectedCategories.push({
-        ...category,
-        items: (answers[`${categoryId}Items`] ?? []).map((itemId) => ({
-          id: itemId,
-          ...category.categoryChoices[itemId],
-        })),
-      });
-    }
-
-    // Debt
-    if (answers.debt?.length) {
-      selectedCategories.push({
-        ...CATEGORY_DEBT,
-        items: answers.debt.map((itemId) => ({
-          id: itemId,
-          ...CATEGORY_DEBT.categoryChoices[itemId],
-        })),
-      });
-    }
-
     // Income
-    if (answers.income?.includes("working")) {
-      selectedCategories.push({
-        ...CATEGORY_INCOME,
-        items: [
-          {
-            itemName: CATEGORY_INCOME.itemName,
-            itemIcon: CATEGORY_INCOME.itemIcon,
-          },
-        ],
-      });
-    }
+    selectedCategories.push({
+      ...CATEGORY_INCOME,
+      items: [
+        {
+          itemName: CATEGORY_INCOME.itemName,
+          itemIcon: CATEGORY_INCOME.itemIcon,
+        },
+      ],
+    });
 
     // Housing
     if (answers.livingSituation) {
@@ -209,6 +183,31 @@ const OnboardingPage = () => {
         ],
       });
     }
+
+    // Debt
+    if (answers.debt?.length) {
+      selectedCategories.push({
+        ...CATEGORY_DEBT,
+        items: answers.debt.map((itemId) => ({
+          id: itemId,
+          ...CATEGORY_DEBT.categoryChoices[itemId],
+        })),
+      });
+    }
+    // Expense categories
+    for (const categoryId of answers.categories ?? []) {
+      const category = CATEGORY_EXPENSES[categoryId];
+
+      selectedCategories.push({
+        ...category,
+        items: (answers[`${categoryId}Items`] ?? []).map((itemId) => ({
+          id: itemId,
+          ...category.categoryChoices[itemId],
+        })),
+      });
+    }
+
+    console.log(selectedCategories);
     return selectedCategories;
   };
 
@@ -219,8 +218,13 @@ const OnboardingPage = () => {
       console.log("Onboarding complete, answers:", answers);
 
       let name = answers.name || "friend";
-      let budget = await createBudget({ month: 6, year: 2026 });
+      let date = new Date();
+      let budget = await createBudget({
+        month: date.getMonth() + 1,
+        year: date.getFullYear(),
+      });
       const selectedCategories = createdAnswers(answers);
+
       // console.log(selectedCategories)
       let categoryCount = 0;
 

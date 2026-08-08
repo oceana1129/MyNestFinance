@@ -18,6 +18,7 @@ export default function CategoryView({
   userSettings,
 }) {
   const items = data?.items ?? [];
+  console.log(data);
 
   return (
     <InspectorPage
@@ -49,11 +50,13 @@ export default function CategoryView({
         />
       }
       dangerButton={
-        <Button
-          variant="ghostDanger"
-          text="Delete Category"
-          onClick={() => onDeleteCategory?.(data)}
-        />
+        data?.categoryType !== "income" ? (
+          <Button
+            variant="ghostDanger"
+            text="Delete Category"
+            onClick={() => onDeleteCategory?.(data)}
+          />
+        ) : null
       }
     >
       {/* <TopItems items={items} onItemClick={(item) => pushView("item", item)} /> */}
