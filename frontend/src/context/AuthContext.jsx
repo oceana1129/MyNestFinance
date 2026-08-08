@@ -53,7 +53,7 @@ export const AuthContextProvider = ({ children }) => {
    * Register a new Firebase user.
    */
   const createUser = async (email, password) => {
-    console.log("createUser(): creating a user");
+    // console.log("createUser(): creating a user");
     const userCredential = await createUserWithEmailAndPassword(
       auth,
       email,
@@ -66,7 +66,7 @@ export const AuthContextProvider = ({ children }) => {
    * Sign in an existing Firebase user.
    */
   const signIn = async (email, password) => {
-    console.log("signIn(): signing in user");
+    // console.log("signIn(): signing in user");
     const userCredential = await signInWithEmailAndPassword(
       auth,
       email,
@@ -79,7 +79,7 @@ export const AuthContextProvider = ({ children }) => {
    * Sign out current user.
    */
   const logout = async () => {
-    console.log("logout(): signing out user");
+    // console.log("logout(): signing out user");
     return signOut(auth);
   };
 
@@ -87,7 +87,7 @@ export const AuthContextProvider = ({ children }) => {
    * Delete the current firebase user
    */
   const deleteAccount = async () => {
-    console.log("AuthContext.jsx: deleteAccount()");
+    // console.log("AuthContext.jsx: deleteAccount()");
 
     if (!auth.currentUser) {
       throw new Error("No user is currently signed in.");

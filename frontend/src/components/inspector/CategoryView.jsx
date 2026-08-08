@@ -18,7 +18,6 @@ export default function CategoryView({
   userSettings,
 }) {
   const items = data?.items ?? [];
-  console.log(data);
 
   return (
     <InspectorPage

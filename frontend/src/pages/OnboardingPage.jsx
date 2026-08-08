@@ -207,7 +207,6 @@ const OnboardingPage = () => {
       });
     }
 
-    console.log(selectedCategories);
     return selectedCategories;
   };
 
@@ -215,8 +214,6 @@ const OnboardingPage = () => {
   // send answers to the backend
   const handleFinish = async () => {
     try {
-      console.log("Onboarding complete, answers:", answers);
-
       let name = answers.name || "friend";
       let date = new Date();
       let budget = await createBudget({

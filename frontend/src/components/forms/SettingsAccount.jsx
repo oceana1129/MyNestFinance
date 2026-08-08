@@ -15,7 +15,6 @@ const SettingsAccount = () => {
     const navigate = useNavigate();
 
     const handleDelete = async () => {
-        console.log('SettingsAccount.jsx: handleDelete()')
         const confirmed = window.confirm(
             "This will permanently delete your account and all data. This can't be undone."
         );

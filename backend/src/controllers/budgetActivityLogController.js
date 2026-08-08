@@ -11,9 +11,8 @@ import Category from "../models/BudgetCategory.js";
  */
 export async function createActivityLog(req, res) {
   try {
-    console.log(req.body);
     const { budgetItem, name, amount, activityDate, notes } = req.body;
-    console.log(budgetItem);
+
     // does budgetItem exist
     const item = await BudgetItem.findById(budgetItem)
       .populate("monthlyBudget")

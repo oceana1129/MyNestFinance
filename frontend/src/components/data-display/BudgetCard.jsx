@@ -32,8 +32,6 @@ const BudgetCard = ({
             : "bg-[#FBF6F8] border-transparent hover:bg-[#FFFBFD]"
         } hover:cursor-pointer`;
 
-  console.log(item);
-
   const Icon = ICONS[item.emoji] || ICONS["CircleHelp"];
   return (
     <div className={budgetCardStyling} onClick={onClick}>

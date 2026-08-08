@@ -14,9 +14,7 @@ export async function createBudgetItem(req, res) {
   try {
     const { budgetCategory, monthlyBudget, name, emoji, plannedAmount } =
       req.body;
-    console.log("budget Category", budgetCategory);
-    console.log("budget", monthlyBudget);
-    console.log("name", name);
+
     // does category exist
     const category =
       await Category.findById(budgetCategory).populate("monthlyBudget");
@@ -252,7 +250,6 @@ export async function updateBudgetItem(req, res) {
  * @returns
  */
 export async function reorderBudgetItems(req, res) {
-  console.log("reorder budget item");
   try {
     const { items } = req.body;
     // is an array
@@ -269,7 +266,7 @@ export async function reorderBudgetItems(req, res) {
     }
 
     const ids = items.map((i) => i.id);
-    console.log("ids", ids);
+
     const foundItems = await BudgetItem.find({
       _id: { $in: ids },
     }).populate({

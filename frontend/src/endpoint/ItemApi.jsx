@@ -64,7 +64,6 @@ export async function getItemsByBudget(budgetId) {
  * Create a new item.
  */
 export async function createItem(itemData) {
-  console.log(`${API_URL}/item`);
   const response = await fetch(`${API_URL}/item`, {
     method: "POST",
     headers: await authHeaders(true),

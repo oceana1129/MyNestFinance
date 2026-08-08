@@ -227,9 +227,9 @@ const Dashboard = () => {
     });
   }, [dashboardMetrics, currentCategories, monthlyActivity]);
 
-  useEffect(() => {
-    console.log("current thing", currentActivity);
-  }, [currentCategories]);
+  // useEffect(() => {
+  //   console.log("current thing", currentActivity);
+  // }, [currentCategories]);
 
   // normalize id fields
   function idOf(value) {
@@ -999,11 +999,8 @@ const Dashboard = () => {
               pushView={pushView}
               goBack={goBack}
               onClickActivity={(activity) => {
-                console.log("onClickActivity()");
-
                 pushView("activity", activity);
                 setCurrentActivity(activity);
-                console.log("activity current", activity);
               }}
               userSettings={userSettings}
               onAddItem={handleAddItem}

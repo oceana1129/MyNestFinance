@@ -17,7 +17,7 @@ export default function ItemView({
   onDeleteItem,
   userSettings,
 }) {
-  console.log(data);
+
   return (
     <InspectorPage
       backText="Back to Category"

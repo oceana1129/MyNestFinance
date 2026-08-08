@@ -13,7 +13,7 @@ export default function ActivityView({
   onEditActivity,
   userSettings,
 }) {
-  console.log(data);
+
   return (
     <InspectorPage
       backText="Back to Item"

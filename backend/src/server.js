@@ -51,7 +51,7 @@ app.use("/api/dashboard", dashboardRoutes);
 
 // connect to the database
 connectDB().then(() => {
-  app.listen(PORT, () => {
+  app.listen(PORT, "0.0.0.0", () => {
     console.log(`Server started on PORT: ${PORT}`);
   });
 });

@@ -49,7 +49,6 @@ export async function getUserBudgets(userId) {
  * Create a monthly budget.
  */
 export async function createBudget(budgetData) {
-  console.log("create budget");
   const response = await fetch(`${API_URL}/budget`, {
     method: "POST",
     headers: await authHeaders(true),

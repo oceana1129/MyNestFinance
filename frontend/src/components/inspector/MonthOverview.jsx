@@ -8,9 +8,6 @@ import DashboardSection from "./DashboardSection";
 import { Zap, Home, Car } from "lucide-react";
 
 const MonthOverview = ({ dashboardMetrics, monthlyActivity, userSettings }) => {
-  // console.log(monthlyActivity);
-  console.log(dashboardMetrics);
-
   return (
     <>
       <HeaderStandard
@@ -36,9 +33,6 @@ const MonthOverview = ({ dashboardMetrics, monthlyActivity, userSettings }) => {
         }
       />
     </>
-    // <div className="flex flex-col gap-8 px-8 py-10 h-screen sticky shrink-0 top-0 bg-white bg-opacity-70 text-slate-700 border-2 border-white">
-
-    // </div>
   );
 };
 

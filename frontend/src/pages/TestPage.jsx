@@ -53,7 +53,6 @@ const TestPage = () => {
 
     loadDisplayName();
   }, [user]);
-  console.log(displayName);
 
   return (
     <AppPageDisplay

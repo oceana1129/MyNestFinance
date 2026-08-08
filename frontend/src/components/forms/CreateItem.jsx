@@ -602,7 +602,6 @@ export default function CreateItem({
   }
 
   async function handleSubmit() {
-    console.log("handleSumbit()");
     if (!isValid || submitting) return;
 
     try {

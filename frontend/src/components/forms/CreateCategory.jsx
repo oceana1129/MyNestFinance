@@ -437,7 +437,6 @@ export default function CreateCategory({
   const isValid = name.trim() && emoji && color && categoryType;
 
   async function handleSubmit() {
-    console.log("HandleSubmit");
     if (!isValid || submitting) return;
 
     try {

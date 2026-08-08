@@ -52,7 +52,6 @@ const NavBar = ({ activePage = "plan" }) => {
 
     const handleLogout = async () => {
         try {
-            console.log("log out clicked")
             await logout()
             navigate("/")
         } catch (error) {
