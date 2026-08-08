@@ -1,7 +1,15 @@
 import React from "react";
 
 // the page display for the main app (dashboard, insights, settings)
-const AppPageDisplay = ({ nav, contentPrimary, contentSecondary }) => {
+const AppPageDisplay = ({
+  nav,
+  contentPrimary,
+  contentSecondary,
+  removePrimaryStyle = false,
+}) => {
+  const primarySyle = removePrimaryStyle
+    ? "flex-1 min-w-0 items-start"
+    : "flex-1 min-w-0 overflow-y-auto px-16 py-10";
   return (
     // nav is fixed on left side
     // primary content goes in the middle, and if secondary content is available, it goes on the right
@@ -10,9 +18,7 @@ const AppPageDisplay = ({ nav, contentPrimary, contentSecondary }) => {
       <div className="sticky shrink-0 top-0 h-screen">{nav}</div>
 
       {/* middle: primary content, grows to fill remaining space, scrollable if it overflows */}
-      <div className="flex-1 min-w-0 overflow-y-auto px-16 py-10">
-        {contentPrimary}
-      </div>
+      <div className={primarySyle}>{contentPrimary}</div>
 
       {/* right: optional secondary panel, only takes space if provided */}
       {contentSecondary && (

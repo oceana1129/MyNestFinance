@@ -27,9 +27,9 @@ export default function MonthDisplay({
   const [open, setOpen] = useState(false);
   const pickerRef = useRef(null);
 
-  // local storage
   const { user } = UserAuth();
   const hasLoaded = useRef(false);
+  const prevStorageKey = useRef(null);
   const storageKey = user
     ? `dashboard-month-${user.uid}`
     : `dashboard-month-development`;
@@ -61,6 +61,7 @@ export default function MonthDisplay({
     }
   }, [storageKey, onChange]);
 
+  // save into local storage
   // save into local storage
   useEffect(() => {
     if (!hasLoaded.current) return;

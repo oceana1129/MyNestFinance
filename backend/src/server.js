@@ -14,20 +14,23 @@ import budgetItemRoutes from "./routes/budgetItemRoutes.js";
 import activityLogRoutes from "./routes/activityLogRoutes.js";
 import debtItemRoutes from "./routes/budgetDebtItemRoutes.js";
 import budgetPlanRoutes from "./routes/budgetPlanRoutes.js";
-import dashboardRoutes from "./routes/dashboardRoutes.js"
+import dashboardRoutes from "./routes/dashboardRoutes.js";
 
 // set up .env config
 dotenv.config();
 // get port from env
 const PORT = process.env.PORT || 5001;
+const FRONTEND_URL = process.env.FRONTEND_URL || 5173;
 // set up express
 const app = express();
 // use use middleware cors on front end url
 app.use(
   cors({
-    origin: "http://localhost:5173",
+    origin: process.env.FRONTEND_URL,
   }),
 );
+
+console.log("cors added");
 // can read json sent from client
 app.use(express.json());
 // set up rate limiter
@@ -44,11 +47,11 @@ app.use("/api/item", budgetItemRoutes);
 app.use("/api/activity", activityLogRoutes);
 app.use("/api/debt", debtItemRoutes);
 app.use("/api/plan", budgetPlanRoutes);
-app.use("/api/dashboard", budgetPlanRoutes);
+app.use("/api/dashboard", dashboardRoutes);
 
 // connect to the database
 connectDB().then(() => {
-  app.listen(PORT, () => {
+  app.listen(PORT, "0.0.0.0", () => {
     console.log(`Server started on PORT: ${PORT}`);
   });
 });

@@ -11,6 +11,7 @@ const colorThemeLight = {
     subtext: "text-red-500",
     iconBg: "bg-red-100",
     iconText: "text-red-600",
+    hoverBgExtraLight: "hover:bg-red-100",
   },
   orange: {
     bg: "bg-orange-50",
@@ -23,6 +24,7 @@ const colorThemeLight = {
     subtext: "text-orange-500",
     iconBg: "bg-orange-100",
     iconText: "text-orange-600",
+    hoverBgExtraLight: "hover:bg-orange-100",
   },
   amber: {
     bg: "bg-amber-50",
@@ -35,6 +37,7 @@ const colorThemeLight = {
     subtext: "text-amber-500",
     iconBg: "bg-amber-100",
     iconText: "text-amber-600",
+    hoverBgExtraLight: "hover:bg-amber-100",
   },
   yellow: {
     bg: "bg-yellow-50",
@@ -47,6 +50,7 @@ const colorThemeLight = {
     subtext: "text-yellow-500",
     iconBg: "bg-yellow-100",
     iconText: "text-yellow-600",
+    hoverBgExtraLight: "hover:bg-yellow-100",
   },
   lime: {
     bg: "bg-lime-50",
@@ -59,6 +63,7 @@ const colorThemeLight = {
     subtext: "text-lime-500",
     iconBg: "bg-lime-100",
     iconText: "text-lime-600",
+    hoverBgExtraLight: "hover:bg-lime-100",
   },
   green: {
     bg: "bg-green-50",
@@ -71,6 +76,7 @@ const colorThemeLight = {
     subtext: "text-green-500",
     iconBg: "bg-green-100",
     iconText: "text-green-600",
+    hoverBgExtraLight: "hover:bg-green-100",
   },
   emerald: {
     bg: "bg-emerald-50",
@@ -83,6 +89,7 @@ const colorThemeLight = {
     subtext: "text-emerald-500",
     iconBg: "bg-emerald-100",
     iconText: "text-emerald-600",
+    hoverBgExtraLight: "hover:bg-emerald-100",
   },
   teal: {
     bg: "bg-teal-50",
@@ -95,6 +102,7 @@ const colorThemeLight = {
     subtext: "text-teal-500",
     iconBg: "bg-teal-100",
     iconText: "text-teal-600",
+    hoverBgExtraLight: "hover:bg-teal-100",
   },
   cyan: {
     bg: "bg-cyan-50",
@@ -107,6 +115,7 @@ const colorThemeLight = {
     subtext: "text-cyan-500",
     iconBg: "bg-cyan-100",
     iconText: "text-cyan-600",
+    hoverBgExtraLight: "hover:bg-cyan-100",
   },
   sky: {
     bg: "bg-sky-50",
@@ -119,6 +128,7 @@ const colorThemeLight = {
     subtext: "text-sky-500",
     iconBg: "bg-sky-100",
     iconText: "text-sky-600",
+    hoverBgExtraLight: "hover:bg-sky-100",
   },
   blue: {
     bg: "bg-blue-50",
@@ -131,6 +141,7 @@ const colorThemeLight = {
     subtext: "text-blue-500",
     iconBg: "bg-blue-100",
     iconText: "text-blue-600",
+    hoverBgExtraLight: "hover:bg-blue-100",
   },
   indigo: {
     bg: "bg-indigo-50",
@@ -143,6 +154,7 @@ const colorThemeLight = {
     subtext: "text-indigo-500",
     iconBg: "bg-indigo-100",
     iconText: "text-indigo-600",
+    hoverBgExtraLight: "hover:bg-indigo-100",
   },
   violet: {
     bg: "bg-violet-50",
@@ -155,6 +167,7 @@ const colorThemeLight = {
     subtext: "text-violet-500",
     iconBg: "bg-violet-100",
     iconText: "text-violet-600",
+    hoverBgExtraLight: "hover:bg-violet-100",
   },
   purple: {
     bg: "bg-purple-50",
@@ -167,6 +180,7 @@ const colorThemeLight = {
     subtext: "text-purple-500",
     iconBg: "bg-purple-100",
     iconText: "text-purple-600",
+    hoverBgExtraLight: "hover:bg-purple-100",
   },
   fuchsia: {
     bg: "bg-fuchsia-50",
@@ -179,6 +193,7 @@ const colorThemeLight = {
     subtext: "text-fuchsia-500",
     iconBg: "bg-fuchsia-100",
     iconText: "text-fuchsia-600",
+    hoverBgExtraLight: "hover:bg-fuchsia-100",
   },
   pink: {
     bg: "bg-pink-50",
@@ -191,6 +206,7 @@ const colorThemeLight = {
     subtext: "text-pink-500",
     iconBg: "bg-pink-100",
     iconText: "text-pink-600",
+    hoverBgExtraLight: "hover:bg-pink-100",
   },
   rose: {
     bg: "bg-rose-50",
@@ -203,6 +219,7 @@ const colorThemeLight = {
     subtext: "text-rose-500",
     iconBg: "bg-rose-100",
     iconText: "text-rose-600",
+    hoverBgExtraLight: "hover:bg-rose-100",
   },
   slate: {
     bg: "bg-slate-50",
@@ -215,6 +232,7 @@ const colorThemeLight = {
     subtext: "text-slate-500",
     iconBg: "bg-slate-100",
     iconText: "text-slate-600",
+    hoverBgExtraLight: "hover:bg-slate-100",
   },
   zinc: {
     bg: "bg-zinc-50",
@@ -227,6 +245,7 @@ const colorThemeLight = {
     subtext: "text-zinc-500",
     iconBg: "bg-zinc-100",
     iconText: "text-zinc-600",
+    hoverBgExtraLight: "hover:bg-zinc-100",
   },
   stone: {
     bg: "bg-stone-50",
@@ -239,6 +258,7 @@ const colorThemeLight = {
     subtext: "text-stone-500",
     iconBg: "bg-stone-100",
     iconText: "text-stone-600",
+    hoverBgExtraLight: "hover:bg-stone-100",
   },
   taupe: {
     bg: "bg-taupe-50",
@@ -251,6 +271,7 @@ const colorThemeLight = {
     subtext: "text-taupe-500",
     iconBg: "bg-taupe-100",
     iconText: "text-taupe-600",
+    hoverBgExtraLight: "hover:bg-taupe-100",
   },
   mauve: {
     bg: "bg-mauve-50",
@@ -263,6 +284,7 @@ const colorThemeLight = {
     subtext: "text-mauve-500",
     iconBg: "bg-mauve-100",
     iconText: "text-mauve-600",
+    hoverBgExtraLight: "hover:bg-mauve-100",
   },
 };
 

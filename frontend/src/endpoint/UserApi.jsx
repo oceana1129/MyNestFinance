@@ -135,5 +135,51 @@ export async function getDisplayName() {
 
   const data = await response.json();
 
-  return data.displayName;
+  return data.user.displayName;
+}
+
+/**
+ * Get display name.
+ */
+export async function getUserSettings() {
+  const token = await getToken();
+
+  const response = await fetch(`${API_URL}/user/me`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  if (!response.ok) {
+    throw new Error("Failed to fetch name");
+  }
+
+  const data = await response.json();
+
+  return data.user.settings;
+}
+
+/**
+ * Get display name.
+ */
+export async function getCurrentUser() {
+  const token = await getToken();
+
+  const response = await fetch(`${API_URL}/user/me`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  if (!response.ok) {
+    throw new Error("Failed to fetch name");
+  }
+
+  const data = await response.json();
+
+  return data.user;
 }

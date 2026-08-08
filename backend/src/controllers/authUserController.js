@@ -68,7 +68,7 @@ export async function syncAuthUser(req, res) {
       profile,
     });
   } catch (err) {
-    console.error("syncAuthUser(): ", err);
+    // console.error("syncAuthUser(): ", err);
 
     res.status(500).json({
       message: err.message,

@@ -19,10 +19,10 @@ router.use(loadUserProfile);
 // the controller routes
 router.post("/", createDebtItem);
 router.get("/", getAllDebtItems);
-router.get("/:id", getDebtItemById);
 router.get("/item/:budgetItemId", getDebtItemByBudgetItem);
+router.get("/:id", getDebtItemById);
 router.put("/:id", updateDebtItem);
-router.delete("/:id", deleteDebtItem);
 router.delete("/item/:budgetItemId", deleteDebtItemByBudgetItem);
+router.delete("/:id", deleteDebtItem);
 
 export default router;

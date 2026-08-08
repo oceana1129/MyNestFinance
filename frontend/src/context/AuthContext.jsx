@@ -1,9 +1,4 @@
-import { 
-  createContext, 
-  useContext, 
-  useEffect, 
-  useMemo, 
-  useState } from "react";
+import { createContext, useContext, useEffect, useMemo, useState } from "react";
 import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
@@ -12,10 +7,10 @@ import {
 } from "firebase/auth";
 import { auth } from "../firebase";
 import {
-    updateSettings,
-    updateOnboarding,
-    updateDisplayName,
-} from "../services/UserApi"
+  updateSettings,
+  updateOnboarding,
+  updateDisplayName,
+} from "../endpoint/UserApi";
 
 const UserContext = createContext();
 
@@ -33,6 +28,8 @@ export const AuthContextProvider = ({ children }) => {
     try {
       console.log("syncUser(): syncing a user");
       const token = await firebaseUser.getIdToken();
+
+      // / console.log(token)
 
       const response = await fetch(`${API_URL}/auth/sync`, {
         method: "POST",
@@ -56,7 +53,7 @@ export const AuthContextProvider = ({ children }) => {
    * Register a new Firebase user.
    */
   const createUser = async (email, password) => {
-    console.log("createUser(): creating a user");
+    // console.log("createUser(): creating a user");
     const userCredential = await createUserWithEmailAndPassword(
       auth,
       email,
@@ -69,7 +66,7 @@ export const AuthContextProvider = ({ children }) => {
    * Sign in an existing Firebase user.
    */
   const signIn = async (email, password) => {
-    console.log("signIn(): signing in user");
+    // console.log("signIn(): signing in user");
     const userCredential = await signInWithEmailAndPassword(
       auth,
       email,
@@ -82,7 +79,7 @@ export const AuthContextProvider = ({ children }) => {
    * Sign out current user.
    */
   const logout = async () => {
-    console.log("logout(): signing out user");
+    // console.log("logout(): signing out user");
     return signOut(auth);
   };
 
@@ -90,7 +87,7 @@ export const AuthContextProvider = ({ children }) => {
    * Delete the current firebase user
    */
   const deleteAccount = async () => {
-    console.log("AuthContext.jsx: deleteAccount()");
+    // console.log("AuthContext.jsx: deleteAccount()");
 
     if (!auth.currentUser) {
       throw new Error("No user is currently signed in.");
@@ -120,7 +117,7 @@ export const AuthContextProvider = ({ children }) => {
   //   const token = await auth.currentUser.getIdToken();
 
   //   const mergedOnboarding = { ...profile?.onboarding, ...onboardingChanges };
-    
+
   //   const response = await fetch(`${API_URL}/user/me/onboarding`, {
   //     method: "PUT",
   //     headers: {
@@ -141,8 +138,8 @@ export const AuthContextProvider = ({ children }) => {
 
   const handleUpdateSettings = async (changes) => {
     const mergedSettings = {
-        ...profile?.settings,
-        ...changes,
+      ...profile?.settings,
+      ...changes,
     };
 
     const data = await updateSettings(mergedSettings);
@@ -151,11 +148,11 @@ export const AuthContextProvider = ({ children }) => {
 
     return data.updatedUser;
   };
-  
+
   const handleUpdateOnboarding = async (changes) => {
     const mergedOnboarding = {
-        ...profile?.onboarding,
-        ...changes,
+      ...profile?.onboarding,
+      ...changes,
     };
 
     const data = await updateOnboarding(mergedOnboarding);

@@ -16,6 +16,7 @@ import {
     getMonthlyTotalPayments,
     getMonthlyTotalRemaining,
     getMonthlyDashboardSummary,
+    getCategoryBreakdown,
     getTotalCategoryPlanned,
     getTotalCategoryActual,
     getTotalCategoryDifference,
@@ -540,48 +541,74 @@ describe("Dashboard Queries", () => {
         expect(summary.actualIncome).toBeCloseTo(income, 2);
     });
 
-    // test("getCategoryDashboardSummary returns all 7 categories", async () => {
-    //     const { budget } = await createTestDatabase();
+    test("getMonthlyDashboardSummary planned totals match sum of item plannedAmounts", async () => {
+        const { budget } = await createTestDatabase();
 
-    //     const result = await getCategoryDashboardSummary(budget._id);
-    //     expect(result).toHaveLength(7);
-    // });
+        const result = await getMonthlyDashboardSummary(budget._id);
 
-    // test("getCategoryDashboardSummary returns correct shape per category", async () => {
-    //     const { budget } = await createTestDatabase();
+        // income: work(2800) + commissions(100)
+        expect(result.plannedIncome).toBeCloseTo(2900, 2);
+        // expenses: home(1200) + utilities(221) + transportation(315) + food(480) + personal care(193)
+        expect(result.plannedExpenses).toBeCloseTo(2409, 2);
+        // debt: student loans(150)
+        expect(result.plannedPayments).toBeCloseTo(150, 2);
+    });
 
-    //     const result = await getCategoryDashboardSummary(budget._id);
-    //     const food = result.find((c) => c.name === "Food");
+    test("getMonthlyDashboardSummary percentageUsed fields are calculated from actual vs planned", async () => {
+        const { budget } = await createTestDatabase();
 
-    //     expect(food).toBeDefined();
-    //     expect(food).toHaveProperty("planned");
-    //     expect(food).toHaveProperty("actual");
-    //     expect(food).toHaveProperty("difference");
-    //     expect(food).toHaveProperty("reaction");
-    //     expect(food).toHaveProperty("isActive");
-    //     expect(food).toHaveProperty("percentage");
-    //     expect(food).toHaveProperty("itemCount");
-    //     expect(food.itemCount).toBe(3); // groceries, eating out, coffee
-    // });
+        const result = await getMonthlyDashboardSummary(budget._id);
 
-    // test("getCategoryDashboardSummary food category actual matches logs", async () => {
-    //     const { budget } = await createTestDatabase();
+        // actualIncome(3150.69) / plannedIncome(2900)
+        expect(result.percentageUsedIncome).toBeCloseTo(108.64, 2);
+        // actualExpenses(2320.58) / plannedExpenses(2409)
+        expect(result.percentageUsedExpenses).toBeCloseTo(96.33, 2);
+        // actualPayments(200) / plannedPayments(150)
+        expect(result.percentageUsedPayments).toBeCloseTo(133.33, 2);
+    });
 
-    //     const result = await getCategoryDashboardSummary(budget._id);
-    //     const food = result.find((c) => c.name === "Food");
+    test("getCategoryBreakdown returns all 7 categories", async () => {
+        const { budget } = await createTestDatabase();
 
-    //     // groceries(275.73) + eating out(40.89) + coffee(73.40)
-    //     expect(food.actual).toBeCloseTo(390.02, 2);
-    // });
+        const result = await getCategoryBreakdown(budget._id);
+        expect(result).toHaveLength(7);
+    });
 
-    // test("getCategoryDashboardSummary categories are sorted by displayOrder", async () => {
-    //     const { budget } = await createTestDatabase();
+    test("getCategoryBreakdown returns correct shape per category", async () => {
+        const { budget } = await createTestDatabase();
 
-    //     const result = await getCategoryDashboardSummary(budget._id);
-    //     const orders = result.map((c) => c.displayOrder);
+        const result = await getCategoryBreakdown(budget._id);
+        const food = result.find((c) => c.name === "Food");
 
-    //     expect(orders).toEqual([...orders].sort((a, b) => a - b));
-    // });
+        expect(food).toBeDefined();
+        expect(food).toHaveProperty("planned");
+        expect(food).toHaveProperty("actual");
+        expect(food).toHaveProperty("difference");
+        expect(food).toHaveProperty("reaction");
+        expect(food).toHaveProperty("isActive");
+        expect(food).toHaveProperty("percentage");
+        expect(food).toHaveProperty("itemCount");
+        expect(food.itemCount).toBe(3); // groceries, eating out, coffee
+    });
+
+    test("getCategoryBreakdown food category actual matches logs", async () => {
+        const { budget } = await createTestDatabase();
+
+        const result = await getCategoryBreakdown(budget._id);
+        const food = result.find((c) => c.name === "Food");
+
+        // groceries(275.73) + eating out(40.89) + coffee(67.98)
+        expect(food.actual).toBeCloseTo(384.60, 2);
+    });
+
+    test("getCategoryBreakdown categories are sorted by displayOrder", async () => {
+        const { budget } = await createTestDatabase();
+
+        const result = await getCategoryBreakdown(budget._id);
+        const orders = result.map((c) => c.displayOrder);
+
+        expect(orders).toEqual([...orders].sort((a, b) => a - b));
+    });
 
     test("getTotalCategoryPlanned sums item plannedAmounts", async () => {
         const { categories: { foodCategory } } = await createTestDatabase();
@@ -693,7 +720,7 @@ describe("Dashboard Queries", () => {
             new Date("2025-01-07")
         );
 
-        // rent(1), gas(1), car insurance(1), cafe x2(2), winco(1) = 6
+        // paycheck1, rent, car insurance, gas, winco, cafe x3, gym, adobe, netflix = 11
         expect(result).toHaveLength(11);
     });
 

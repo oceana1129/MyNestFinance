@@ -3,19 +3,17 @@ import { verifyFirebaseToken } from "../middleware/verifyFirebaseTokens.js";
 import { loadUserProfile } from "../middleware/loadUserProfile.js";
 
 import {
-    getMonthlyDashboardSummary,
-    getCategoryBreakdown,
-    getTotalCategoryDifference,
-    getTotalItemDifference,
-    getMonthlyActivity,
-} from "../services/budgetQuerySe rvice.js";
+  getMonthlyDashboardSummary,
+  getCategoryBreakdown,
+  getTotalCategoryDifference,
+  getTotalItemDifference,
+  getMonthlyActivity,
+} from "../controllers/dashboardController.js";
 
 const router = express.Router();
 
 router.use(verifyFirebaseToken);
 router.use(loadUserProfile);
-
-// the controller routes
 
 /**
  * get monthly dashboard
@@ -84,6 +82,5 @@ router.get("/category/:categoryId", getTotalCategoryDifference);
 }
  */
 router.get("/item/:itemId", getTotalItemDifference);
-
 
 export default router;

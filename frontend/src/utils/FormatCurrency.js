@@ -1,3 +1,7 @@
+// setCurrency(labelForSymbol(profile.settings.currencyPreference));
+//             setShowDecimals(profile.settings.showDecimals);
+import { getUserSettings } from "../endpoint/UserApi";
+
 /**
  * Formats a number as currency based on the user's settings.
  *

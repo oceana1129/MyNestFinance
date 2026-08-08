@@ -1,21 +1,22 @@
 import ActivityLog from "../models/BudgetActivityLog.js";
 import BudgetItem from "../models/BudgetItem.js";
+import Category from "../models/BudgetCategory.js";
 
 // CREATE
 /**
  * create an activity log
- * @param {*} req 
- * @param {*} res 
- * @returns 
+ * @param {*} req
+ * @param {*} res
+ * @returns
  */
 export async function createActivityLog(req, res) {
   try {
-    const { budgetItem, name, amount, activityDate, notes } =
-      req.body;
+    const { budgetItem, name, amount, activityDate, notes } = req.body;
 
     // does budgetItem exist
     const item = await BudgetItem.findById(budgetItem)
-      .populate("monthlyBudget");
+      .populate("monthlyBudget")
+      .populate("budgetCategory");
 
     if (!item) {
       return res.status(404).json({
@@ -34,7 +35,7 @@ export async function createActivityLog(req, res) {
       name,
       amount,
       activityDate,
-      notes
+      notes,
     });
 
     res.status(200).json({
@@ -56,9 +57,9 @@ export async function createActivityLog(req, res) {
 // READ
 /**
  * get all activity logs
- * @param {*} req 
- * @param {*} res 
- * @returns 
+ * @param {*} req
+ * @param {*} res
+ * @returns
  */
 export async function getAllActivityLogs(req, res) {
   // authorization
@@ -77,19 +78,18 @@ export async function getAllActivityLogs(req, res) {
 
 /**
  * get activity log by id
- * @param {*} req 
- * @param {*} res 
- * @returns 
+ * @param {*} req
+ * @param {*} res
+ * @returns
  */
 export async function getActivityLogById(req, res) {
   try {
-    const activityLog = await ActivityLog.findById(req.params.id)
-      .populate({
-        path: "budgetItem",
-        populate: {
-          path: "monthlyBudget",
-        },
-      });
+    const activityLog = await ActivityLog.findById(req.params.id).populate({
+      path: "budgetItem",
+      populate: {
+        path: "monthlyBudget",
+      },
+    });
 
     if (!activityLog) {
       return res.status(404).json({
@@ -97,7 +97,9 @@ export async function getActivityLogById(req, res) {
       });
     }
 
-    if (!activityLog.budgetItem.monthlyBudget.userProfile.equals(req.profile._id)) {
+    if (
+      !activityLog.budgetItem.monthlyBudget.userProfile.equals(req.profile._id)
+    ) {
       return res.status(403).json({
         message: "Forbidden",
       });
@@ -113,33 +115,34 @@ export async function getActivityLogById(req, res) {
 
 /**
  * get activity log by budget item
- * @param {*} req 
- * @param {*} res 
- * @returns 
+ * @param {*} req
+ * @param {*} res
+ * @returns
  */
 export async function getActivityLogsByBudget(req, res) {
   try {
-    const item = await BudgetItem.findById(req.params.budgetItemId)
-  .populate("monthlyBudget");
+    const item = await BudgetItem.findById(req.params.budgetItemId).populate(
+      "monthlyBudget",
+    );
 
-  if (!item) {
-    return res.status(404).json({
-      message: "Item not found",
+    if (!item) {
+      return res.status(404).json({
+        message: "Item not found",
+      });
+    }
+
+    if (!item.monthlyBudget.userProfile.equals(req.profile._id)) {
+      return res.status(403).json({
+        message: "Forbidden",
+      });
+    }
+
+    const activityLogs = await ActivityLog.find({
+      budgetItem: item._id,
+    }).sort({
+      activityDate: -1,
     });
-  }
 
-  if (!item.monthlyBudget.userProfile.equals(req.profile._id)) {
-    return res.status(403).json({
-      message: "Forbidden",
-    });
-  }
-
-  const activityLogs = await ActivityLog.find({
-    budgetItem: item._id,
-  }).sort({
-    activityDate: -1,
-  });
-  
     res.status(200).json({ activityLogs });
   } catch (err) {
     console.error("getActivityLogsByBudget(): ", err);
@@ -150,19 +153,18 @@ export async function getActivityLogsByBudget(req, res) {
 // UPDATE
 /**
  * update activity log
- * @param {*} req 
- * @param {*} res 
- * @returns 
+ * @param {*} req
+ * @param {*} res
+ * @returns
  */
 export async function updateActivityLog(req, res) {
   try {
-    const activityLog = await ActivityLog.findById(req.params.id)
-      .populate({
-        path: "budgetItem",
-        populate: {
-          path: "monthlyBudget",
-        },
-      });
+    const activityLog = await ActivityLog.findById(req.params.id).populate({
+      path: "budgetItem",
+      populate: {
+        path: "monthlyBudget",
+      },
+    });
 
     if (!activityLog) {
       return res.status(404).json({
@@ -170,7 +172,9 @@ export async function updateActivityLog(req, res) {
       });
     }
 
-    if (!activityLog.budgetItem.monthlyBudget.userProfile.equals(req.profile._id)) {
+    if (
+      !activityLog.budgetItem.monthlyBudget.userProfile.equals(req.profile._id)
+    ) {
       return res.status(403).json({
         message: "Forbidden",
       });
@@ -201,19 +205,18 @@ export async function updateActivityLog(req, res) {
 // DELETE
 /**
  * delete activity log
- * @param {*} req 
- * @param {*} res 
- * @returns 
+ * @param {*} req
+ * @param {*} res
+ * @returns
  */
 export async function deleteActivityLog(req, res) {
   try {
-    const activityLog = await ActivityLog.findById(req.params.id)
-      .populate({
-        path: "budgetItem",
-        populate: {
-          path: "monthlyBudget",
-        },
-      });
+    const activityLog = await ActivityLog.findById(req.params.id).populate({
+      path: "budgetItem",
+      populate: {
+        path: "monthlyBudget",
+      },
+    });
 
     if (!activityLog) {
       return res.status(404).json({
@@ -221,12 +224,13 @@ export async function deleteActivityLog(req, res) {
       });
     }
 
-    if (!activityLog.budgetItem.monthlyBudget.userProfile.equals(req.profile._id)) {
+    if (
+      !activityLog.budgetItem.monthlyBudget.userProfile.equals(req.profile._id)
+    ) {
       return res.status(403).json({
         message: "Forbidden",
       });
     }
-
 
     const deletedActivityLog = await ActivityLog.findByIdAndDelete(
       req.params.id,
@@ -247,8 +251,9 @@ export async function deleteActivityLog(req, res) {
 // delete activity log by budget item
 export async function deleteActivityLogByBudget(req, res) {
   try {
-    const item = await BudgetItem.findById(req.params.budgetItemId)
-    .populate("monthlyBudget");
+    const item = await BudgetItem.findById(req.params.budgetItemId).populate(
+      "monthlyBudget",
+    );
 
     if (!item) {
       return res.status(404).json({

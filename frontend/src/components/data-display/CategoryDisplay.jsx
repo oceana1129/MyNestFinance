@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { ChevronUp, ChevronDown } from "lucide-react";
 import { getColorTheme } from "../../utils/ColorThemeLight";
+import { formatCurrency } from "../../utils/FormatCurrency";
 import BudgetCard from "./BudgetCard";
 import BudgetCardAdd from "./BudgetCardAdd";
 
@@ -11,6 +12,12 @@ const CategoryDisplay = ({
   targetAmount = 0,
   color = "green",
   items = [],
+  currentItem,
+  setCurrentItem,
+  onClick,
+  onClickItem,
+  onClickButton,
+  userSettings,
 }) => {
   const [hidden, setHidden] = useState(true);
 
@@ -24,7 +31,12 @@ const CategoryDisplay = ({
         onClick={() => setHidden((prev) => !prev)}
       >
         <div className="flex flex-col gap-2">
-          <h2 className="text-3xl font-bold text-slate-900">{title}</h2>
+          <h2
+            className="text-3xl font-bold text-slate-900 hover:text-slate-500 transition"
+            onClick={onClick}
+          >
+            {title}
+          </h2>
 
           <div className="flex items-center gap-3">
             <span
@@ -45,10 +57,12 @@ const CategoryDisplay = ({
             <div
               className={`text-3xl font-bold ${subtitle === "income" ? colors.text : "text-slate-900"}`}
             >
-              ${currentAmount}
+              {formatCurrency(currentAmount, userSettings)}
             </div>
 
-            <div className="text-xl text-slate-500">of ${targetAmount}</div>
+            <div className="text-xl text-slate-500">
+              of {formatCurrency(targetAmount, userSettings)}
+            </div>
           </div>
 
           <button className="mt-2 rounded-lg p-1 transition hover:bg-slate-100">
@@ -61,10 +75,23 @@ const CategoryDisplay = ({
       {!hidden && (
         <div className="flex flex-col gap-5">
           {items.map((item) => (
-            <BudgetCard key={item.id} {...item} />
+            <BudgetCard
+              key={item._id}
+              item={item}
+              color={color}
+              plannedAmount={item.plannedAmount}
+              active={currentItem?._id === item._id}
+              onClick={() => onClickItem(item)}
+              isExpense={subtitle === "expense"}
+              userSettings={userSettings}
+            />
           ))}
 
-          <BudgetCardAdd text={`add ${subtitle} +`} color={color} />
+          <BudgetCardAdd
+            text={`add ${subtitle} +`}
+            color={color}
+            onClick={onClickButton}
+          />
         </div>
       )}
     </div>
