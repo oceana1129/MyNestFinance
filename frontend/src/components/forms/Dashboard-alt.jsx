@@ -228,7 +228,7 @@ const Dashboard = () => {
   }, [dashboardMetrics, currentCategories, monthlyActivity]);
 
   useEffect(() => {
-    console.log(currentCategories);
+    console.log("current thing", currentActivity);
   }, [currentCategories]);
 
   // normalize id fields
@@ -299,13 +299,11 @@ const Dashboard = () => {
 
   async function handleCreateBudget() {
     try {
-      console.log("handleCreateBudget()");
       let createdBudget = await createBudget({
         month: month.month,
         year: month.year,
       });
 
-      console.log("createdBudget", createdBudget);
       createdBudget = createdBudget.savedBudget;
 
       const [income, expense] = await Promise.all([
@@ -326,8 +324,6 @@ const Dashboard = () => {
           categoryType: "expense",
         }),
       ]);
-
-      console.log(income);
 
       const categories = [income.savedCategory, expense.savedCategory];
 
@@ -388,9 +384,7 @@ const Dashboard = () => {
   async function handleCreateItem(itemData) {
     try {
       let created = await createItem(itemData);
-      console.log(created);
       created = created.savedItem;
-      console.log(created);
 
       setCurrentCategories((prev) =>
         prev.map((category) => {
@@ -424,7 +418,6 @@ const Dashboard = () => {
 
   async function handleCreateActivity(activityData) {
     try {
-      console.log("activityData", activityData);
       let created = await createActivityLog(activityData);
       created = created.savedActivityLog;
 
@@ -476,7 +469,6 @@ const Dashboard = () => {
   }
 
   function handleAddActivity(item) {
-    console.log("item", item);
     setCurrentItem(item);
     setShowCreateActivity(true);
   }
@@ -500,12 +492,8 @@ const Dashboard = () => {
 
   // edit item
   async function handleEditItem(updates) {
-    console.log("handleEditItem()");
-    console.log("updates", updates);
     try {
-      console.log("TODO: edit item");
       let updated = await updateItem(updates._id, updates);
-      console.log("updated", updated);
       updated = updated.updatedItem;
       setCurrentCategories((prev) =>
         prev.map((category) => {
@@ -536,31 +524,46 @@ const Dashboard = () => {
   }
 
   // edit activity
-  async function handleEditActivity(activity) {
+  async function handleEditActivity(updates) {
     try {
-      console.log("TODO: edit activity", activity);
-      // let updated = await updateActivityLog(activityId, updates);
-      // updated = updated.savedActivity; // ASSUMPTION, same wrapper convention
+      let updated = await updateActivityLog(updates._id, updates);
+      updated = updated.updatedActivityLog;
 
-      // setMonthlyActivity((prev) =>
-      //   (prev ?? []).map((activity) =>
-      //     activity._id === activityId ? { ...activity, ...updated } : activity,
-      //   ),
-      // );
+      // Update monthly activity list
+      setMonthlyActivity((prev) =>
+        (prev ?? []).map((activity) =>
+          idOf(activity._id) === idOf(updated._id)
+            ? { ...activity, ...updated }
+            : activity,
+        ),
+      );
 
-      // setCurrentCategories((prev) =>
-      //   prev.map((category) => ({
-      //     ...category,
-      //     items: (category.items ?? []).map((item) => ({
-      //       ...item,
-      //       activities: (item.activities ?? []).map((activity) =>
-      //         activity._id === activityId ? { ...activity, ...updated } : activity,
-      //       ),
-      //     })),
-      //   })),
-      // );
+      // Update activity under its item
+      setCurrentCategories((prev) =>
+        prev.map((category) => ({
+          ...category,
+          items: (category.items ?? []).map((item) => {
+            if (
+              !(item.activities ?? []).some(
+                (activity) => idOf(activity._id) === idOf(updated._id),
+              )
+            ) {
+              return item;
+            }
 
-      // updateStack("item", updatedItem._id, () => updatedItem);
+            return {
+              ...item,
+              activities: item.activities.map((activity) =>
+                idOf(activity._id) === idOf(updated._id)
+                  ? { ...activity, ...updated }
+                  : activity,
+              ),
+            };
+          }),
+        })),
+      );
+
+      updateStack("activity", updated._id, () => updated);
     } catch (error) {
       console.error("Failed to update activity:", error);
     }
@@ -568,15 +571,11 @@ const Dashboard = () => {
 
   // edit
   function onEditCategory(category) {
-    console.log("handle edit category");
-    console.log("currentCategory", currentCategory);
     setCurrentCategory(category);
     setShowEditCategory(true);
   }
 
   function onEditItem(item) {
-    console.log("handle edit item");
-    console.log("currentItem", currentItem);
     const parentCategory = currentCategories.find((c) =>
       (c.items ?? []).some((i) => idOf(i._id) === idOf(item._id)),
     );
@@ -587,8 +586,6 @@ const Dashboard = () => {
   }
 
   function onEditActivity(activity) {
-    console.log("handle edit activity");
-    console.log("currentActivity", currentActivity);
     let parentItem = null;
 
     for (const category of currentCategories) {
@@ -664,12 +661,10 @@ const Dashboard = () => {
         const category = currentCategories.find(
           (c) => idOf(c._id) === idOf(deletedItem.budgetCategory),
         );
-        console.log("category", category);
         const reorderedItems = (category?.items ?? [])
           .filter((i) => i._id !== item._id)
           .map((i, index) => ({ ...i, displayOrder: index }));
 
-        console.log("reorderedItems", reorderedItems);
         await reorderItems(
           reorderedItems.map((i) => ({
             id: i._id,
@@ -995,6 +990,13 @@ const Dashboard = () => {
               stack={stack}
               pushView={pushView}
               goBack={goBack}
+              onClickActivity={(activity) => {
+                console.log("onClickActivity()");
+
+                pushView("activity", activity);
+                setCurrentActivity(activity);
+                console.log("activity current", activity);
+              }}
               userSettings={userSettings}
               onAddItem={handleAddItem}
               onAddActivity={handleAddActivity}

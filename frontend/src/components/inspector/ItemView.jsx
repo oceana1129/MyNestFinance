@@ -11,6 +11,7 @@ export default function ItemView({
   data,
   pushView,
   goBack,
+  onClickActivity,
   onAddActivity,
   onEditItem,
   onDeleteItem,
@@ -62,7 +63,7 @@ export default function ItemView({
 
       <RecentActivity
         activities={data?.activities ?? []}
-        onActivityClick={(activity) => pushView("activity", activity)}
+        onClickActivity={onClickActivity}
       />
     </InspectorPage>
   );

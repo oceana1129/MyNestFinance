@@ -10,23 +10,28 @@ const InfoDisplay = ({
   text,
   color = "purple",
   content, // dropdown, toggle, or button
-  borderTop=false
+  borderTop = false,
+  onClick,
 }) => {
-  const colors = getColorTheme(color)
-  const bgColor = colors.bgExtraLight
-  const iconColor = colors.text
+  const colors = getColorTheme(color);
+  const bgColor = colors.bgExtraLight;
+  const iconColor = colors.text;
   const headerTextColor =
     variant === "detail" ? "text-slate-500" : "text-slate-700";
   const iconRounded = variant === "default" ? "rounded-md" : "rounded-full";
   const direction =
-    variant === "default" || variant === "item" || variant === "activity" 
+    variant === "default" || variant === "item" || variant === "activity"
       ? "flex-col"
       : "flex-col-reverse";
   const bgStyling = variant === "detail" ? "rounded-2xl bg-white p-4" : "";
-  const borderStyle = borderTop? "border-t-2 border-slate-300 pt-4" : ""
+  const borderStyle = borderTop ? "border-t-2 border-slate-300 pt-4" : "";
 
+  
   return (
-    <div className={`flex gap-4 items-center ${bgStyling} ${borderStyle}`}>
+    <div
+      className={`flex gap-4 items-center ${bgStyling} ${borderStyle}`}
+      onClick={onClick}
+    >
       {/* Icon */}
       {Icon && (
         <div>

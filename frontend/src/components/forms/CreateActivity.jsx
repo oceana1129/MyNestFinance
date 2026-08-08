@@ -78,7 +78,7 @@ export default function CreateActivity({
 
   const maxDate = new Date(year, month, 0).toISOString().split("T")[0];
 
-  // reset the form each time the overlay opens — preload from editData
+  // reset the form each time the overlay opens and preload from editData
   // when editing, otherwise default to today (within the current month)
   useEffect(() => {
     if (!open) return;
@@ -88,7 +88,7 @@ export default function CreateActivity({
     if (edit && editData) {
       setName(editData.name ?? "");
       setSpent(editData.amount ?? null);
-      setNote(editData.note ?? null);
+      setNote(editData.notes ?? null);
       setActivityDate(
         editData.date
           ? new Date(editData.date).toISOString().split("T")[0]
@@ -98,10 +98,6 @@ export default function CreateActivity({
       setName("");
       setSpent(null);
       setNote(null);
-      // NOTE: this used to be `setActivityDate(new Date())` — a raw Date
-      // object, which doesn't work as a controlled <input type="date">
-      // value (that needs a "YYYY-MM-DD" string). Fixed here since edit
-      // mode needs a correctly-formatted string anyway.
       const today = new Date().toISOString().split("T")[0];
       setActivityDate(today >= minDate && today <= maxDate ? today : minDate);
     }
@@ -135,7 +131,7 @@ export default function CreateActivity({
         name: name.trim(),
         amount: spent,
         date: activityDate,
-        note,
+        notes: note,
       });
 
       onClose();

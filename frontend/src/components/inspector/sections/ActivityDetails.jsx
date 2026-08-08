@@ -17,15 +17,17 @@ export default function ActivityDetails({ data }) {
         <InfoDisplay
           variant="detail"
           icon={DollarSign}
-          header="Amount"
-          text={`$${data?.amount ?? 0}`}
+          color="teal"
+          text="Amount"
+          header={`$${data?.amount ?? 0}`}
         />
 
         <InfoDisplay
           variant="detail"
           icon={CalendarDays}
-          header="Date"
-          text={
+          color="blue"
+          text="Date"
+          header={
             data?.activityDate
               ? new Date(data.activityDate).toLocaleDateString()
               : "—"

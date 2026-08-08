@@ -23,6 +23,7 @@ const viewMap = {
 export default function Inspector({
   stack,
   pushView,
+  onClickActivity,
   userSettings,
   goBack,
   onAddItem,
@@ -46,6 +47,7 @@ export default function Inspector({
       data={current.data}
       pushView={pushView}
       goBack={goBack}
+      onClickActivity={onClickActivity}
       userSettings={userSettings}
       onAddItem={onAddItem}
       onAddActivity={onAddActivity}

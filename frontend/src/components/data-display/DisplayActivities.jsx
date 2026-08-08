@@ -5,15 +5,15 @@ import { formatDate } from "../../utils/FormatDate";
 import { formatCurrency } from "../../utils/FormatCurrency";
 
 const DisplayActivities = ({
+  onClickActivity,
   activities,
   variant,
   maxActivities = activities.length,
   userSettings,
 }) => {
   {
-    // console.log("Activities", activities);]
-    // console.log(activities);
-    // console.log(formatDate(activity.activityDate));
+    console.log("Activities", activities);
+    console.log(activities);
 
     return (
       <>
@@ -22,6 +22,7 @@ const DisplayActivities = ({
             .slice(0, maxActivities)
             .map((activity) => (
               <InfoDisplay
+                onClick={() => onClickActivity?.(activity)}
                 key={activity._id}
                 variant={variant}
                 icon={ICONS[activity.emoji] || ICONS["CircleHelp"]}
