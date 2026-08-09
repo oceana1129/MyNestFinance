@@ -31,7 +31,7 @@ const LogInForm = () => {
     setError("");
     try {
       await signIn(email, password);
-      navigate("/settings");
+      navigate("/plan");
     } catch (error) {
       setError("There was an error logging you in");
       console.error({ message: "Log In handle submit error", error });
