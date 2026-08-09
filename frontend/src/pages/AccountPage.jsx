@@ -2,7 +2,7 @@ import { UserAuth } from "../context/AuthContext";
 import { useNavigate } from "react-router";
 import NavBar from "../components/navigation/NavBar";
 import AppPageDisplay from "../components/data-display/AppPageDisplay";
-import { formatCurrency } from "../utils/formatCurrency.js";
+import { formatCurrency } from "../utils/FormatCurrency.js";
 
 const AccountPage = () => {
   const { user, profile, logout } = UserAuth();
