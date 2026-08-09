@@ -36,7 +36,7 @@ const FEATURES = [
     icon: BarChart3,
     iconBg: "bg-emerald-100 text-emerald-600",
     title: "Plan vs actual",
-    text: "Set a planned budget each month, then track what you actually spent. See the gap at a glance without digging through rows.",
+    text: "Set a planned budget each month, then track what you actually spent. See the gap at a glance.",
   },
   {
     icon: RefreshCw,
@@ -54,13 +54,13 @@ const FEATURES = [
     icon: LineChart,
     iconBg: "bg-violet-100 text-violet-600",
     title: "Visual insights",
-    text: "Soft, readable charts that show spending trends over time. Helpful context, not a wall of numbers.",
+    text: "Soft, readable charts that show spending trends over time.",
   },
   {
     icon: Landmark,
     iconBg: "bg-rose-100 text-rose-600",
     title: "Debt tracker",
-    text: "Track balances, minimum payments, and interest rates. See your remaining balance shrink as you chip away at it.",
+    text: "Track balances, minimum payments, and interest rates. And chip away at your remaining balances.",
   },
 ];
 
@@ -68,7 +68,7 @@ const STEPS = [
   {
     icon: UserPlus,
     title: "Create your account",
-    text: "Sign up with your email. No credit card, no subscription tricks. Your data stays private and yours.",
+    text: "Sign up with your email. No credit card, no subscription needed. Your data stays private and yours.",
   },
   {
     icon: FolderPlus,
@@ -78,7 +78,7 @@ const STEPS = [
   {
     icon: PenLine,
     title: "Set your plan for the month",
-    text: "Enter how much you plan to earn, spend, or pay off. Keep it rough — you can adjust anytime. There's no wrong way to start.",
+    text: "Enter how much you plan to earn, spend, or pay off. You can adjust anytime. There's no wrong way to start.",
   },
   {
     icon: MapPin,
@@ -88,7 +88,7 @@ const STEPS = [
   {
     icon: Sprout,
     title: "Check your insights, feel good",
-    text: "At the end of the month, review what worked and what you'd like to adjust. Budgeting is a practice, not a test.",
+    text: "At the end of the month, review what worked and what you'd like to adjust.",
   },
 ];
 
@@ -268,7 +268,7 @@ const HomePage = () => {
               Up and running in minutes.
             </h2>
             <p className="mt-3 text-slate-600">
-              No onboarding maze. Just a few gentle steps to get your first
+              No onboarding maze. Just a few simple steps to get your first
               budget set up.
             </p>
           </div>
