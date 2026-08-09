@@ -21,7 +21,7 @@ import dashboardRoutes from "./routes/dashboardRoutes.js";
 dotenv.config();
 // get port from env
 const PORT = process.env.PORT || 5001;
-const FRONTEND_URL = process.env.FRONTEND_URL || 5173;
+
 // set up express
 const app = express();
 // use use middleware cors on front end url

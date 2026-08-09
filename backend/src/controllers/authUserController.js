@@ -21,7 +21,7 @@ export async function getAllAuthUsers(_, res) {
  */
 export async function syncAuthUser(req, res) {
   try {
-    //console.log("syncAuthUser(): syncing user for auth");
+    console.log("syncAuthUser(): syncing user for auth", req.user);
 
     const { uid, email, firebase } = req.user;
 
@@ -36,6 +36,7 @@ export async function syncAuthUser(req, res) {
     // NEW USER (first login and signup)
     if (!authUser) {
       // create a new user
+      console.log("creating a new user:");
       authUser = await AuthUser.create({
         _firebaseUid: uid,
         emailAddress: email,
@@ -48,7 +49,7 @@ export async function syncAuthUser(req, res) {
         authUser: authUser._id,
       });
 
-      // console.log("syncUser(): created AuthUser");
+      console.log("syncUser(): created AuthUser");
     }
     // EXISTING USER
     else {
@@ -68,7 +69,7 @@ export async function syncAuthUser(req, res) {
       profile,
     });
   } catch (err) {
-    // console.error("syncAuthUser(): ", err);
+    console.error("syncAuthUser(): ", err);
 
     res.status(500).json({
       message: err.message,
